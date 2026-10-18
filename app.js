@@ -1,7 +1,7 @@
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.9.0/firebase-app.js";
 import {
   getFirestore, collection, addDoc, deleteDoc, updateDoc, doc,
-  onSnapshot, query, orderBy, serverTimestamp, collectionGroup
+  onSnapshot, query, orderBy, serverTimestamp
 } from "https://www.gstatic.com/firebasejs/10.9.0/firebase-firestore.js";
 import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.9.0/firebase-auth.js";
 import { createClient } from "https://cdn.jsdelivr.net/npm/@supabase/supabase-js/+esm";
@@ -27,8 +27,7 @@ const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 const PKG_COLLECTION = "tour_packages";
 
 let packages = [], promos = [], inquiries = [], usersList = [], chats = [];
-let reviewStats = {}; // packageId -> { sum, count } (totoong reviews galing sa app users)
-let pkgFilter = "All", inqFilter = "all", activeChat = null, currentInq = null;
+let pkgFilter = "All", inqFilter = "all", revFilter = "all", activeChat = null, currentInq = null;
 const files = { pkg: null, promo: null };
 
 /* ---------- Helper Functions ---------- */
@@ -99,6 +98,7 @@ export function go(sec, btn) {
     packages: "Tour Packages", 
     promos: "Promos & Banners", 
     inquiries: "Booking Inquiries", 
+    revenue: "Payments & Revenue",
     users: "Users & Accounts", 
     chatbot: "Chatbot Logs", 
     analytics: "Analytics" 
@@ -126,9 +126,6 @@ export function openPkgForm(id) {
   $("pkg-price").value = g("price", "");
   $("pkg-cat").value = g("category", "Beach & Island");
   $("pkg-route").value = g("route");
-  $("pkg-featured").value = pkg?.featured === true ? "true" : "false";
-  $("pkg-featured-order").value = g("featuredOrder", "");
-  $("pkg-featured-until").value = g("featuredUntil", "");
   
   let incText = "";
   if (Array.isArray(pkg?.inclusions)) {
@@ -226,6 +223,8 @@ export async function savePackage() {
       gallery: [poster],
       isActive: true,
       status: "active",
+      rating: "4.8",
+      reviews: 18,
       groupMin: 1,
       groupMax: 10,
       activity: "Easy",
@@ -233,11 +232,7 @@ export async function savePackage() {
       bestFor: ["Couples", "Barkada", "Solo", "Families"],
       inclusions: incList.length > 0 ? incList : ["Hotel Accommodation", "Daily Breakfast", "Airport Transfers"],
       exclusions: excList.length > 0 ? excList : ["Airfare Tickets", "Personal Expenses"],
-      itineraryText: val("pkg-itin"),
-      // Home screen placement (Featured Packages sa mobile app)
-      featured: $("pkg-featured").value === "true",
-      featuredOrder: Number($("pkg-featured-order").value) || null,
-      featuredUntil: $("pkg-featured-until").value || null
+      itineraryText: val("pkg-itin")
     };
 
     if (id) {
@@ -249,8 +244,6 @@ export async function savePackage() {
       await addDoc(collection(db, PKG_COLLECTION), { 
         ...data, 
         views: 0, 
-        rating: 0,
-        reviews: 0,
         createdAt: serverTimestamp() 
       });
     }
@@ -276,40 +269,16 @@ export async function removePkg(id) {
   }
 }
 
-/* Featured = featured:true at hindi pa lampas sa featuredUntil */
-const todayStr = () => new Date().toISOString().slice(0, 10);
-const isFeaturedNow = p => p.featured === true && (!p.featuredUntil || p.featuredUntil >= todayStr());
-
-export async function toggleFeatured(id) {
-  const p = packages.find(x => x.id === id);
-  if (!p) return;
-  const turnOn = p.featured !== true;
-  const data = { featured: turnOn, updatedAt: serverTimestamp() };
-  if (turnOn) {
-    // expired na dati? i-clear para hindi agad mawala; ilagay sa dulo ng order
-    if (p.featuredUntil && p.featuredUntil < todayStr()) data.featuredUntil = null;
-    if (!p.featuredOrder) {
-      data.featuredOrder = Math.max(0, ...packages.map(x => Number(x.featuredOrder) || 0)) + 1;
-    }
-  }
-  try {
-    await updateDoc(doc(db, PKG_COLLECTION, id), data);
-    toast(turnOn ? "Added to Featured Packages on the app." : "Removed from Featured. Now under Recommended only.");
-  } catch (err) {
-    toast("Update failed: " + err.message, "err");
-  }
-}
-
 export function renderPkgs() {
   const q = val("pkg-search").toLowerCase();
   const list = packages.filter(p =>
-    (pkgFilter === "All" || (pkgFilter === "Featured" ? isFeaturedNow(p) : p.region === pkgFilter)) &&
+    (pkgFilter === "All" || p.region === pkgFilter) &&
     (!q || [p.name, p.title, p.code, p.dest, p.destination, p.location].some(v => String(v || "").toLowerCase().includes(q)))
   );
   
   const tbody = $("pkg-body");
   if (!list.length) { 
-    tbody.innerHTML = emptyRow(10, "No packages found. Click “Add new package” to create one."); 
+    tbody.innerHTML = emptyRow(9, "No packages found. Click “Add new package” to create one."); 
     return; 
   }
 
@@ -322,13 +291,7 @@ export function renderPkgs() {
       <td>${pillRegion(p.region)}</td>
       <td class="td-muted">${esc(p.dur || p.durationLabel)}</td>
       <td class="td-navy">${peso(p.price)}</td>
-      <td>${(() => { const st = reviewStats[p.id]; return st && st.count ? `<span class="pill pill-view"><i class="ti ti-star-filled"></i> ${(st.sum / st.count).toFixed(1)} (${st.count})</span>` : `<span class="td-muted">No reviews yet</span>`; })()}</td>
-      <td>
-        <button class="star-btn ${isFeaturedNow(p) ? "on" : ""}" onclick="toggleFeatured('${p.id}')" title="${isFeaturedNow(p) ? "Remove from Featured" : "Feature on app Home"}" aria-label="Toggle featured"><i class="ti ti-star${isFeaturedNow(p) ? "-filled" : ""}"></i></button>
-        ${p.featured === true ? (isFeaturedNow(p)
-          ? `<span class="pill pill-feat">#${p.featuredOrder || "–"}${p.featuredUntil ? " · until " + esc(p.featuredUntil) : ""}</span>`
-          : `<span class="pill pill-off">Expired</span>`) : ""}
-      </td>
+      <td><span class="pill pill-view"><i class="ti ti-star"></i> ${esc(p.rating || "4.8")} (${p.reviews || 0})</span></td>
       <td>
         <button class="btn-edit" onclick="openPkgForm('${p.id}')">Edit</button>
         <button class="btn-danger" onclick="removePkg('${p.id}')">Delete</button>
@@ -470,7 +433,7 @@ export function renderInquiries() {
         <td class="td-bold" style="font-size:12px;color:var(--nav);">${dateRange}</td>
         <td>${i.pax || 1} pax</td>
         <td class="td-navy">${peso(amount(i))}</td>
-        <td class="td-mono">${esc(i.paymentMethod || "GCash")}</td>
+        <td class="td-mono">${esc(i.paymentMethod || "UnionBank QR Ph")}</td>
         <td>${pillStatus(i.status || "pending")}</td>
         <td><button class="btn-outline" onclick="openDetail('${i.id}')">View</button></td>
       </tr>`;
@@ -489,7 +452,7 @@ export function exportInquiries() {
     pkgName(i), 
     i.pax || 1, 
     amount(i), 
-    i.paymentMethod || "GCash", 
+    i.paymentMethod || "UnionBank QR Ph", 
     i.status || "pending", 
     i.travelDate ? `${i.travelDate} to ${i.travelEndDate || ''}` : "", 
     i.specialRequests || "",
@@ -517,7 +480,7 @@ export function openDetail(id) {
   $("det-email").textContent = i.email || "Not provided";
   $("det-pax").textContent = `${i.pax || 1} traveler${(i.pax || 1) > 1 ? 's' : ''}`;
   $("det-price").textContent = peso(amount(i));
-  $("det-pay").textContent = i.paymentMethod || "GCash";
+  $("det-pay").textContent = i.paymentMethod || "UnionBank QR Ph";
   
   const dateStr = i.travelDate 
     ? `${i.travelDate}${i.travelEndDate ? ' – ' + i.travelEndDate : ''}` 
@@ -559,11 +522,111 @@ async function setStatus(status, stamp, msg) {
 }
 
 export const sendInquiryReply = () => setStatus("responded", "respondedAt", "Inquiry marked as responded with notes.");
-export const confirmInquiry = () => setStatus("confirmed", "confirmedAt", "Booking inquiry confirmed.");
+export const confirmInquiry = () => setStatus("confirmed", "confirmedAt", "Booking inquiry confirmed as paid.");
 export const cancelInquiry = () => {
   if (!confirm("Reject or cancel this inquiry?")) return;
   setStatus("cancelled", "cancelledAt", "Booking marked as cancelled.");
 };
+
+/* ---------- Payments & Revenue Ledger ---------- */
+export function filterRev(mode, btn) {
+  revFilter = mode;
+  document.querySelectorAll("#revenue-filters .filt-btn").forEach(b => b.classList.remove("on"));
+  btn?.classList.add("on");
+  renderRevenue();
+}
+
+function getPaidInquiries() {
+  const q = val("revenue-search").toLowerCase();
+  return inquiries.filter(i => {
+    const isPaid = ["confirmed", "paid"].includes(i.status);
+    if (!isPaid) return false;
+    const method = String(i.paymentMethod || "").toLowerCase();
+    const matchChannel = (revFilter === "all") ||
+      (revFilter === "ub" && method.includes("unionbank")) ||
+      (revFilter === "bpi" && method.includes("bpi"));
+    const matchQuery = !q || [i.client, i.name, pkgName(i), i.id, i.code, i.reference, i.paymentMethod].some(v => String(v || "").toLowerCase().includes(q));
+    return matchChannel && matchQuery;
+  });
+}
+
+export function renderRevenue() {
+  const paidList = getPaidInquiries();
+  const allPaid = inquiries.filter(i => ["confirmed", "paid"].includes(i.status));
+
+  const totalCollected = allPaid.reduce((sum, item) => sum + amount(item), 0);
+  const ubItems = allPaid.filter(i => String(i.paymentMethod || "").toLowerCase().includes("unionbank"));
+  const bpiItems = allPaid.filter(i => String(i.paymentMethod || "").toLowerCase().includes("bpi"));
+
+  const ubVol = ubItems.reduce((sum, item) => sum + amount(item), 0);
+  const bpiVol = bpiItems.reduce((sum, item) => sum + amount(item), 0);
+  const totalPax = allPaid.reduce((sum, item) => sum + (Number(item.pax) || 1), 0);
+  const avgVal = totalPax > 0 ? (totalCollected / totalPax) : 0;
+
+  if ($("rev-total-collected")) $("rev-total-collected").textContent = peso(totalCollected);
+  if ($("rev-paid-count")) $("rev-paid-count").textContent = `${allPaid.length} confirmed bookings`;
+  if ($("rev-ub-volume")) $("rev-ub-volume").textContent = peso(ubVol);
+  if ($("rev-ub-count")) $("rev-ub-count").textContent = `${ubItems.length} transactions`;
+  if ($("rev-bpi-volume")) $("rev-bpi-volume").textContent = peso(bpiVol);
+  if ($("rev-bpi-count")) $("rev-bpi-count").textContent = `${bpiItems.length} transactions`;
+  if ($("rev-avg-value")) $("rev-avg-value").textContent = peso(avgVal);
+
+  const tbody = $("revenue-body");
+  if (!tbody) return;
+
+  if (!paidList.length) {
+    tbody.innerHTML = emptyRow(9, "No paid transactions were found for this filter.");
+    return;
+  }
+
+  tbody.innerHTML = paidList.map(i => {
+    const dateRange = i.travelDate 
+      ? `${esc(i.travelDate)}${i.travelEndDate ? ' – ' + esc(i.travelEndDate) : ''}`
+      : "Flexible";
+
+    return `
+      <tr>
+        <td class="td-mono">${esc((i.code || i.reference || i.id).substring(0, 10))}</td>
+        <td class="td-bold">
+          ${esc(i.client || i.name || "Traveler")}
+          <div class="td-muted" style="font-size:11px;font-weight:400;">${esc(i.phone || maskEmail(i.email))}</div>
+        </td>
+        <td class="td-muted">${esc(pkgName(i))}</td>
+        <td class="td-bold" style="font-size:12px;color:var(--nav);">${dateRange}</td>
+        <td>${i.pax || 1} pax</td>
+        <td class="td-navy" style="color:var(--green);font-size:14px;">${peso(amount(i))}</td>
+        <td class="td-mono"><span class="pill pill-view"><i class="ti ti-credit-card"></i> ${esc(i.paymentMethod || "UnionBank QR Ph")}</span></td>
+        <td class="td-muted">${fmtDate(i.confirmedAt || i.createdAt)}</td>
+        <td><span class="pill pill-conf">Paid &amp; Confirmed</span></td>
+      </tr>`;
+  }).join("");
+}
+
+export function exportRevenue() {
+  const rows = getPaidInquiries();
+  if (!rows.length) return toast("No paid records to export.", "err");
+  const head = ["Receipt/Ref", "Client", "Phone", "Email", "Package", "Pax", "Amount Paid", "Channel", "Confirmed Date", "Travel Schedule"];
+  const lines = rows.map(i => [
+    i.code || i.reference || i.id,
+    i.client || i.name || "",
+    i.phone || "",
+    i.email || "",
+    pkgName(i),
+    i.pax || 1,
+    amount(i),
+    i.paymentMethod || "UnionBank QR Ph",
+    fmtDate(i.confirmedAt || i.createdAt),
+    i.travelDate ? `${i.travelDate} to ${i.travelEndDate || ''}` : "Flexible"
+  ].map(v => `"${String(v).replace(/"/g, '""')}"`).join(","));
+
+  const blob = new Blob(["\ufeff" + [head.join(","), ...lines].join("\n")], { type: "text/csv;charset=utf-8" });
+  const a = document.createElement("a");
+  a.href = URL.createObjectURL(blob);
+  a.download = `mkdwander-revenue-${new Date().toISOString().slice(0, 10)}.csv`;
+  a.click();
+  URL.revokeObjectURL(a.href);
+  toast("Revenue CSV exported.");
+}
 
 /* ---------- Registered Users ---------- */
 export function renderUsers() {
@@ -571,7 +634,7 @@ export function renderUsers() {
   const list = usersList.filter(u => !q || String(u.fullName || u.displayName || u.firstName || "").toLowerCase().includes(q));
   const tbody = $("users-body");
   if (!list.length) { 
-    tbody.innerHTML = emptyRow(5, "No registered travelers found."); 
+    tbody.innerHTML = emptyRow(4, "No registered travelers found."); 
     return; 
   }
   
@@ -580,7 +643,6 @@ export function renderUsers() {
       <td class="td-bold"><i class="ti ti-user" style="margin-right:6px;color:var(--orange)"></i>${esc(u.fullName || u.displayName || u.firstName || "App Traveler")}</td>
       <td class="td-muted">${esc(maskEmail(u.email))}</td>
       <td><span class="pill pill-hash">${esc(hashUid(u.id))}</span></td>
-      <td><span class="pill pill-view"><i class="ti ti-bookmark"></i> ${u.savedCount || 0} saved</span></td>
       <td><span class="pill pill-conf">Active</span></td>
     </tr>`).join("");
 }
@@ -715,16 +777,6 @@ function initFirestoreRealtime() {
     renderPkgs(); 
     renderDashboardData(); 
   });
-  snap(collectionGroup(db, "reviews"), s => {
-    reviewStats = {};
-    s.docs.forEach(d => {
-      const r = d.data();
-      if (!r.packageId || !(Number(r.rating) > 0)) return;
-      const cur = reviewStats[r.packageId] || { sum: 0, count: 0 };
-      reviewStats[r.packageId] = { sum: cur.sum + Number(r.rating), count: cur.count + 1 };
-    });
-    renderPkgs();
-  });
   snap(query(collection(db, "promo_banners"), orderBy("createdAt", "desc")), s => { 
     promos = s.docs.map(d => ({ id: d.id, ...d.data() })); 
     renderPromos(); 
@@ -732,6 +784,7 @@ function initFirestoreRealtime() {
   snap(query(collection(db, "booking_inquiries"), orderBy("createdAt", "desc")), s => { 
     inquiries = s.docs.map(d => ({ id: d.id, ...d.data() })); 
     renderInquiries(); 
+    renderRevenue();
     renderDashboardData(); 
   });
   snap(collection(db, "users"), s => { 
@@ -747,7 +800,8 @@ function initFirestoreRealtime() {
 }
 
 Object.assign(window, {
-  go, toggleSidebar, toggleTheme, logout, openPkgForm, closePkgForm, previewImg, filterPkg, savePackage, removePkg, renderPkgs, toggleFeatured,
+  go, toggleSidebar, toggleTheme, logout, openPkgForm, closePkgForm, previewImg, filterPkg, savePackage, removePkg, renderPkgs,
   toggleAddPromoForm, saveNewPromo, togglePromo, removePromo, filterInq, renderInquiries, exportInquiries,
+  filterRev, renderRevenue, exportRevenue,
   openDetail, closeDetail, sendInquiryReply, confirmInquiry, cancelInquiry, renderUsers, openChat
 });
