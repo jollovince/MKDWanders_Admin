@@ -1,7 +1,7 @@
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.9.0/firebase-app.js";
 import {
   getFirestore, collection, addDoc, deleteDoc, updateDoc, doc,
-  onSnapshot, query, orderBy, serverTimestamp
+  onSnapshot, query, orderBy, serverTimestamp, collectionGroup
 } from "https://www.gstatic.com/firebasejs/10.9.0/firebase-firestore.js";
 import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.9.0/firebase-auth.js";
 import { createClient } from "https://cdn.jsdelivr.net/npm/@supabase/supabase-js/+esm";
@@ -27,6 +27,7 @@ const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 const PKG_COLLECTION = "tour_packages";
 
 let packages = [], promos = [], inquiries = [], usersList = [], chats = [];
+let reviewStats = {}; // packageId -> { sum, count } (totoong reviews galing sa app users)
 let pkgFilter = "All", inqFilter = "all", activeChat = null, currentInq = null;
 const files = { pkg: null, promo: null };
 
@@ -125,6 +126,9 @@ export function openPkgForm(id) {
   $("pkg-price").value = g("price", "");
   $("pkg-cat").value = g("category", "Beach & Island");
   $("pkg-route").value = g("route");
+  $("pkg-featured").value = pkg?.featured === true ? "true" : "false";
+  $("pkg-featured-order").value = g("featuredOrder", "");
+  $("pkg-featured-until").value = g("featuredUntil", "");
   
   let incText = "";
   if (Array.isArray(pkg?.inclusions)) {
@@ -222,8 +226,6 @@ export async function savePackage() {
       gallery: [poster],
       isActive: true,
       status: "active",
-      rating: "4.8",
-      reviews: 18,
       groupMin: 1,
       groupMax: 10,
       activity: "Easy",
@@ -231,7 +233,11 @@ export async function savePackage() {
       bestFor: ["Couples", "Barkada", "Solo", "Families"],
       inclusions: incList.length > 0 ? incList : ["Hotel Accommodation", "Daily Breakfast", "Airport Transfers"],
       exclusions: excList.length > 0 ? excList : ["Airfare Tickets", "Personal Expenses"],
-      itineraryText: val("pkg-itin")
+      itineraryText: val("pkg-itin"),
+      // Home screen placement (Featured Packages sa mobile app)
+      featured: $("pkg-featured").value === "true",
+      featuredOrder: Number($("pkg-featured-order").value) || null,
+      featuredUntil: $("pkg-featured-until").value || null
     };
 
     if (id) {
@@ -243,6 +249,8 @@ export async function savePackage() {
       await addDoc(collection(db, PKG_COLLECTION), { 
         ...data, 
         views: 0, 
+        rating: 0,
+        reviews: 0,
         createdAt: serverTimestamp() 
       });
     }
@@ -268,16 +276,40 @@ export async function removePkg(id) {
   }
 }
 
+/* Featured = featured:true at hindi pa lampas sa featuredUntil */
+const todayStr = () => new Date().toISOString().slice(0, 10);
+const isFeaturedNow = p => p.featured === true && (!p.featuredUntil || p.featuredUntil >= todayStr());
+
+export async function toggleFeatured(id) {
+  const p = packages.find(x => x.id === id);
+  if (!p) return;
+  const turnOn = p.featured !== true;
+  const data = { featured: turnOn, updatedAt: serverTimestamp() };
+  if (turnOn) {
+    // expired na dati? i-clear para hindi agad mawala; ilagay sa dulo ng order
+    if (p.featuredUntil && p.featuredUntil < todayStr()) data.featuredUntil = null;
+    if (!p.featuredOrder) {
+      data.featuredOrder = Math.max(0, ...packages.map(x => Number(x.featuredOrder) || 0)) + 1;
+    }
+  }
+  try {
+    await updateDoc(doc(db, PKG_COLLECTION, id), data);
+    toast(turnOn ? "Added to Featured Packages on the app." : "Removed from Featured. Now under Recommended only.");
+  } catch (err) {
+    toast("Update failed: " + err.message, "err");
+  }
+}
+
 export function renderPkgs() {
   const q = val("pkg-search").toLowerCase();
   const list = packages.filter(p =>
-    (pkgFilter === "All" || p.region === pkgFilter) &&
+    (pkgFilter === "All" || (pkgFilter === "Featured" ? isFeaturedNow(p) : p.region === pkgFilter)) &&
     (!q || [p.name, p.title, p.code, p.dest, p.destination, p.location].some(v => String(v || "").toLowerCase().includes(q)))
   );
   
   const tbody = $("pkg-body");
   if (!list.length) { 
-    tbody.innerHTML = emptyRow(9, "No packages found. Click “Add new package” to create one."); 
+    tbody.innerHTML = emptyRow(10, "No packages found. Click “Add new package” to create one."); 
     return; 
   }
 
@@ -290,7 +322,13 @@ export function renderPkgs() {
       <td>${pillRegion(p.region)}</td>
       <td class="td-muted">${esc(p.dur || p.durationLabel)}</td>
       <td class="td-navy">${peso(p.price)}</td>
-      <td><span class="pill pill-view"><i class="ti ti-star"></i> ${esc(p.rating || "4.8")} (${p.reviews || 0})</span></td>
+      <td>${(() => { const st = reviewStats[p.id]; return st && st.count ? `<span class="pill pill-view"><i class="ti ti-star-filled"></i> ${(st.sum / st.count).toFixed(1)} (${st.count})</span>` : `<span class="td-muted">No reviews yet</span>`; })()}</td>
+      <td>
+        <button class="star-btn ${isFeaturedNow(p) ? "on" : ""}" onclick="toggleFeatured('${p.id}')" title="${isFeaturedNow(p) ? "Remove from Featured" : "Feature on app Home"}" aria-label="Toggle featured"><i class="ti ti-star${isFeaturedNow(p) ? "-filled" : ""}"></i></button>
+        ${p.featured === true ? (isFeaturedNow(p)
+          ? `<span class="pill pill-feat">#${p.featuredOrder || "–"}${p.featuredUntil ? " · until " + esc(p.featuredUntil) : ""}</span>`
+          : `<span class="pill pill-off">Expired</span>`) : ""}
+      </td>
       <td>
         <button class="btn-edit" onclick="openPkgForm('${p.id}')">Edit</button>
         <button class="btn-danger" onclick="removePkg('${p.id}')">Delete</button>
@@ -677,6 +715,16 @@ function initFirestoreRealtime() {
     renderPkgs(); 
     renderDashboardData(); 
   });
+  snap(collectionGroup(db, "reviews"), s => {
+    reviewStats = {};
+    s.docs.forEach(d => {
+      const r = d.data();
+      if (!r.packageId || !(Number(r.rating) > 0)) return;
+      const cur = reviewStats[r.packageId] || { sum: 0, count: 0 };
+      reviewStats[r.packageId] = { sum: cur.sum + Number(r.rating), count: cur.count + 1 };
+    });
+    renderPkgs();
+  });
   snap(query(collection(db, "promo_banners"), orderBy("createdAt", "desc")), s => { 
     promos = s.docs.map(d => ({ id: d.id, ...d.data() })); 
     renderPromos(); 
@@ -699,7 +747,7 @@ function initFirestoreRealtime() {
 }
 
 Object.assign(window, {
-  go, toggleSidebar, toggleTheme, logout, openPkgForm, closePkgForm, previewImg, filterPkg, savePackage, removePkg, renderPkgs,
+  go, toggleSidebar, toggleTheme, logout, openPkgForm, closePkgForm, previewImg, filterPkg, savePackage, removePkg, renderPkgs, toggleFeatured,
   toggleAddPromoForm, saveNewPromo, togglePromo, removePromo, filterInq, renderInquiries, exportInquiries,
   openDetail, closeDetail, sendInquiryReply, confirmInquiry, cancelInquiry, renderUsers, openChat
 });
