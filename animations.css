@@ -1,0 +1,93 @@
+/* MKDWander Admin - smooth animations (load AFTER the main <style>) */
+:root{--ease:cubic-bezier(.22,1,.36,1);--ease-soft:cubic-bezier(.4,0,.2,1)}
+
+@keyframes fadeUp{from{opacity:0;transform:translateY(16px)}to{opacity:1;transform:none}}
+@keyframes slideRow{from{opacity:0;transform:translateX(-10px)}to{opacity:1;transform:none}}
+@keyframes popIn{from{opacity:0;transform:translateY(10px) scale(.97)}to{opacity:1;transform:none}}
+@keyframes growY{from{transform:scaleY(0)}to{transform:scaleY(1)}}
+@keyframes growX{from{transform:scaleX(0)}to{transform:scaleX(1)}}
+@keyframes toastOut{to{opacity:0;transform:translateX(24px)}}
+@keyframes dashMove{to{stroke-dashoffset:-13}}
+@keyframes ringPulse{0%{transform:scale(.7);opacity:.9}100%{transform:scale(1.5);opacity:0}}
+@keyframes spin{to{transform:rotate(360deg)}}
+@keyframes rippleOut{from{transform:scale(0);opacity:.28}to{transform:scale(1);opacity:0}}
+@keyframes dotPulse{0%,100%{box-shadow:0 0 0 3px rgba(34,197,94,.2)}50%{box-shadow:0 0 0 7px rgba(34,197,94,0)}}
+
+/* ---- Section change ---- */
+.section.active{animation:fadeUp .45s var(--ease) backwards}
+.hero{animation:fadeUp .6s var(--ease) backwards}
+.section.active .ph{animation:slideRow .5s var(--ease) backwards}
+
+/* ---- KPI + cards stagger (fill-mode backwards so hover transforms still work) ---- */
+.kpi-card,.card{animation:fadeUp .6s var(--ease) backwards}
+.kpi-card:nth-child(1){animation-delay:.05s}
+.kpi-card:nth-child(2){animation-delay:.12s}
+.kpi-card:nth-child(3){animation-delay:.19s}
+.kpi-card:nth-child(4){animation-delay:.26s}
+.two-col .card:nth-child(1){animation-delay:.2s}
+.two-col .card:nth-child(2){animation-delay:.28s}
+.two-col .card:nth-child(3){animation-delay:.36s}
+.two-col .card:nth-child(4){animation-delay:.44s}
+.tbl-wrap,.chat-list,.chat-win{animation:fadeUp .55s var(--ease) .1s backwards}
+
+/* ---- Hover / press feedback ---- */
+.kpi-card,.card,.tbl-wrap,.chat-list,.chat-win{transition:transform .3s var(--ease),box-shadow .3s var(--ease),border-color .3s}
+.kpi-card:hover,.card:hover{transform:translateY(-4px);box-shadow:0 14px 34px rgba(4,38,75,.14)}
+.kpi-ico{transition:transform .35s var(--ease)}
+.kpi-card:hover .kpi-ico{transform:scale(1.12) rotate(-6deg)}
+.nav-btn,.nav-btn i,.btn-orange,.btn-outline,.btn-send,.btn-confirm,.btn-ghost,.btn-danger,.btn-edit,.btn-full,.filt-btn,.foot-btns button,.search,.badge-warn{transition:transform .2s var(--ease),background .25s,color .25s,border-color .25s,box-shadow .25s,filter .2s}
+.nav-btn:hover{transform:translateX(3px)}
+.nav-btn:hover i{transform:scale(1.1)}
+.btn-orange:hover,.btn-outline:hover,.btn-send:hover,.btn-confirm:hover,.btn-ghost:hover,.btn-edit:hover,.btn-danger:hover,.filt-btn:hover,.badge-warn:hover{transform:translateY(-2px)}
+.btn-orange:hover{box-shadow:0 8px 18px rgba(253,120,48,.35)}
+.btn-orange:active,.btn-outline:active,.btn-send:active,.btn-confirm:active,.btn-ghost:active,.btn-edit:active,.btn-danger:active,.filt-btn:active,.btn-full:active{transform:scale(.96)}
+.search:focus{box-shadow:0 0 0 3px rgba(73,201,240,.2);border-color:var(--sky)}
+tbody tr{transition:background .2s}
+.poster-thumb,.promo-banner-thumb{transition:transform .35s var(--ease),box-shadow .35s}
+.poster-thumb:hover,.promo-banner-thumb:hover{transform:scale(1.08);box-shadow:0 8px 20px rgba(4,38,75,.25)}
+.inq-row,.chat-item{transition:background .2s,padding-left .25s var(--ease)}
+.inq-row:hover{padding-left:8px}
+.upload-box{transition:border-color .25s,background .25s,transform .25s var(--ease)}
+.upload-box:hover{transform:scale(1.01)}
+
+/* ---- Table / list rows ---- */
+tbody tr,.inq-row,.chat-item,.dest-row,.perf-row{animation:slideRow .45s var(--ease) backwards}
+tbody tr:nth-child(1),.inq-row:nth-child(1),.chat-item:nth-child(1),.dest-row:nth-child(1),.perf-row:nth-child(1){animation-delay:.03s}
+tbody tr:nth-child(2),.inq-row:nth-child(2),.chat-item:nth-child(2),.dest-row:nth-child(2),.perf-row:nth-child(2){animation-delay:.07s}
+tbody tr:nth-child(3),.inq-row:nth-child(3),.chat-item:nth-child(3),.dest-row:nth-child(3),.perf-row:nth-child(3){animation-delay:.11s}
+tbody tr:nth-child(4),.inq-row:nth-child(4),.chat-item:nth-child(4),.dest-row:nth-child(4),.perf-row:nth-child(4){animation-delay:.15s}
+tbody tr:nth-child(5),.inq-row:nth-child(5),.chat-item:nth-child(5),.dest-row:nth-child(5),.perf-row:nth-child(5){animation-delay:.19s}
+tbody tr:nth-child(6),.perf-row:nth-child(6){animation-delay:.23s}
+tbody tr:nth-child(7){animation-delay:.27s}
+tbody tr:nth-child(8){animation-delay:.31s}
+tbody tr:nth-child(n+9){animation-delay:.35s}
+
+/* ---- Charts ---- */
+.bar{transform-origin:bottom;animation:growY .8s var(--ease) backwards}
+.bar-wrap:nth-child(1) .bar{animation-delay:.10s}
+.bar-wrap:nth-child(2) .bar{animation-delay:.18s}
+.bar-wrap:nth-child(3) .bar{animation-delay:.26s}
+.bar-wrap:nth-child(4) .bar{animation-delay:.34s}
+.bar-wrap:nth-child(5) .bar{animation-delay:.42s}
+.bar-wrap:nth-child(6) .bar{animation-delay:.50s}
+.bar-val,.bar-lbl{animation:fadeUp .6s var(--ease) .3s backwards}
+.prog-fill{transform-origin:left;animation:growX 1s var(--ease) .25s backwards}
+
+/* ---- Forms, detail drawer, chat bubbles ---- */
+.add-form,.inq-detail{animation:popIn .4s var(--ease) backwards}
+.bubble-user,.bubble-bot{animation:popIn .35s var(--ease) backwards}
+.bubble-user{transform-origin:bottom right}
+.bubble-bot{transform-origin:bottom left}
+
+/* ---- Hero decoration ---- */
+.hero svg path{animation:dashMove 1.4s linear infinite}
+.hero svg circle:last-child{transform-box:fill-box;transform-origin:center;animation:ringPulse 2.2s ease-out infinite}
+.online-dot{animation:dotPulse 2s ease-in-out infinite}
+
+/* ---- Toast in/out ---- */
+.toast{animation:popIn .35s var(--ease),toastOut .3s var(--ease-soft) 2.85s forwards}
+
+/* ---- Loader icon + ripple ---- */
+.ti-loader{display:inline-block;animation:spin .9s linear infinite}
+.btn-orange,.btn-outline,.btn-send,.btn-confirm,.btn-ghost,.btn-full,.filt-btn{position:relative;overflow:hidden}
+.ripple{position:absolute;border-radius:50%;background:currentColor;pointer-events:none;transform:scale(0);animation:rippleOut .6s var(--ease-soft)}
