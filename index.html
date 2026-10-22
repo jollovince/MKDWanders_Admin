@@ -5,15 +5,16 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>MKDWander Admin Dashboard</title>
 <link rel="icon" type="image/png" href="images/logo.png">
-<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@latest/tabler-icons.min.css">
 <style>
 *{box-sizing:border-box;margin:0;padding:0}
 :root{--nav:#04264B;--nav2:#0A3563;--orange:#FD7830;--sky:#49C9F0;--gold:#FFBF49;--green:#16A34A;--red:#DC2626;
 --bg:#EEF2F8;--card:#fff;--soft:#F6F8FC;--border:#E3E8F0;--muted:#74809A;--text:#2B364A;--head:#04264B;--shadow:0 1px 2px rgba(4,38,75,.05),0 8px 24px rgba(4,38,75,.06)}
 [data-theme=dark]{--bg:#0A1424;--card:#111E33;--soft:#16253D;--border:#22344F;--muted:#8A9AB5;--text:#DCE4F2;--head:#fff;--shadow:0 8px 24px rgba(0,0,0,.35)}
-body{font-family:'Plus Jakarta Sans',sans-serif;background:var(--bg);color:var(--text);display:flex;height:100vh;overflow:hidden;font-size:13px;line-height:1.5;-webkit-font-smoothing:antialiased}
+body{font-family:'Inter',system-ui,-apple-system,'Segoe UI',sans-serif;font-feature-settings:'cv11','ss01','tnum' 0;background:var(--bg);color:var(--text);display:flex;height:100vh;overflow:hidden;font-size:13px;line-height:1.5;-webkit-font-smoothing:antialiased}
 button,input,select,textarea{font-family:inherit;color:inherit}
+td,.td-bold,.td-navy,.stat-num{font-variant-numeric:tabular-nums}
 :focus-visible{outline:2px solid var(--sky);outline-offset:2px}
 .sidebar{width:248px;min-width:248px;margin:12px 0 12px 12px;height:calc(100vh - 24px);border-radius:22px;background:linear-gradient(180deg,var(--nav),#021733);display:flex;flex-direction:column;transition:.2s;overflow:hidden;box-shadow:0 14px 34px rgba(4,38,75,.3)}
 .sidebar.collapsed{width:72px;min-width:72px}
@@ -129,6 +130,37 @@ tbody tr:hover{background:var(--soft)}tbody tr:last-child td{border:none}
 .form-field input,.form-field select,.form-field-full input,.form-field-full textarea{width:100%;padding:10px 12px;border-radius:10px;border:1px solid var(--border);background:var(--soft);font-size:13px}
 .form-field input:focus,.form-field select:focus,.form-field-full textarea:focus,.reply-textarea:focus{outline:none;border-color:var(--sky);box-shadow:0 0 0 3px rgba(73,201,240,.2)}
 .form-field-full{grid-column:1/-1}
+.feature-box{background:var(--soft);border:1.5px dashed var(--gold);border-radius:14px;padding:16px}
+.feature-hd{font-size:13px;font-weight:800;color:var(--head);margin-bottom:12px;display:flex;align-items:center;gap:8px}
+.feature-hd i{color:var(--gold);font-size:18px}
+.feature-note{font-size:12px;color:var(--muted);margin-top:10px}
+.gal-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(130px,1fr));gap:10px;margin-top:10px}
+.gal-item{position:relative;border-radius:12px;overflow:hidden;border:2px solid var(--border);background:var(--soft)}
+.gal-item.first{border-color:var(--orange)}
+.gal-item img{width:100%;height:92px;object-fit:cover;display:block}
+.gal-tag{position:absolute;left:6px;top:6px;background:rgba(4,38,75,.78);color:#fff;font-size:10px;font-weight:700;border-radius:6px;padding:2px 7px}
+.gal-item.first .gal-tag{background:var(--orange)}
+.gal-act{display:flex;justify-content:space-between;gap:4px;padding:5px}
+.gal-act button{flex:1;border:1px solid var(--border);background:#fff;border-radius:7px;height:28px;cursor:pointer;font-size:14px;color:var(--head)}
+.gal-act button:hover{border-color:var(--orange);color:var(--orange)}
+.scan-row{display:flex;flex-wrap:wrap;align-items:center;gap:12px;margin-top:10px}
+.scan-ow{display:flex;align-items:center;gap:6px;font-size:12px;font-weight:500;color:var(--muted);margin:0}
+.scan-ow input{width:auto}
+.scan-status{font-size:12px;font-weight:600;color:var(--muted);flex-basis:100%}
+.autofilled{border-color:var(--orange)!important;background:#FFF8F2!important}
+.cp-box{background:var(--soft);border:1.5px dashed var(--sky);border-radius:14px;padding:16px}
+.cp-box .feature-hd i{color:var(--sky)}
+.cp-chips,.cp-pick{display:flex;flex-wrap:wrap;gap:8px}
+.cp-label{font-size:11px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.04em;margin:12px 0 6px}
+.cp-chip{display:inline-flex;align-items:center;gap:6px;background:#fff;border:1px solid var(--border);border-radius:10px;padding:7px 12px;font-size:13px;font-weight:600;color:var(--head)}
+.cp-chip.maybe{border-style:dashed}
+.cp-chip i{font-size:16px;color:var(--orange)}.cp-chip.more{color:var(--muted)}
+.cp-pick-btn{display:inline-flex;align-items:center;gap:6px;background:transparent;border:1px solid var(--border);border-radius:10px;padding:7px 12px;font:inherit;font-size:12px;font-weight:600;color:var(--head);cursor:pointer}
+.cp-pick-btn.on{border-color:var(--orange);background:#FFF1E8;color:#B8470F}
+.cp-auto{font-size:11px;font-weight:700;background:#E6F7EC;color:#15803D;border-radius:6px;padding:2px 8px;margin-left:auto}
+.cp-auto.pin{background:#FFF1E8;color:#B8470F}
+.pill-feat{background:#FEF0CC;color:#9A5A08}.pill-feat::before{display:none}
+.star-btn{border:none;background:transparent;cursor:pointer;font-size:20px;color:#CBD5E1;line-height:1}.star-btn.on{color:var(--gold)}
 .upload-box{border:2px dashed var(--border);border-radius:12px;padding:18px;text-align:center;background:var(--soft);position:relative;color:var(--muted)}
 .upload-box:hover{border-color:var(--orange)}
 .upload-box input{position:absolute;inset:0;opacity:0;cursor:pointer;width:100%;height:100%}
@@ -215,6 +247,59 @@ tbody tr:hover{background:var(--soft)}tbody tr:last-child td{border:none}
         <div class="hero-actions">
           <button class="btn-orange" onclick="go('revenue',null)"><i class="ti ti-cash"></i> View Paid Bookings</button>
           <button class="btn-ghost" onclick="go('inquiries',null)">Review Inquiries</button>
+          <div class="form-field-full feature-box">
+            <div class="feature-hd"><i class="ti ti-star"></i> Home screen placement</div>
+            <div class="form-grid">
+              <div class="form-field"><label>Feature on app Home?</label><select id="pkg-featured"><option value="false">No &mdash; show under Suggestions only</option><option value="true">Yes &mdash; show in Featured Packages</option></select></div>
+              <div class="form-field"><label>Featured order (1 = first)</label><input type="number" id="pkg-featured-order" min="1" placeholder="1"></div>
+              <div class="form-field"><label>Featured until (optional)</label><input type="date" id="pkg-featured-until"></div>
+            </div>
+            <p class="feature-note">Featured = bagong package o may promo na gusto mong i-push. Lahat ng hindi featured ay lalabas pa rin sa <b>Recommended for you</b>, naka-rank ayon sa budget &amp; tour type ng user.</p>
+          </div>
+          <div class="form-field" style="grid-column:span 2"><label>Stops and highlights (comma-separated)</label><input id="pkg-route" placeholder="e.g. Big Lagoon, Secret Lagoon, Shimizu Island"></div>
+          <div class="form-field-full"><label>Inclusions (one per line)</label><textarea id="pkg-inc" class="reply-textarea" placeholder="3 Nights Hotel Stay&#10;Daily Breakfast" oninput="renderIncPreview()"></textarea></div>
+          <div class="form-field-full cp-box">
+            <div class="feature-hd"><i class="ti ti-layout-cards"></i> Card preview (ito ang lalabas sa app card) <span class="cp-auto" id="cp-mode">AUTO</span></div>
+            <div class="cp-chips" id="cp-chips"><span class="feature-note">Maglagay ng inclusions sa taas para lumabas ang preview.</span></div>
+            <div class="cp-label">Gusto mong ibang inclusion? I-click para i-pin (max 3)</div>
+            <div class="cp-pick" id="cp-pick"></div>
+            <p class="feature-note">Auto-pick ang pinaka-importante (hotel, breakfast, transfer, flight, ferry...). Ang na-pin mo ang unang ilalabas. Sa app, ang <b>kasya lang sa lapad ng card</b> ang makikita (karaniwan 2-3); ang natitira ay "+N more". Ang dashed na chip ay maaaring hindi kasya sa maliliit na phone.</p>
+          </div>
+          <div class="form-field-full"><label>Exclusions (one per line)</label><textarea id="pkg-exc" class="reply-textarea" placeholder="Airfare Tickets&#10;Travel Insurance"></textarea></div>
+          <div class="form-field-full"><label>Day-by-Day Itinerary</label><textarea id="pkg-itin" class="reply-textarea" placeholder="Day 1: Airport pickup and hotel check-in&#10;Day 2: Island hopping tour"></textarea></div>
+          <div class="form-field-full"><label>Package photos * (lalabas sa package details; i-swipe sa app kung higit sa isa)</label>
+            <div class="upload-box"><input type="file" id="gal-file" accept="image/*" multiple onchange="addGalleryFiles(event)"><i class="ti ti-photos"></i><span>Click or drag one or more tour photos (PNG, JPG). Pwedeng pumili ng marami nang sabay.</span></div>
+            <div class="gal-grid" id="gal-grid"></div>
+            <p class="feature-note"><b>Ang unang larawan</b> ang magiging <b>cover sa Home</b>. Gamitin ang mga arrow para ayusin ang pagkakasunod. Malinis na photo ang ilagay dito (walang text/poster).</p>
+          </div>
+          <div class="form-field-full"><label>Agency poster (optional)</label>
+            <div class="upload-box"><input type="file" id="pkg-file" accept="image/*" onchange="previewImg(event,'pkg-prev','pkg-hint','pkg')"><i class="ti ti-cloud-upload"></i><span id="pkg-hint">Click or drag the agency poster (PNG, JPG)</span><img id="pkg-prev" class="upload-preview" alt="Poster preview"></div>
+            <div class="scan-row"><button type="button" class="btn-outline" id="btn-scan" onclick="scanPoster()"><i class="ti ti-scan"></i> Scan poster &amp; auto-fill</button><label class="scan-ow"><input type="checkbox" id="scan-overwrite"> Palitan din ang mga may laman na</label><span class="scan-status" id="scan-status"></span></div>
+            <p class="feature-note">Binabasa ng browser mo ang poster (OCR) at pino-fill lang ang <b>Package name</b> at <b>Inclusions</b>. <b>Laging i-check</b> ang mga orange na fields bago i-save. Hindi ito ginagamit bilang cover; para lang sa scan.</p>
+          </div>
+        </div>
+        <div class="form-actions"><button class="btn-outline" onclick="closePkgForm()">Cancel</button><button class="btn-orange" id="btn-save-pkg" onclick="savePackage()"><i class="ti ti-check"></i> Save package</button></div>
+      </div>
+      <div class="tbl-wrap"><table><thead><tr><th>Photo</th><th>Code</th><th>Package name</th><th>Destination</th><th>Region</th><th>Duration</th><th>Price / pax</th><th>Rating</th><th>Featured</th><th>Actions</th></tr></thead>
+      <tbody id="pkg-body"><tr><td colspan="10" class="empty-row">Loading packages from Firestore...</td></tr></tbody></table></div>
+    </div>
+
+    <div class="section" id="sec-promos">
+      <div class="filter-row">
+        <div class="ph" style="margin:0"><div class="ph-ico"><i class="ti ti-discount-2"></i></div><div><h2>App promo banners &amp; vouchers</h2><p>These promos sync with the mobile app banner feed.</p></div></div>
+        <button class="btn-orange" onclick="toggleAddPromoForm()"><i class="ti ti-tag"></i> Add promo banner</button>
+      </div>
+      <div class="add-form" id="add-promo-form" style="border-top-color:var(--gold)">
+        <div class="add-form-title">Upload a new promo banner</div>
+        <div class="form-grid">
+          <div class="form-field"><label>Promo title</label><input id="new-promo-title" placeholder="e.g. Summer Island Fiesta 50% Off"></div>
+          <div class="form-field"><label>Voucher code</label><input id="new-promo-code" placeholder="e.g. SUMMER50"></div>
+          <div class="form-field"><label>Discount badge</label><input id="new-promo-discount" placeholder="e.g. 50% OFF"></div>
+          <div class="form-field"><label>Valid until</label><input type="date" id="new-promo-expiry"></div>
+          <div class="form-field" style="grid-column:span 2"><label>Short description</label><input id="new-promo-desc" placeholder="Applies to all Palawan and Boracay packages."></div>
+          <div class="form-field-full"><label>Promo banner image (landscape)</label>
+            <div class="upload-box"><input type="file" id="promo-file-input" accept="image/*" onchange="previewImg(event,'promo-preview-img','promo-upload-hint','promo')"><i class="ti ti-photo-heart"></i><span id="promo-upload-hint">Click or drag the promo image here</span><img id="promo-preview-img" class="upload-preview" alt="Promo preview"></div>
+          </div>
         </div>
         <svg viewBox="0 0 400 160" preserveAspectRatio="xMaxYMid slice" aria-hidden="true"><path d="M20 130 C110 130 120 40 210 70 S320 110 380 30" fill="none" stroke="#49C9F0" stroke-width="2" stroke-dasharray="6 7" stroke-linecap="round"/><circle cx="20" cy="130" r="6" fill="#FFBF49"/><circle cx="210" cy="70" r="5" fill="#49C9F0"/><circle cx="380" cy="30" r="7" fill="#FD7830"/><circle cx="380" cy="30" r="14" fill="none" stroke="#FD7830" stroke-opacity=".4"/></svg>
       </div>
@@ -243,6 +328,7 @@ tbody tr:hover{background:var(--soft)}tbody tr:last-child td{border:none}
           <button class="filt-btn" onclick="filterPkg('Luzon',this)">Luzon</button>
           <button class="filt-btn" onclick="filterPkg('Visayas',this)">Visayas</button>
           <button class="filt-btn" onclick="filterPkg('Mindanao',this)">Mindanao</button>
+          <button class="filt-btn" onclick="filterPkg('Featured',this)"><i class="ti ti-star"></i> Featured</button>
         </div>
         <div class="tools">
           <input class="search" id="pkg-search" placeholder="Search package, code, destination" oninput="renderPkgs()">
@@ -258,20 +344,35 @@ tbody tr:hover{background:var(--soft)}tbody tr:last-child td{border:none}
           <div class="form-field"><label>Destination Location</label><input id="pkg-dest" placeholder="e.g. El Nido, Palawan"></div>
           <div class="form-field"><label>Region</label><select id="pkg-region"><option>Luzon</option><option>Visayas</option><option>Mindanao</option></select></div>
           <div class="form-field"><label>Duration</label><input id="pkg-dur" placeholder="e.g. 4D - 3N"></div>
+          <div class="form-field"><label>Package type (label sa card)</label><input id="pkg-type" list="pkg-type-list" placeholder="e.g. Land Arrangement"><datalist id="pkg-type-list"><option value="Land Arrangement"><option value="Free &amp; Easy"><option value="Joiner Tour"><option value="Private Tour"><option value="Day Tour"></datalist></div>
           <div class="form-field"><label>Price per person (₱)</label><input type="number" id="pkg-price" placeholder="12500"></div>
           <div class="form-field"><label>Category</label><select id="pkg-cat"><option>Beach &amp; Island</option><option>Nature &amp; Eco</option><option>Adventure</option><option>Leisure</option></select></div>
           <div class="form-field" style="grid-column:span 2"><label>Stops and highlights (comma-separated)</label><input id="pkg-route" placeholder="e.g. Big Lagoon, Secret Lagoon, Shimizu Island"></div>
-          <div class="form-field-full"><label>Inclusions (one per line)</label><textarea id="pkg-inc" class="reply-textarea" placeholder="3 Nights Hotel Stay&#10;Daily Breakfast"></textarea></div>
+          <div class="form-field-full"><label>Inclusions (one per line)</label><textarea id="pkg-inc" class="reply-textarea" placeholder="3 Nights Hotel Stay&#10;Daily Breakfast" oninput="renderIncPreview()"></textarea></div>
+          <div class="form-field-full cp-box">
+            <div class="feature-hd"><i class="ti ti-layout-cards"></i> Card preview (ito ang lalabas sa app card) <span class="cp-auto" id="cp-mode">AUTO</span></div>
+            <div class="cp-chips" id="cp-chips"><span class="feature-note">Maglagay ng inclusions sa taas para lumabas ang preview.</span></div>
+            <div class="cp-label">Gusto mong ibang inclusion? I-click para i-pin (max 3)</div>
+            <div class="cp-pick" id="cp-pick"></div>
+            <p class="feature-note">Auto-pick ang pinaka-importante (hotel, breakfast, transfer, flight, ferry...). Ang na-pin mo ang unang ilalabas. Sa app, ang <b>kasya lang sa lapad ng card</b> ang makikita (karaniwan 2-3); ang natitira ay "+N more". Ang dashed na chip ay maaaring hindi kasya sa maliliit na phone.</p>
+          </div>
           <div class="form-field-full"><label>Exclusions (one per line)</label><textarea id="pkg-exc" class="reply-textarea" placeholder="Airfare Tickets&#10;Travel Insurance"></textarea></div>
           <div class="form-field-full"><label>Day-by-Day Itinerary</label><textarea id="pkg-itin" class="reply-textarea" placeholder="Day 1: Airport pickup and hotel check-in&#10;Day 2: Island hopping tour"></textarea></div>
-          <div class="form-field-full"><label>Tour poster / cover photo</label>
-            <div class="upload-box"><input type="file" id="pkg-file" accept="image/*" onchange="previewImg(event,'pkg-prev','pkg-hint','pkg')"><i class="ti ti-cloud-upload"></i><span id="pkg-hint">Click or drag an image here (PNG, JPG)</span><img id="pkg-prev" class="upload-preview" alt="Poster preview"></div>
+          <div class="form-field-full"><label>Package photos * (lalabas sa package details; i-swipe sa app kung higit sa isa)</label>
+            <div class="upload-box"><input type="file" id="gal-file" accept="image/*" multiple onchange="addGalleryFiles(event)"><i class="ti ti-photos"></i><span>Click or drag one or more tour photos (PNG, JPG). Pwedeng pumili ng marami nang sabay.</span></div>
+            <div class="gal-grid" id="gal-grid"></div>
+            <p class="feature-note"><b>Ang unang larawan</b> ang magiging <b>cover sa Home</b>. Gamitin ang mga arrow para ayusin ang pagkakasunod. Malinis na photo ang ilagay dito (walang text/poster).</p>
+          </div>
+          <div class="form-field-full"><label>Agency poster (optional)</label>
+            <div class="upload-box"><input type="file" id="pkg-file" accept="image/*" onchange="previewImg(event,'pkg-prev','pkg-hint','pkg')"><i class="ti ti-cloud-upload"></i><span id="pkg-hint">Click or drag the agency poster (PNG, JPG)</span><img id="pkg-prev" class="upload-preview" alt="Poster preview"></div>
+            <div class="scan-row"><button type="button" class="btn-outline" id="btn-scan" onclick="scanPoster()"><i class="ti ti-scan"></i> Scan poster &amp; auto-fill</button><label class="scan-ow"><input type="checkbox" id="scan-overwrite"> Palitan din ang mga may laman na</label><span class="scan-status" id="scan-status"></span></div>
+            <p class="feature-note">Binabasa ng browser mo ang poster (OCR) at pino-fill lang ang <b>Package name</b> at <b>Inclusions</b>. <b>Laging i-check</b> ang mga orange na fields bago i-save. Hindi ito ginagamit bilang cover; para lang sa scan.</p>
           </div>
         </div>
         <div class="form-actions"><button class="btn-outline" onclick="closePkgForm()">Cancel</button><button class="btn-orange" id="btn-save-pkg" onclick="savePackage()"><i class="ti ti-check"></i> Save package</button></div>
       </div>
-      <div class="tbl-wrap"><table><thead><tr><th>Poster</th><th>Code</th><th>Package name</th><th>Destination</th><th>Region</th><th>Duration</th><th>Price / pax</th><th>Rating</th><th>Actions</th></tr></thead>
-      <tbody id="pkg-body"><tr><td colspan="9" class="empty-row">Loading packages from Firestore...</td></tr></tbody></table></div>
+      <div class="tbl-wrap"><table><thead><tr><th>Photo</th><th>Code</th><th>Package name</th><th>Destination</th><th>Region</th><th>Duration</th><th>Price / pax</th><th>Rating</th><th>Featured</th><th>Actions</th></tr></thead>
+      <tbody id="pkg-body"><tr><td colspan="10" class="empty-row">Loading packages from Firestore...</td></tr></tbody></table></div>
     </div>
 
     <div class="section" id="sec-promos">
