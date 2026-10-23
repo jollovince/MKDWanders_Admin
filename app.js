@@ -1,7 +1,7 @@
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.9.0/firebase-app.js";
 import {
   getFirestore, collection, addDoc, deleteDoc, updateDoc, doc,
-  onSnapshot, query, orderBy, serverTimestamp, collectionGroup
+  onSnapshot, query, orderBy, serverTimestamp, collectionGroup, arrayUnion, Timestamp
 } from "https://www.gstatic.com/firebasejs/10.9.0/firebase-firestore.js";
 import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.9.0/firebase-auth.js";
 import { createClient } from "https://cdn.jsdelivr.net/npm/@supabase/supabase-js/+esm";
@@ -26,10 +26,11 @@ const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
 const PKG_COLLECTION = "tour_packages";
 
-let packages = [], promos = [], inquiries = [], usersList = [], chats = [];
+let packages = [], inquiries = [], usersList = [], chats = [];
 let reviewStats = {}; // packageId -> { sum, count } (totoong reviews galing sa app users)
+let chatFilter = "all";
 let pkgFilter = "All", inqFilter = "all", revFilter = "all", activeChat = null, currentInq = null;
-const files = { pkg: null, promo: null };
+const files = { pkg: null };
 let gal = []; // {url?, file?, src}  — gallery ng package; [0] = cover sa Home
 
 /* ---------- Helper Functions ---------- */
@@ -98,7 +99,6 @@ export function go(sec, btn) {
   const labels = { 
     dashboard: "Dashboard", 
     packages: "Tour Packages", 
-    promos: "Promos & Banners", 
     inquiries: "Booking Inquiries", 
     revenue: "Payments & Revenue",
     users: "Users & Accounts", 
@@ -652,86 +652,6 @@ export function renderPkgs() {
     </tr>`).join("");
 }
 
-/* ---------- Promo Banners Management ---------- */
-export function toggleAddPromoForm() {
-  const f = $("add-promo-form");
-  f.style.display = f.style.display === "block" ? "none" : "block";
-}
-
-export async function saveNewPromo() {
-  const title = val("new-promo-title");
-  if (!title) return toast("Enter a promo title.", "err");
-  const btn = $("btn-save-promo");
-  btn.disabled = true;
-
-  try {
-    let bannerUrl = "https://images.unsplash.com/photo-1507525428034-b723cf961d3e?q=80&w=800&auto=format&fit=crop";
-    if (files.promo) {
-      bannerUrl = await uploadImage(files.promo, "promos");
-    }
-
-    await addDoc(collection(db, "promo_banners"), {
-      title,
-      code: val("new-promo-code").toUpperCase() || "PROMO",
-      discount: val("new-promo-discount") || "SPECIAL OFFER",
-      expiry: $("new-promo-expiry").value || "No expiry",
-      description: val("new-promo-desc"),
-      bannerUrl,
-      isActive: true,
-      createdAt: serverTimestamp()
-    });
-
-    ["new-promo-title", "new-promo-code", "new-promo-discount", "new-promo-expiry", "new-promo-desc"].forEach(i => ($(i).value = ""));
-    $("promo-preview-img").style.display = "none";
-    files.promo = null;
-    toggleAddPromoForm();
-    toast("Promo banner posted to the app.");
-  } catch (err) { 
-    toast("Promo error: " + err.message, "err"); 
-  } finally { 
-    btn.disabled = false; 
-  }
-}
-
-export async function togglePromo(id) {
-  const p = promos.find(x => x.id === id);
-  if (!p) return;
-  await updateDoc(doc(db, "promo_banners", id), { isActive: p.isActive === false });
-  toast(p.isActive === false ? "Promo is now live." : "Promo hidden from the app.");
-}
-
-export async function removePromo(id) {
-  if (!confirm("Delete promo banner?")) return;
-  await deleteDoc(doc(db, "promo_banners", id));
-  toast("Promo deleted.");
-}
-
-function renderPromos() {
-  const tbody = $("promo-body");
-  if (!promos.length) { 
-    tbody.innerHTML = emptyRow(7, "No promo banners yet. Add one to show it in the app."); 
-    return; 
-  }
-
-  const today = new Date().setHours(0, 0, 0, 0);
-  tbody.innerHTML = promos.map(p => {
-    const expired = p.expiry && p.expiry !== "No expiry" && new Date(p.expiry) < today;
-    const live = p.isActive !== false && !expired;
-    return `<tr>
-      <td><img src="${esc(p.bannerUrl)}" class="promo-banner-thumb" alt="${esc(p.title)}"></td>
-      <td class="td-bold">${esc(p.title)}<div class="td-muted" style="font-weight:400;font-size:12px">${esc(p.description)}</div></td>
-      <td><span class="pill pill-hash" style="color:var(--orange);font-weight:800">${esc(p.code || "PROMO")}</span></td>
-      <td><span class="pill pill-conf">${esc(p.discount || "SPECIAL")}</span></td>
-      <td class="td-muted">${esc(p.expiry || "Flexible")}</td>
-      <td><span class="pill ${live ? "pill-conf" : "pill-off"}">${expired ? "Expired" : live ? "Live on app" : "Hidden"}</span></td>
-      <td>
-        <button class="btn-edit" onclick="togglePromo('${p.id}')">${p.isActive === false ? "Show" : "Hide"}</button>
-        <button class="btn-danger" onclick="removePromo('${p.id}')">Delete</button>
-      </td>
-    </tr>`;
-  }).join("");
-}
-
 /* ---------- Booking Inquiries Management ---------- */
 const pillRegion = r => `<span class="pill pill-${r === "Luzon" ? "luzon" : r === "Visayas" ? "visayas" : "mindanao"}">${esc(r || "Mindanao")}</span>`;
 
@@ -1001,37 +921,102 @@ export function renderUsers() {
 }
 
 /* ---------- Chatbot Logs ---------- */
+const chatState = c => c.status === "escalated" ? "escalated" : c.status === "resolved" ? "resolved" : "bot";
+const chatTime = c => (toDate(c.updatedAt || c.createdAt) || 0);
+
+export function filterChats(mode, btn) {
+  chatFilter = mode;
+  document.querySelectorAll("#chat-filters .filt-btn").forEach(b => b.classList.remove("on"));
+  btn?.classList.add("on");
+  renderChats();
+}
+
 function renderChats() {
   const box = $("chat-session-list");
-  if (!chats.length) { 
-    box.innerHTML = `<div class="empty-row">No chatbot sessions yet.</div>`; 
-    return; 
+  const need = chats.filter(c => chatState(c) === "escalated").length;
+  const badge = $("nav-chat-badge");
+  if (badge) badge.textContent = need || "";
+  const nf = $("chat-need-count");
+  if (nf) nf.textContent = need ? ` (${need})` : "";
+
+  const list = chats
+    .filter(c => chatFilter === "all" || (chatFilter === "need" ? chatState(c) === "escalated" : chatState(c) === chatFilter))
+    // Kailangan ng reply = nasa itaas, tapos pinakabago
+    .sort((a, b) => (chatState(b) === "escalated") - (chatState(a) === "escalated") || chatTime(b) - chatTime(a));
+
+  if (!list.length) {
+    box.innerHTML = `<div class="empty-row">${chats.length ? "No conversations in this filter." : "No chatbot sessions yet."}</div>`;
+    return;
   }
 
-  box.innerHTML = chats.map(c => {
+  box.innerHTML = list.map(c => {
     const msgs = c.messages || [];
     const last = msgs[msgs.length - 1];
+    const st = chatState(c);
+    const pill = st === "escalated" ? `<span class="pill pill-pend">Needs reply</span>`
+      : st === "resolved" ? `<span class="pill pill-conf">Resolved</span>`
+      : `<span class="pill pill-hash">${c.handledBy === "agent" ? "Agent" : "Bot"}</span>`;
     return `<div class="chat-item ${c.id === activeChat ? "on" : ""}" onclick="openChat('${c.id}')">
       <div class="chat-item-top">
         <span class="chat-item-name">${esc(c.userName || c.user || "Traveler")}</span>
         <span class="chat-time">${fmtDate(c.updatedAt || c.createdAt)}</span>
       </div>
       <div class="chat-preview">${esc(last?.text || last?.content || "No messages")}</div>
-      <span class="pill ${c.handledBy === "agent" ? "pill-resp" : "pill-hash"}">${c.handledBy === "agent" ? "Agent" : "Bot"} · ${msgs.length} msgs</span>
+      <div class="chat-meta">${pill}<span class="td-muted">${msgs.length} msgs</span></div>
     </div>`;
   }).join("");
 }
+
+const bubbleClass = m => { const s = m.role || m.sender; return s === "user" ? "bubble-user" : s === "agent" ? "bubble-agent" : "bubble-bot"; };
 
 export function openChat(id) {
   activeChat = id;
   const c = chats.find(x => x.id === id);
   if (!c) return;
+  const st = chatState(c);
   $("chat-active-name").textContent = c.userName || c.user || "Traveler";
-  $("chat-active-sub").textContent = `${(c.messages || []).length} messages · ${fmtDate(c.updatedAt || c.createdAt)}`;
-  $("chat-msgs-container").innerHTML = (c.messages || []).map(m =>
-    `<div class="${(m.role || m.sender) === "user" ? "bubble-user" : "bubble-bot"}">${esc(m.text || m.content)}</div>`
+  $("chat-active-sub").textContent = `${(c.messages || []).length} messages · ${fmtDate(c.updatedAt || c.createdAt)}` + (st === "escalated" ? " · Needs reply" : st === "resolved" ? " · Resolved" : "");
+  const box = $("chat-msgs-container");
+  box.innerHTML = (c.messages || []).map(m =>
+    `<div class="${bubbleClass(m)}">${(m.role || m.sender) === "agent" ? `<span class="bubble-tag">You (MKDWander team)</span>` : ""}${esc(m.text || m.content)}</div>`
   ).join("") || `<div class="empty-row">This session has no messages.</div>`;
+  box.scrollTop = box.scrollHeight;
+  $("chat-reply-bar").style.display = "flex";
+  $("btn-chat-resolve").style.display = st === "resolved" ? "none" : "inline-flex";
   renderChats();
+}
+
+export async function sendChatReply() {
+  const c = chats.find(x => x.id === activeChat);
+  const text = val("chat-reply-text");
+  if (!c || !text) return;
+  const btn = $("btn-chat-send");
+  btn.disabled = true;
+  try {
+    await updateDoc(doc(db, "chatbot_logs", c.id), {
+      messages: arrayUnion({ sender: "agent", text, at: Timestamp.now() }),
+      handledBy: "agent",
+      status: "escalated",          // bukas pa hanggang i-resolve
+      updatedAt: serverTimestamp()
+    });
+    $("chat-reply-text").value = "";
+    toast("Reply sent. Makikita ito ng traveler sa app agad.");
+  } catch (err) {
+    toast("Could not send: " + err.message, "err");
+  } finally {
+    btn.disabled = false;
+  }
+}
+
+export async function resolveChat() {
+  const c = chats.find(x => x.id === activeChat);
+  if (!c) return;
+  try {
+    await updateDoc(doc(db, "chatbot_logs", c.id), { status: "resolved", resolvedAt: serverTimestamp() });
+    toast("Conversation marked as resolved.");
+  } catch (err) {
+    toast("Update failed: " + err.message, "err");
+  }
 }
 
 /* ---------- Dashboard & Analytics ---------- */
@@ -1140,10 +1125,6 @@ function initFirestoreRealtime() {
     });
     renderPkgs();
   });
-  snap(query(collection(db, "promo_banners"), orderBy("createdAt", "desc")), s => { 
-    promos = s.docs.map(d => ({ id: d.id, ...d.data() })); 
-    renderPromos(); 
-  });
   snap(query(collection(db, "booking_inquiries"), orderBy("createdAt", "desc")), s => { 
     inquiries = s.docs.map(d => ({ id: d.id, ...d.data() })); 
     renderInquiries(); 
@@ -1164,7 +1145,7 @@ function initFirestoreRealtime() {
 
 Object.assign(window, {
   go, toggleSidebar, toggleTheme, logout, openPkgForm, closePkgForm, previewImg, filterPkg, savePackage, addGalleryFiles, galMove, galDel, scanPoster, renderIncPreview, toggleIncPin, removePkg, renderPkgs, toggleFeatured,
-  toggleAddPromoForm, saveNewPromo, togglePromo, removePromo, filterInq, renderInquiries, exportInquiries,
+  filterInq, renderInquiries, exportInquiries,
   filterRev, renderRevenue, exportRevenue,
-  openDetail, closeDetail, sendInquiryReply, confirmInquiry, cancelInquiry, renderUsers, openChat
+  openDetail, closeDetail, sendInquiryReply, confirmInquiry, cancelInquiry, renderUsers, openChat, filterChats, sendChatReply, resolveChat
 });

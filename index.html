@@ -8,216 +8,274 @@
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@latest/tabler-icons.min.css">
 <style>
+/* ============ MKDWander Admin — design tokens ============
+   Spacing: 4/8/12/16/24/32 · Radius: 8/12/16 · Type: 12/13/14/16/20/28
+   Brand: navy (structure) + orange (one primary action per view)        */
 *{box-sizing:border-box;margin:0;padding:0}
-:root{--nav:#04264B;--nav2:#0A3563;--orange:#FD7830;--sky:#49C9F0;--gold:#FFBF49;--green:#16A34A;--red:#DC2626;
---bg:#EEF2F8;--card:#fff;--soft:#F6F8FC;--border:#E3E8F0;--muted:#74809A;--text:#2B364A;--head:#04264B;--shadow:0 1px 2px rgba(4,38,75,.05),0 8px 24px rgba(4,38,75,.06)}
-[data-theme=dark]{--bg:#0A1424;--card:#111E33;--soft:#16253D;--border:#22344F;--muted:#8A9AB5;--text:#DCE4F2;--head:#fff;--shadow:0 8px 24px rgba(0,0,0,.35)}
-body{font-family:'Inter',system-ui,-apple-system,'Segoe UI',sans-serif;font-feature-settings:'cv11','ss01','tnum' 0;background:var(--bg);color:var(--text);display:flex;height:100vh;overflow:hidden;font-size:13px;line-height:1.5;-webkit-font-smoothing:antialiased}
-button,input,select,textarea{font-family:inherit;color:inherit}
-td,.td-bold,.td-navy,.stat-num{font-variant-numeric:tabular-nums}
+:root{
+  --nav:#04264B;--nav2:#0A3563;--orange:#FD7830;--cta:#D9480F;--cta-h:#C2410C;--sky:#49C9F0;--gold:#FFBF49;--green:#16A34A;--red:#DC2626;
+  --bg:#F1F4F9;--card:#fff;--soft:#F6F8FC;--border:#E2E8F0;--border-s:#CBD5E1;--muted:#5B6779;--text:#27334A;--head:#04264B;
+  --r-s:8px;--r-m:12px;--r-l:16px;
+  --shadow:0 1px 2px rgba(4,38,75,.06),0 4px 12px rgba(4,38,75,.05);--shadow-l:0 12px 32px rgba(4,38,75,.14);
+  --ring:0 0 0 3px rgba(73,201,240,.35)}
+[data-theme=dark]{--bg:#0A1424;--card:#111E33;--soft:#16253D;--border:#22344F;--border-s:#2F4565;--muted:#9AA9C2;--text:#DCE4F2;--head:#fff;--cta:#F26A21;--cta-h:#FF7F3D;--shadow:0 1px 2px rgba(0,0,0,.3),0 4px 12px rgba(0,0,0,.25)}
+html{scroll-behavior:smooth}
+body{font-family:'Inter',system-ui,-apple-system,'Segoe UI',sans-serif;background:var(--bg);color:var(--text);display:flex;height:100vh;overflow:hidden;font-size:14px;line-height:1.55;-webkit-font-smoothing:antialiased}
+button,input,select,textarea{font-family:inherit;font-size:inherit;color:inherit}
+button{cursor:pointer}
+td,.td-bold,.td-navy,.kpi-val{font-variant-numeric:tabular-nums}
 :focus-visible{outline:2px solid var(--sky);outline-offset:2px}
-.sidebar{width:248px;min-width:248px;margin:12px 0 12px 12px;height:calc(100vh - 24px);border-radius:22px;background:linear-gradient(180deg,var(--nav),#021733);display:flex;flex-direction:column;transition:.2s;overflow:hidden;box-shadow:0 14px 34px rgba(4,38,75,.3)}
-.sidebar.collapsed{width:72px;min-width:72px}
-.sidebar.collapsed .logo-texts,.sidebar.collapsed .nav-label,.sidebar.collapsed .user-info,.sidebar.collapsed .nav-badge{display:none}
-.logo{padding:20px 16px;display:flex;align-items:center;gap:12px}
-.logo-icon{width:42px;height:42px;border-radius:12px;background:#fff;padding:4px;flex-shrink:0;display:flex;align-items:center;justify-content:center;color:var(--orange);font-size:20px}
+.skip{position:absolute;left:-999px;top:8px;background:var(--nav);color:#fff;padding:8px 16px;border-radius:var(--r-s);z-index:200}.skip:focus{left:8px}
+
+/* ---------- Sidebar ---------- */
+.sidebar{width:256px;min-width:256px;margin:12px 0 12px 12px;height:calc(100vh - 24px);border-radius:var(--r-l);background:linear-gradient(180deg,var(--nav),#021733);display:flex;flex-direction:column;transition:width .2s,min-width .2s;overflow:hidden;box-shadow:var(--shadow-l)}
+.sidebar.collapsed{width:76px;min-width:76px}
+.sidebar.collapsed .logo-texts,.sidebar.collapsed .nav-label,.sidebar.collapsed .user-info,.sidebar.collapsed .nav-badge,.sidebar.collapsed .nav-group{display:none}
+.logo{padding:20px 16px 12px;display:flex;align-items:center;gap:12px}
+.logo-icon{width:44px;height:44px;border-radius:var(--r-m);background:#fff;padding:5px;flex-shrink:0;display:flex;align-items:center;justify-content:center;color:var(--orange);font-size:22px}
 .logo-icon img{width:100%;height:100%;object-fit:contain}
-.logo-name{color:#fff;font-weight:800;font-size:16px;letter-spacing:-.02em}
-.logo-sub{color:rgba(255,255,255,.5);font-size:11px}
-nav{flex:1;padding:6px 10px;overflow-y:auto}
-.nav-btn{display:flex;align-items:center;gap:12px;width:100%;padding:8px 10px;border-radius:12px;border:none;cursor:pointer;margin-bottom:4px;background:transparent;color:rgba(255,255,255,.72);font-size:13px;font-weight:500;text-align:left;white-space:nowrap;transition:.15s}
-.nav-btn i{width:34px;height:34px;display:flex;align-items:center;justify-content:center;border-radius:10px;background:rgba(255,255,255,.07);font-size:18px;flex-shrink:0}
+.logo-name{color:#fff;font-weight:800;font-size:16px;letter-spacing:-.01em;line-height:1.2}
+.logo-sub{color:rgba(255,255,255,.62);font-size:12px}
+nav{flex:1;padding:4px 12px 12px;overflow-y:auto}
+.nav-group{color:rgba(255,255,255,.5);font-size:11px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;padding:16px 12px 6px}
+.nav-btn{position:relative;display:flex;align-items:center;gap:12px;width:100%;min-height:44px;padding:5px 10px;border-radius:var(--r-m);border:none;margin-bottom:2px;background:transparent;color:rgba(255,255,255,.8);font-size:14px;font-weight:500;text-align:left;white-space:nowrap;transition:background .15s,color .15s}
+.nav-btn i{width:34px;height:34px;display:flex;align-items:center;justify-content:center;border-radius:10px;background:rgba(255,255,255,.08);font-size:18px;flex-shrink:0;transition:background .15s}
 .nav-btn:hover{background:rgba(255,255,255,.08);color:#fff}
-.nav-btn.active{background:rgba(255,255,255,.12);color:#fff;font-weight:700}
-.nav-btn.active i{background:var(--orange);box-shadow:0 6px 14px rgba(253,120,48,.4)}
-.nav-badge{margin-left:auto;background:var(--orange);color:#fff;font-size:11px;font-weight:700;padding:1px 8px;border-radius:99px}
+.nav-btn.active{background:rgba(255,255,255,.14);color:#fff;font-weight:700}
+.nav-btn.active::before{content:"";position:absolute;left:-12px;top:10px;bottom:10px;width:4px;border-radius:0 4px 4px 0;background:var(--orange)}
+.nav-btn.active i{background:var(--orange);color:#fff}
+.nav-badge{margin-left:auto;background:var(--orange);color:#1A1204;font-size:12px;font-weight:800;padding:1px 8px;border-radius:99px;min-width:22px;text-align:center}
 .nav-badge:empty{display:none}
-.sidebar-foot{padding:12px 10px;border-top:1px solid rgba(255,255,255,.1)}
-.user-row{display:flex;align-items:center;gap:10px;padding:6px}
-.avatar{width:36px;height:36px;border-radius:50%;background:var(--gold);display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:800;color:var(--nav);flex-shrink:0}
-.user-name{color:#fff;font-size:12px;font-weight:700;max-width:140px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
-.user-role{color:rgba(255,255,255,.5);font-size:11px}
-.foot-btns{display:flex;gap:6px;margin-top:8px}
-.foot-btns button{flex:1;padding:8px;border-radius:10px;border:none;cursor:pointer;background:rgba(255,255,255,.08);color:rgba(255,255,255,.75);font-size:14px}
-.foot-btns button:hover{background:rgba(255,255,255,.16);color:#fff}
+.sidebar-foot{padding:12px;border-top:1px solid rgba(255,255,255,.1)}
+.user-row{display:flex;align-items:center;gap:12px;padding:4px}
+.avatar{width:38px;height:38px;border-radius:50%;background:var(--gold);display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:800;color:var(--nav);flex-shrink:0}
+.user-name{color:#fff;font-size:13px;font-weight:700;max-width:150px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.user-role{color:rgba(255,255,255,.62);font-size:12px}
+.foot-btns{display:flex;gap:8px;margin-top:12px}
+.foot-btns button{flex:1;min-height:40px;border-radius:10px;border:none;background:rgba(255,255,255,.08);color:rgba(255,255,255,.85);font-size:16px;transition:background .15s}
+.foot-btns button:hover{background:rgba(255,255,255,.18);color:#fff}
 .sidebar.collapsed .foot-btns{flex-direction:column}
 
+/* ---------- Shell ---------- */
 .main{flex:1;display:flex;flex-direction:column;overflow:hidden;min-width:0}
-.topbar{margin:12px 12px 0;padding:12px 24px;background:color-mix(in srgb,var(--card) 85%,transparent);backdrop-filter:blur(10px);border:1px solid var(--border);border-radius:18px;display:flex;align-items:center;justify-content:space-between;gap:12px;box-shadow:var(--shadow)}
-.topbar h1{font-size:20px;font-weight:800;color:var(--head);letter-spacing:-.02em}
-.topbar p{font-size:12px;color:var(--muted)}
-.topbar-right{display:flex;align-items:center;gap:14px}
-.badge-warn{background:#FFF1D0;color:#8A5A00;font-size:12px;padding:6px 14px;border-radius:99px;font-weight:700;cursor:pointer}
+.topbar{margin:12px 12px 0;padding:12px 24px;background:var(--card);border:1px solid var(--border);border-radius:var(--r-l);display:flex;align-items:center;justify-content:space-between;gap:16px;box-shadow:var(--shadow)}
+.topbar h1{font-size:20px;font-weight:800;color:var(--head);letter-spacing:-.01em;line-height:1.3}
+.topbar p{font-size:13px;color:var(--muted)}
+.topbar-right{display:flex;align-items:center;gap:16px}
+.badge-warn{background:#FFF1D0;color:#7A4D00;font-size:13px;padding:6px 14px;border-radius:99px;font-weight:700;cursor:pointer;transition:filter .15s}.badge-warn:hover{filter:brightness(.96)}
 [data-theme=dark] .badge-warn{background:#3A2C0B;color:#FFC857}
-.online{display:flex;align-items:center;gap:6px;font-size:12px;color:var(--muted)}
+.online{display:flex;align-items:center;gap:8px;font-size:13px;color:var(--muted)}
 .online-dot{width:8px;height:8px;border-radius:50%;background:#22C55E;box-shadow:0 0 0 3px rgba(34,197,94,.2)}
-.content{flex:1;overflow-y:auto;padding:20px 24px 40px}
-.section{display:none}.section.active{display:block}
+.content{flex:1;overflow-y:auto;padding:24px 24px 48px;scroll-padding-top:16px}
+.section{display:none;max-width:1440px;margin:0 auto}.section.active{display:block}
 
-.hero{position:relative;overflow:hidden;border-radius:22px;padding:28px 32px;margin-bottom:18px;color:#fff;background:linear-gradient(120deg,var(--nav),var(--nav2) 60%,#0F4C8A)}
-.hero h2{font-size:23px;font-weight:800;letter-spacing:-.02em}
-.hero p{color:rgba(255,255,255,.72);margin-top:4px;max-width:440px}
-.hero-actions{display:flex;gap:10px;margin-top:18px;position:relative;z-index:1;flex-wrap:wrap}
-.hero svg{position:absolute;right:0;top:0;height:100%;width:50%;pointer-events:none}
-.btn-ghost{padding:9px 16px;border-radius:10px;border:1px solid rgba(255,255,255,.3);background:transparent;color:#fff;font-weight:600;cursor:pointer}
-.btn-ghost:hover{background:rgba(255,255,255,.1)}
-.kpi-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:16px;margin-bottom:18px}
-.kpi-card{position:relative;background:var(--card);border-radius:18px;padding:18px 20px;border:1px solid var(--border);border-top:4px solid var(--sky);box-shadow:var(--shadow)}
-.kpi-card:nth-child(2){border-top-color:var(--gold)}.kpi-card:nth-child(3){border-top-color:var(--orange)}.kpi-card:nth-child(4){border-top-color:#22C55E}
-.kpi-ico{position:absolute;right:16px;top:18px;width:38px;height:38px;border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:20px;background:rgba(73,201,240,.15);color:#0A8DB5}
-.kpi-card:nth-child(2) .kpi-ico{background:rgba(255,191,73,.18);color:#B27A00}
-.kpi-card:nth-child(3) .kpi-ico{background:rgba(253,120,48,.15);color:#D4560F}
-.kpi-card:nth-child(4) .kpi-ico{background:rgba(34,197,94,.15);color:var(--green)}
-.kpi-label{font-size:12px;color:var(--muted);font-weight:500;margin-bottom:6px}
-.kpi-val{font-size:28px;font-weight:800;color:var(--head);letter-spacing:-.02em;font-variant-numeric:tabular-nums}
-.kpi-note{font-size:12px;color:var(--muted);margin-top:2px}
+/* ---------- Hero (dashboard) ---------- */
+.hero{position:relative;overflow:hidden;border-radius:var(--r-l);padding:32px;margin-bottom:24px;min-height:232px;color:#fff;display:flex;flex-direction:column;justify-content:center;
+  background-color:var(--nav2);
+  background-image:linear-gradient(90deg,rgba(4,38,75,.94) 0%,rgba(4,38,75,.80) 42%,rgba(4,38,75,.18) 100%),url('images/hero.jpg'),url('https://www.thepoortraveler.net/wp-content/uploads/2017/05/Twin-Lagoon-Coron.jpg');
+  background-size:cover;background-position:center;box-shadow:var(--shadow)}
+.hero-eyebrow{font-size:12px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--gold);margin-bottom:8px}
+.hero h2{font-size:28px;font-weight:800;letter-spacing:-.02em;line-height:1.2}
+.hero p{color:rgba(255,255,255,.88);margin-top:8px;max-width:460px;font-size:15px}
+.hero-actions{display:flex;gap:12px;margin-top:24px;flex-wrap:wrap}
+.hero-credit{position:absolute;right:16px;bottom:12px;font-size:12px;color:rgba(255,255,255,.9);background:rgba(4,38,75,.55);backdrop-filter:blur(4px);padding:3px 10px;border-radius:99px;text-decoration:none}
+.hero-credit:hover{background:rgba(4,38,75,.8)}
+
+/* ---------- Buttons (1 primary · 2 secondary · 3 destructive) ---------- */
+.btn-orange,.btn-ghost,.btn-outline,.btn-send,.btn-confirm{min-height:40px;border-radius:10px;font-size:14px;font-weight:600;display:inline-flex;align-items:center;justify-content:center;gap:8px;padding:8px 16px;transition:background .15s,border-color .15s,filter .15s,transform .05s}
+.btn-orange{border:none;background:var(--cta);color:#fff;font-weight:700}
+.btn-orange:hover{background:var(--cta-h)}.btn-orange:active{transform:translateY(1px)}
+.btn-orange:disabled,.btn-outline:disabled{opacity:.6;cursor:not-allowed}
+.btn-ghost{border:1px solid rgba(255,255,255,.55);background:rgba(255,255,255,.08);color:#fff}.btn-ghost:hover{background:rgba(255,255,255,.2)}
+.btn-outline{border:1px solid var(--border-s);background:var(--card);color:var(--head)}.btn-outline:hover{background:var(--soft);border-color:var(--muted)}
+.btn-full{width:100%;min-height:40px;border-radius:10px;border:1px solid var(--border-s);background:var(--card);color:var(--head);font-weight:600;margin-top:16px}.btn-full:hover{background:var(--soft)}
+.btn-danger,.btn-edit{min-height:32px;padding:4px 12px;border-radius:var(--r-s);background:var(--card);font-size:13px;font-weight:600;margin-right:4px;transition:background .15s}
+.btn-danger{border:1px solid #F5B5B5;color:#B42318}.btn-danger:hover{background:#FEF3F2}
+.btn-edit{border:1px solid #B5CCF8;color:#1D4ED8}.btn-edit:hover{background:#EFF5FF}
+[data-theme=dark] .btn-danger{color:#FCA5A5;border-color:#7F2D2D}[data-theme=dark] .btn-edit{color:#93C5FD;border-color:#2B4A85}
+.btn-confirm{background:#ECFDF3;color:#116B3A;border:1px solid #A6E3BF}.btn-confirm:hover{background:#D9F7E5}
+.btn-send{background:var(--nav);color:#fff;border:none;flex:1}.btn-send:hover{background:var(--nav2)}
+
+/* ---------- KPI + cards ---------- */
+.kpi-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:16px;margin-bottom:24px}
+.kpi-card{position:relative;background:var(--card);border-radius:var(--r-l);padding:20px;border:1px solid var(--border);box-shadow:var(--shadow);transition:box-shadow .2s,transform .2s}
+.kpi-card:hover{box-shadow:var(--shadow-l);transform:translateY(-1px)}
+.kpi-ico{position:absolute;right:16px;top:16px;width:40px;height:40px;border-radius:var(--r-m);display:flex;align-items:center;justify-content:center;font-size:20px;background:rgba(73,201,240,.16);color:#0A7DA0}
+.kpi-card:nth-child(2) .kpi-ico{background:rgba(255,191,73,.22);color:#8A5A00}
+.kpi-card:nth-child(3) .kpi-ico{background:rgba(253,120,48,.16);color:#B8470F}
+.kpi-card:nth-child(4) .kpi-ico{background:rgba(34,197,94,.16);color:#15803D}
+.kpi-label{font-size:13px;color:var(--muted);font-weight:600;margin-bottom:8px;padding-right:48px}
+.kpi-val{font-size:28px;font-weight:800;color:var(--head);letter-spacing:-.02em;line-height:1.2}
+.kpi-note{font-size:13px;color:var(--muted);margin-top:4px}
 .two-col{display:grid;grid-template-columns:1fr 1fr;gap:16px}
-.card{background:var(--card);border-radius:18px;padding:20px;border:1px solid var(--border);box-shadow:var(--shadow)}
-.card-title{font-size:14px;font-weight:700;color:var(--head);margin-bottom:14px;display:flex;align-items:center;gap:8px}
-.card-title::before{content:"";width:8px;height:8px;border-radius:50%;background:var(--orange)}
-.bar-chart{display:flex;align-items:flex-end;gap:10px;height:150px}
+.card{background:var(--card);border-radius:var(--r-l);padding:24px;border:1px solid var(--border);box-shadow:var(--shadow)}
+.card-title{font-size:15px;font-weight:700;color:var(--head);margin-bottom:16px;display:flex;align-items:center;gap:8px}
+.card-title::before{content:"";width:4px;height:16px;border-radius:2px;background:var(--orange)}
+.bar-chart{display:flex;align-items:flex-end;gap:12px;height:160px}
 .bar-wrap{flex:1;display:flex;flex-direction:column;align-items:center;gap:4px;justify-content:flex-end;height:100%}
-.bar{width:100%;border-radius:6px 6px 0 0;background:linear-gradient(180deg,var(--orange),#FFA168);min-height:3px}
-.bar-val{font-size:11px;font-weight:700;color:var(--head)}
-.bar-lbl{font-size:11px;color:var(--muted)}
-.dest-row,.perf-row{margin-bottom:12px}
-.dest-hd{display:flex;justify-content:space-between;margin-bottom:5px;font-size:12px}
-.dest-pct{font-weight:700;color:var(--head)}
+.bar{width:100%;max-width:48px;border-radius:6px 6px 0 0;background:linear-gradient(180deg,var(--orange),#FFA168);min-height:3px}
+.bar-val{font-size:12px;font-weight:700;color:var(--head)}.bar-lbl{font-size:12px;color:var(--muted)}
+.dest-row,.perf-row{margin-bottom:16px}.dest-row:last-child,.perf-row:last-child{margin-bottom:0}
+.dest-hd{display:flex;justify-content:space-between;gap:12px;margin-bottom:6px;font-size:13px}
+.dest-pct{font-weight:700;color:var(--head);white-space:nowrap}
 .prog-bg{height:8px;border-radius:99px;background:var(--soft)}
 .prog-fill{height:100%;border-radius:99px;background:linear-gradient(90deg,var(--sky),var(--orange))}
-.pill{font-size:11px;font-weight:700;padding:3px 10px;border-radius:99px;white-space:nowrap;display:inline-flex;align-items:center;gap:5px}
+.inq-row{display:flex;justify-content:space-between;align-items:center;gap:12px;padding:12px 8px;margin:0 -8px;border-bottom:1px solid var(--border);cursor:pointer;border-radius:var(--r-s);transition:background .15s}
+.inq-row:hover{background:var(--soft)}.inq-row:last-child{border:none}
+.inq-name{font-weight:600;color:var(--head)}.inq-sub{font-size:13px;color:var(--muted)}
+.users-big{padding:8px 0 20px;text-align:center}.users-big b{display:block;font-size:40px;font-weight:800;color:var(--head);line-height:1.2}.users-big span{color:var(--muted)}
+.privacy-note{background:rgba(34,197,94,.1);border:1px solid rgba(34,197,94,.3);border-radius:10px;padding:12px;font-size:13px;color:#166534;display:flex;gap:8px;align-items:flex-start}
+[data-theme=dark] .privacy-note{color:#86EFAC}
+.insights p{margin-bottom:12px;display:flex;gap:8px}.insights i{color:var(--orange);font-size:18px;flex-shrink:0}
+.analytics-kpi{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;margin-bottom:24px}
+
+/* ---------- Pills ---------- */
+.pill{font-size:12px;font-weight:700;padding:3px 10px;border-radius:99px;white-space:nowrap;display:inline-flex;align-items:center;gap:6px}
 .pill::before{content:"";width:6px;height:6px;border-radius:50%;background:currentColor}
-.pill-view::before,.pill-hash::before{display:none}
-.pill-pend{background:#FFF1DE;color:#B54708}.pill-resp{background:#E1F0FF;color:#0B4FA8}.pill-conf{background:#E3F6E8;color:#17692F}.pill-off{background:#F1F2F4;color:#586070}
-.pill-luzon{background:#E8F0FF;color:#1D4ED8}.pill-visayas{background:#FEF0CC;color:#9A5A08}.pill-mindanao{background:#F2E8FF;color:#6B21A8}
-.pill-luzon::before,.pill-visayas::before,.pill-mindanao::before{display:none}
-.pill-view{background:#E8F0FF;color:#2563EB}.pill-hash{background:var(--soft);color:var(--muted);font-family:ui-monospace,monospace}
-[data-theme=dark] .pill{filter:brightness(.95)}
-.inq-row{display:flex;justify-content:space-between;align-items:center;padding:10px 0;border-bottom:1px solid var(--border);cursor:pointer}
-.inq-row:last-child{border:none}
-.inq-name{font-weight:600}.inq-sub{font-size:11px;color:var(--muted)}
-.btn-orange{padding:9px 18px;border-radius:10px;border:none;background:var(--orange);color:#fff;font-size:13px;cursor:pointer;font-weight:700;display:inline-flex;align-items:center;gap:6px;transition:.15s}
-.btn-orange:hover{filter:brightness(1.07)}.btn-orange:disabled{background:#CBD5E1;cursor:not-allowed}
-.btn-outline{padding:8px 14px;border-radius:10px;border:1px solid var(--border);background:var(--card);color:var(--head);font-size:12px;cursor:pointer;font-weight:600;display:inline-flex;align-items:center;gap:6px}
-.btn-outline:hover{background:var(--soft)}
-.btn-full{width:100%;padding:10px;border-radius:10px;border:1px solid var(--border);background:var(--soft);color:var(--head);font-weight:600;cursor:pointer;margin-top:12px}
-.btn-danger,.btn-edit{padding:5px 10px;border-radius:8px;background:var(--card);font-size:12px;cursor:pointer;margin-right:4px}
-.btn-danger{border:1px solid #FBCFCF;color:var(--red)}.btn-edit{border:1px solid #BFD7FF;color:#2563EB}
-.btn-confirm{padding:10px 14px;background:#F0FDF4;color:#15803D;border:1px solid #BBF7D0;border-radius:10px;cursor:pointer;font-weight:700}
-.btn-send{flex:1;padding:10px;background:var(--nav);color:#fff;border:none;border-radius:10px;cursor:pointer;font-weight:700}
-.tbl-wrap{background:var(--card);border-radius:18px;border:1px solid var(--border);overflow:auto;box-shadow:var(--shadow)}
-.tbl-header{padding:14px 20px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;gap:10px}
-.tbl-header-title{font-size:14px;font-weight:700;color:var(--head)}
-table{width:100%;border-collapse:collapse}
-th{padding:11px 16px;text-align:left;color:var(--muted);font-weight:600;font-size:12px;border-bottom:1px solid var(--border);white-space:nowrap;background:var(--soft);position:sticky;top:0}
-td{padding:12px 16px;border-bottom:1px solid var(--border);vertical-align:middle}
-tbody tr:hover{background:var(--soft)}tbody tr:last-child td{border:none}
-.td-bold{font-weight:700;color:var(--head)}.td-muted{color:var(--muted)}.td-navy{font-weight:700;color:var(--orange)}.td-mono{font-family:ui-monospace,monospace;font-size:12px;color:var(--muted)}
-.poster-thumb{width:64px;height:64px;border-radius:12px;object-fit:cover;border:1px solid var(--border);background:var(--soft)}
-.promo-banner-thumb{width:120px;height:64px;border-radius:12px;object-fit:cover;border:1px solid var(--border);background:var(--soft)}
+.pill-view::before,.pill-hash::before,.pill-luzon::before,.pill-visayas::before,.pill-mindanao::before,.pill-feat::before{display:none}
+.pill-pend{background:#FFF1DE;color:#9A3F06}.pill-resp{background:#E1F0FF;color:#0B4FA8}.pill-conf{background:#E3F6E8;color:#14612D}.pill-off{background:#EEF0F3;color:#4B5565}
+.pill-luzon{background:#E8F0FF;color:#1D4ED8}.pill-visayas{background:#FEF0CC;color:#80500A}.pill-mindanao{background:#F2E8FF;color:#6B21A8}
+.pill-view{background:#E8F0FF;color:#1D4ED8}.pill-hash{background:var(--soft);color:var(--muted);font-family:ui-monospace,monospace}
+.pill-feat{background:#FEF0CC;color:#80500A}
+[data-theme=dark] .pill{filter:brightness(.92)}
+
+/* ---------- Tables ---------- */
+.tbl-wrap{background:var(--card);border-radius:var(--r-l);border:1px solid var(--border);overflow:auto;box-shadow:var(--shadow)}
+.tbl-header{padding:16px 24px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap}
+.tbl-header-title{font-size:15px;font-weight:700;color:var(--head)}
+table{width:100%;border-collapse:collapse;min-width:720px}
+th{padding:12px 16px;text-align:left;color:var(--muted);font-weight:700;font-size:12px;letter-spacing:.04em;text-transform:uppercase;border-bottom:1px solid var(--border);white-space:nowrap;background:var(--soft);position:sticky;top:0;z-index:1}
+td{padding:14px 16px;border-bottom:1px solid var(--border);vertical-align:middle}
+tbody tr{transition:background .12s}tbody tr:hover{background:var(--soft)}tbody tr:last-child td{border:none}
+.td-bold{font-weight:700;color:var(--head)}.td-muted{color:var(--muted)}.td-navy{font-weight:700;color:#B8470F}[data-theme=dark] .td-navy{color:var(--orange)}
+.td-mono{font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:13px;color:var(--muted)}
+.poster-thumb{width:64px;height:48px;border-radius:var(--r-s);object-fit:cover;border:1px solid var(--border);background:var(--soft)}
+.empty-row{text-align:center;padding:48px 24px;color:var(--muted)}
+.star-btn{border:none;background:transparent;font-size:22px;color:#B6C0CE;line-height:1;width:36px;height:36px;border-radius:var(--r-s);vertical-align:middle}.star-btn:hover{background:var(--soft)}.star-btn.on{color:#E8A400}
+
+/* ---------- Page header, filters ---------- */
+.ph{display:flex;align-items:center;gap:16px;margin-bottom:24px}
+.ph-ico{width:48px;height:48px;border-radius:var(--r-m);display:flex;align-items:center;justify-content:center;font-size:24px;color:#fff;background:var(--nav);flex-shrink:0}
+.ph h2{font-size:22px;color:var(--head);font-weight:800;letter-spacing:-.01em;line-height:1.3}.ph p{font-size:14px;color:var(--muted)}
 .filter-row{display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;gap:12px;flex-wrap:wrap}
 .filter-btns,.tools{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
-.filt-btn{padding:7px 16px;border-radius:99px;border:1px solid var(--border);background:var(--card);color:var(--muted);font-size:12px;cursor:pointer;font-weight:600}
+.filt-btn{min-height:36px;padding:6px 16px;border-radius:99px;border:1px solid var(--border-s);background:var(--card);color:var(--muted);font-size:13px;font-weight:600;transition:background .15s,color .15s}
+.filt-btn:hover{background:var(--soft);color:var(--head)}
 .filt-btn.on{background:var(--nav);color:#fff;border-color:var(--nav)}
-.search{padding:8px 14px;border-radius:99px;border:1px solid var(--border);background:var(--card);font-size:12px;min-width:200px}
-.ph{display:flex;align-items:center;gap:14px;margin-bottom:18px}
-.ph-ico{width:48px;height:48px;border-radius:15px;display:flex;align-items:center;justify-content:center;font-size:24px;color:#fff;background:linear-gradient(135deg,var(--orange),#FF9C63);box-shadow:0 8px 18px rgba(253,120,48,.3)}
-.ph h2{font-size:19px;color:var(--head);font-weight:800;letter-spacing:-.02em}.ph p{font-size:12px;color:var(--muted)}
-.add-form{background:var(--card);border:1px solid var(--border);border-top:4px solid var(--orange);border-radius:18px;padding:22px;margin-bottom:20px;box-shadow:var(--shadow);display:none}
-.add-form-title{font-size:15px;font-weight:800;color:var(--head);margin-bottom:16px}
-.form-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:14px}
-.form-field label,.form-field-full label{display:block;font-size:12px;font-weight:600;color:var(--head);margin-bottom:6px}
-.form-field input,.form-field select,.form-field-full input,.form-field-full textarea{width:100%;padding:10px 12px;border-radius:10px;border:1px solid var(--border);background:var(--soft);font-size:13px}
-.form-field input:focus,.form-field select:focus,.form-field-full textarea:focus,.reply-textarea:focus{outline:none;border-color:var(--sky);box-shadow:0 0 0 3px rgba(73,201,240,.2)}
+.search{min-height:40px;padding:8px 16px;border-radius:99px;border:1px solid var(--border-s);background:var(--card);font-size:14px;min-width:240px}
+.search:focus,.form-field input:focus,.form-field select:focus,.form-field-full input:focus,.form-field-full textarea:focus,.reply-textarea:focus{outline:none;border-color:var(--sky);box-shadow:var(--ring)}
+
+/* ---------- Forms ---------- */
+.add-form{background:var(--card);border:1px solid var(--border);border-radius:var(--r-l);padding:0;margin-bottom:24px;box-shadow:var(--shadow);display:none;overflow:hidden}
+.add-form-title{font-size:18px;font-weight:800;color:var(--head);padding:20px 24px;border-bottom:1px solid var(--border);background:var(--soft)}
+.form-body{padding:8px 24px 0}
+.form-sec{padding:24px 0;border-bottom:1px solid var(--border)}.form-sec:last-child{border-bottom:none}
+.form-sec-hd{display:flex;align-items:flex-start;gap:12px;margin-bottom:16px}
+.form-sec-hd .n{width:28px;height:28px;border-radius:50%;background:var(--nav);color:#fff;font-size:13px;font-weight:700;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.form-sec-hd h3{font-size:15px;font-weight:700;color:var(--head);line-height:1.3}.form-sec-hd p{font-size:13px;color:var(--muted)}
+.form-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:16px}
+.form-field label,.form-field-full label{display:block;font-size:13px;font-weight:600;color:var(--head);margin-bottom:6px}
+.req{color:#C2260C;margin-left:2px}
+.form-field input,.form-field select,.form-field-full input,.form-field-full textarea{width:100%;min-height:44px;padding:10px 12px;border-radius:10px;border:1px solid var(--border-s);background:var(--card);font-size:14px;transition:border-color .15s,box-shadow .15s}
+.form-field input::placeholder,.form-field-full textarea::placeholder,.search::placeholder{color:#8593A8}
 .form-field-full{grid-column:1/-1}
-.feature-box{background:var(--soft);border:1.5px dashed var(--gold);border-radius:14px;padding:16px}
-.feature-hd{font-size:13px;font-weight:800;color:var(--head);margin-bottom:12px;display:flex;align-items:center;gap:8px}
-.feature-hd i{color:var(--gold);font-size:18px}
-.feature-note{font-size:12px;color:var(--muted);margin-top:10px}
-.gal-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(130px,1fr));gap:10px;margin-top:10px}
-.gal-item{position:relative;border-radius:12px;overflow:hidden;border:2px solid var(--border);background:var(--soft)}
+.reply-textarea{width:100%;min-height:88px;border:1px solid var(--border-s);background:var(--card);border-radius:10px;padding:10px 12px;margin-bottom:0;resize:vertical;line-height:1.5}
+.feature-box,.cp-box{background:var(--soft);border:1px solid var(--border);border-radius:var(--r-m);padding:16px}
+.feature-hd{font-size:14px;font-weight:700;color:var(--head);margin-bottom:12px;display:flex;align-items:center;gap:8px}
+.feature-hd i{color:#B8820A;font-size:18px}.cp-box .feature-hd i{color:#0A7DA0}
+.feature-note{font-size:13px;color:var(--muted);margin-top:8px}
+.form-actions{display:flex;justify-content:flex-end;gap:12px;padding:16px 24px;border-top:1px solid var(--border);background:var(--card);position:sticky;bottom:0;z-index:2}
+.upload-box{border:2px dashed var(--border-s);border-radius:var(--r-m);padding:24px 16px;text-align:center;background:var(--soft);position:relative;color:var(--muted);transition:border-color .15s,background .15s}
+.upload-box:hover{border-color:var(--orange);background:var(--card)}
+.upload-box input{position:absolute;inset:0;opacity:0;cursor:pointer;width:100%;height:100%;min-height:0}
+.upload-box i{font-size:32px;display:block;margin-bottom:4px}
+.upload-preview{width:100%;max-height:200px;border-radius:var(--r-s);object-fit:cover;display:none;margin-top:12px}
+.gal-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(140px,1fr));gap:12px;margin-top:12px}
+.gal-item{position:relative;border-radius:var(--r-m);overflow:hidden;border:2px solid var(--border);background:var(--soft)}
 .gal-item.first{border-color:var(--orange)}
-.gal-item img{width:100%;height:92px;object-fit:cover;display:block}
-.gal-tag{position:absolute;left:6px;top:6px;background:rgba(4,38,75,.78);color:#fff;font-size:10px;font-weight:700;border-radius:6px;padding:2px 7px}
-.gal-item.first .gal-tag{background:var(--orange)}
-.gal-act{display:flex;justify-content:space-between;gap:4px;padding:5px}
-.gal-act button{flex:1;border:1px solid var(--border);background:#fff;border-radius:7px;height:28px;cursor:pointer;font-size:14px;color:var(--head)}
-.gal-act button:hover{border-color:var(--orange);color:var(--orange)}
-.scan-row{display:flex;flex-wrap:wrap;align-items:center;gap:12px;margin-top:10px}
-.scan-ow{display:flex;align-items:center;gap:6px;font-size:12px;font-weight:500;color:var(--muted);margin:0}
-.scan-ow input{width:auto}
-.scan-status{font-size:12px;font-weight:600;color:var(--muted);flex-basis:100%}
+.gal-item img{width:100%;height:96px;object-fit:cover;display:block}
+.gal-tag{position:absolute;left:8px;top:8px;background:rgba(4,38,75,.82);color:#fff;font-size:11px;font-weight:700;border-radius:6px;padding:2px 8px}
+.gal-item.first .gal-tag{background:var(--cta)}
+.gal-act{display:flex;gap:4px;padding:6px}
+.gal-act button{flex:1;border:1px solid var(--border);background:var(--card);border-radius:var(--r-s);height:32px;font-size:15px;color:var(--head)}
+.gal-act button:hover{border-color:var(--orange);color:var(--cta)}
+.scan-row{display:flex;flex-wrap:wrap;align-items:center;gap:12px;margin-top:12px}
+.scan-ow{display:flex;align-items:center;gap:8px;font-size:13px;font-weight:500;color:var(--muted);margin:0!important}
+.scan-ow input{width:auto;min-height:0}
+.scan-status{font-size:13px;font-weight:600;color:var(--muted);flex-basis:100%}
 .autofilled{border-color:var(--orange)!important;background:#FFF8F2!important}
-.cp-box{background:var(--soft);border:1.5px dashed var(--sky);border-radius:14px;padding:16px}
-.cp-box .feature-hd i{color:var(--sky)}
 .cp-chips,.cp-pick{display:flex;flex-wrap:wrap;gap:8px}
-.cp-label{font-size:11px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.04em;margin:12px 0 6px}
-.cp-chip{display:inline-flex;align-items:center;gap:6px;background:#fff;border:1px solid var(--border);border-radius:10px;padding:7px 12px;font-size:13px;font-weight:600;color:var(--head)}
-.cp-chip.maybe{border-style:dashed}
-.cp-chip i{font-size:16px;color:var(--orange)}.cp-chip.more{color:var(--muted)}
-.cp-pick-btn{display:inline-flex;align-items:center;gap:6px;background:transparent;border:1px solid var(--border);border-radius:10px;padding:7px 12px;font:inherit;font-size:12px;font-weight:600;color:var(--head);cursor:pointer}
-.cp-pick-btn.on{border-color:var(--orange);background:#FFF1E8;color:#B8470F}
-.cp-auto{font-size:11px;font-weight:700;background:#E6F7EC;color:#15803D;border-radius:6px;padding:2px 8px;margin-left:auto}
-.cp-auto.pin{background:#FFF1E8;color:#B8470F}
-.pill-feat{background:#FEF0CC;color:#9A5A08}.pill-feat::before{display:none}
-.star-btn{border:none;background:transparent;cursor:pointer;font-size:20px;color:#CBD5E1;line-height:1}.star-btn.on{color:var(--gold)}
-.upload-box{border:2px dashed var(--border);border-radius:12px;padding:18px;text-align:center;background:var(--soft);position:relative;color:var(--muted)}
-.upload-box:hover{border-color:var(--orange)}
-.upload-box input{position:absolute;inset:0;opacity:0;cursor:pointer;width:100%;height:100%}
-.upload-box i{font-size:30px;display:block}
-.upload-preview{width:100%;height:160px;border-radius:8px;object-fit:cover;display:none;margin-top:10px}
-.form-actions{display:flex;justify-content:flex-end;gap:10px;margin-top:18px}
-.inq-detail{background:var(--card);border-radius:18px;border:1px solid var(--border);border-left:6px solid var(--orange);padding:20px;margin-top:16px;box-shadow:var(--shadow);display:none}
-.inq-det-hd{display:flex;justify-content:space-between;margin-bottom:16px}
-.inq-det-name{font-size:17px;font-weight:800;color:var(--head)}.inq-det-ref{font-size:12px;color:var(--muted);font-family:ui-monospace,monospace}
-.close-x{background:none;border:none;cursor:pointer;color:var(--muted);font-size:24px}
-.det-box{background:var(--soft);border:1.5px dashed var(--border);border-radius:12px;padding:14px;margin-bottom:14px}
-.det-box-lbl{font-size:12px;color:var(--muted);margin-bottom:8px;font-weight:600}
-.det-row{display:flex;justify-content:space-between;margin-bottom:6px}.det-key{color:var(--muted)}.det-val{font-weight:600}
-.reply-textarea{width:100%;min-height:80px;border:1px solid var(--border);background:var(--soft);border-radius:10px;padding:10px 12px;margin-bottom:12px;resize:vertical}
-.reply-row{display:flex;gap:10px}
-.chat-layout{display:grid;grid-template-columns:300px 1fr;gap:16px}
-.chat-list,.chat-win{background:var(--card);border-radius:18px;border:1px solid var(--border);overflow:hidden;box-shadow:var(--shadow)}
-.chat-win{display:flex;flex-direction:column;min-height:460px}
-.chat-list-hd,.chat-win-hd{padding:14px 18px;border-bottom:1px solid var(--border);font-weight:700;color:var(--head)}
-.chat-win-sub{font-size:12px;color:var(--muted);font-weight:400}
-.chat-item{padding:13px 18px;border-bottom:1px solid var(--border);cursor:pointer}
+.cp-label{font-size:12px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.05em;margin:16px 0 8px}
+.cp-chip{display:inline-flex;align-items:center;gap:8px;background:var(--card);border:1px solid var(--border-s);border-radius:10px;padding:6px 12px;font-size:13px;font-weight:600;color:var(--head)}
+.cp-chip.maybe{border-style:dashed}.cp-chip i{font-size:16px;color:#C2500F}.cp-chip.more{color:var(--muted)}
+.cp-pick-btn{display:inline-flex;align-items:center;gap:8px;background:var(--card);border:1px solid var(--border-s);border-radius:10px;min-height:36px;padding:6px 12px;font-size:13px;font-weight:600;color:var(--head)}
+.cp-pick-btn:hover{border-color:var(--muted)}
+.cp-pick-btn.on{border-color:var(--orange);background:#FFF1E8;color:#9A3F06}
+.cp-auto{font-size:12px;font-weight:700;background:#E6F7EC;color:#14612D;border-radius:6px;padding:2px 8px;margin-left:auto}.cp-auto.pin{background:#FFF1E8;color:#9A3F06}
+
+/* ---------- Inquiry drawer ---------- */
+.inq-detail{background:var(--card);border-radius:var(--r-l);border:1px solid var(--border);border-left:4px solid var(--orange);padding:24px;margin-top:16px;box-shadow:var(--shadow);display:none}
+.inq-det-hd{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:16px}
+.inq-det-name{font-size:18px;font-weight:800;color:var(--head)}.inq-det-ref{font-size:13px;color:var(--muted);font-family:ui-monospace,monospace}
+.close-x{width:40px;height:40px;border-radius:var(--r-s);background:none;border:none;color:var(--muted);font-size:24px;line-height:1}.close-x:hover{background:var(--soft);color:var(--head)}
+.det-box{background:var(--soft);border:1px solid var(--border);border-radius:var(--r-m);padding:16px;margin-bottom:16px}
+.det-box-lbl{font-size:12px;color:var(--muted);margin-bottom:12px;font-weight:700;letter-spacing:.05em;text-transform:uppercase}
+.det-row{display:flex;justify-content:space-between;gap:16px;padding:6px 0;border-bottom:1px dashed var(--border)}.det-row:last-child{border:none}
+.det-key{color:var(--muted)}.det-val{font-weight:600;color:var(--head);text-align:right}
+.reply-row{display:flex;gap:12px;flex-wrap:wrap}
+
+/* ---------- Chat ---------- */
+.chat-layout{display:grid;grid-template-columns:320px 1fr;gap:16px}
+.chat-list,.chat-win{background:var(--card);border-radius:var(--r-l);border:1px solid var(--border);overflow:hidden;box-shadow:var(--shadow)}
+.chat-win{display:flex;flex-direction:column;min-height:480px}
+.chat-list-hd,.chat-win-hd{padding:16px 20px;border-bottom:1px solid var(--border);font-weight:700;color:var(--head)}
+.chat-win-sub{font-size:13px;color:var(--muted);font-weight:400}
+.chat-item{padding:14px 20px;border-bottom:1px solid var(--border);cursor:pointer;display:flex;flex-direction:column;gap:4px;align-items:flex-start}
 .chat-item:hover,.chat-item.on{background:var(--soft)}
-.chat-item-top{display:flex;justify-content:space-between}.chat-item-name{font-weight:600}.chat-time{font-size:11px;color:var(--muted)}
-.chat-preview{font-size:12px;color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.chat-msgs{flex:1;padding:18px;display:flex;flex-direction:column;gap:12px;overflow-y:auto}
-.bubble-user{align-self:flex-end;max-width:70%;background:linear-gradient(135deg,var(--nav),var(--nav2));color:#fff;border-radius:14px 14px 3px 14px;padding:10px 14px}
-.bubble-bot{align-self:flex-start;max-width:70%;background:var(--soft);border-radius:14px 14px 14px 3px;padding:10px 14px}
-.analytics-kpi{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;margin-bottom:18px}
-.insights p{margin-bottom:10px;display:flex;gap:8px}.insights i{color:var(--orange);font-size:17px;flex-shrink:0}
-.users-big{padding:12px 0 18px;text-align:center}.users-big b{display:block;font-size:38px;font-weight:800;color:var(--head)}.users-big span{color:var(--muted)}
-.privacy-note{background:rgba(34,197,94,.1);border:1px solid rgba(34,197,94,.3);border-radius:10px;padding:12px;font-size:12px;color:var(--green)}
-.empty-row{text-align:center;padding:36px;color:var(--muted)}
-#toasts{position:fixed;right:20px;bottom:20px;display:flex;flex-direction:column;gap:8px;z-index:99}
-.toast{background:var(--nav);color:#fff;padding:12px 18px;border-radius:12px;font-weight:600;box-shadow:0 10px 28px rgba(0,0,0,.3);border-left:4px solid var(--green);animation:pop .25s}
-.toast.err{border-left-color:var(--red)}
+.chat-item-top{display:flex;justify-content:space-between;width:100%}.chat-item-name{font-weight:600;color:var(--head)}.chat-time{font-size:12px;color:var(--muted)}
+.chat-preview{font-size:13px;color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:100%}
+.chat-msgs{flex:1;padding:20px;display:flex;flex-direction:column;gap:12px;overflow-y:auto}
+.bubble-user{align-self:flex-end;max-width:70%;background:linear-gradient(135deg,var(--nav),var(--nav2));color:#fff;border-radius:16px 16px 4px 16px;padding:10px 16px}
+.bubble-bot{align-self:flex-start;max-width:70%;background:var(--soft);border:1px solid var(--border);border-radius:16px 16px 16px 4px;padding:10px 16px}
+
+.chat-filters{display:flex;gap:8px;flex-wrap:wrap;padding:12px 16px;border-bottom:1px solid var(--border)}
+.chat-meta{display:flex;align-items:center;gap:8px;margin-top:4px}
+.bubble-agent{align-self:flex-start;max-width:70%;background:#EEF2FF;color:#1E2A5A;border:1px solid #C7D2FE;border-radius:16px 16px 16px 4px;padding:10px 16px}
+.bubble-tag{display:block;font-size:12px;font-weight:700;color:#4338CA;margin-bottom:2px}
+.chat-reply{border-top:1px solid var(--border);padding:12px 16px;display:flex;flex-direction:column;gap:8px;background:var(--card)}
+.chat-reply-actions{display:flex;justify-content:flex-end;gap:8px}
+/* ---------- Toasts + responsive ---------- */
+#toasts{position:fixed;right:24px;bottom:24px;display:flex;flex-direction:column;gap:8px;z-index:99}
+.toast{background:var(--nav);color:#fff;padding:12px 20px;border-radius:var(--r-m);font-weight:600;box-shadow:var(--shadow-l);border-left:4px solid var(--green);animation:pop .25s;max-width:360px}
+.toast.err{border-left-color:#F87171}
 @keyframes pop{from{opacity:0;transform:translateY(10px)}}
-@media(prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
-@media(max-width:1100px){.kpi-grid{grid-template-columns:repeat(2,1fr)}.form-grid{grid-template-columns:repeat(2,1fr)}}
-@media(max-width:820px){.sidebar{width:72px;min-width:72px;margin:0;border-radius:0;height:100vh}.sidebar .logo-texts,.sidebar .nav-label,.sidebar .user-info,.sidebar .nav-badge{display:none}.two-col,.chat-layout,.analytics-kpi{grid-template-columns:1fr}.content{padding:16px}.topbar{margin:0;border-radius:0}.online{display:none}.hero svg{opacity:.3}}
-@media(max-width:560px){.kpi-grid,.form-grid{grid-template-columns:1fr}}
+@media(prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important;scroll-behavior:auto!important}}
+@media(max-width:1200px){.kpi-grid{grid-template-columns:repeat(2,1fr)}.form-grid{grid-template-columns:repeat(2,1fr)}}
+@media(max-width:900px){.two-col,.chat-layout,.analytics-kpi{grid-template-columns:1fr}.hero{padding:24px}.hero h2{font-size:24px}}
+@media(max-width:820px){.sidebar{width:76px;min-width:76px;margin:0;border-radius:0;height:100vh}.sidebar .logo-texts,.sidebar .nav-label,.sidebar .user-info,.sidebar .nav-badge,.sidebar .nav-group{display:none}.content{padding:16px}.topbar{margin:0;border-radius:0}.online{display:none}.search{min-width:0;flex:1}.btn-orange,.btn-outline,.filt-btn{min-height:44px}}
+@media(max-width:560px){.kpi-grid,.form-grid{grid-template-columns:1fr}.hero-credit{display:none}.form-body{padding:8px 16px 0}.form-actions{padding:12px 16px}}
 </style>
 <link rel="stylesheet" href="animations.css">
 </head>
 <body>
+<a class="skip" href="#main">Skip to content</a>
 <div class="sidebar" id="sidebar">
   <div class="logo">
     <div class="logo-icon"><img src="images/logo.png" alt="MKDWander logo" onerror="this.outerHTML='<i class=&quot;ti ti-plane&quot;></i>'"></div>
     <div class="logo-texts"><div class="logo-name">MKDWander</div><div class="logo-sub">Travel &amp; Tours</div></div>
   </div>
-  <nav>
+  <nav aria-label="Main">
+    <div class="nav-group">Overview</div>
     <button class="nav-btn active" onclick="go('dashboard',this)" data-label="Dashboard"><i class="ti ti-layout-dashboard"></i><span class="nav-label">Dashboard</span></button>
+    <div class="nav-group">Catalog</div>
     <button class="nav-btn" onclick="go('packages',this)" data-label="Tour Packages"><i class="ti ti-photo-plus"></i><span class="nav-label">Tour Packages</span></button>
-    <button class="nav-btn" onclick="go('promos',this)" data-label="Promos &amp; Banners"><i class="ti ti-discount-2"></i><span class="nav-label">Promos &amp; Banners</span></button>
+    <div class="nav-group">Sales</div>
     <button class="nav-btn" onclick="go('inquiries',this)" data-label="Booking Inquiries"><i class="ti ti-clipboard-list"></i><span class="nav-label">Booking Inquiries</span><span class="nav-badge" id="nav-inq-badge"></span></button>
     <button class="nav-btn" onclick="go('revenue',this)" data-label="Payments &amp; Revenue"><i class="ti ti-cash"></i><span class="nav-label">Payments &amp; Revenue</span></button>
+    <div class="nav-group">Audience</div>
     <button class="nav-btn" onclick="go('users',this)" data-label="Users &amp; Accounts"><i class="ti ti-users"></i><span class="nav-label">Users &amp; Accounts</span></button>
-    <button class="nav-btn" onclick="go('chatbot',this)" data-label="Chatbot Logs"><i class="ti ti-message-dots"></i><span class="nav-label">Chatbot Logs</span></button>
+    <button class="nav-btn" onclick="go('chatbot',this)" data-label="Chatbot Logs"><i class="ti ti-message-dots"></i><span class="nav-label">Chatbot Logs</span><span class="nav-badge" id="nav-chat-badge"></span></button>
+    <div class="nav-group">Insights</div>
     <button class="nav-btn" onclick="go('analytics',this)" data-label="Analytics"><i class="ti ti-chart-bar"></i><span class="nav-label">Analytics</span></button>
   </nav>
   <div class="sidebar-foot">
@@ -238,70 +296,18 @@ tbody tr:hover{background:var(--soft)}tbody tr:last-child td{border:none}
       <div class="online"><div class="online-dot"></div>Live</div>
     </div>
   </div>
-  <div class="content">
+  <div class="content" id="main" tabindex="-1">
 
     <div class="section active" id="sec-dashboard">
       <div class="hero">
+        <div class="hero-eyebrow">MKDWander Admin</div>
         <h2 id="greeting">Welcome back, MKDWander Admin</h2>
-        <p>Review new inquiries, track confirmed revenue and manage travel packages.</p>
+        <p>Review new inquiries, track confirmed revenue and manage your travel packages.</p>
         <div class="hero-actions">
-          <button class="btn-orange" onclick="go('revenue',null)"><i class="ti ti-cash"></i> View Paid Bookings</button>
-          <button class="btn-ghost" onclick="go('inquiries',null)">Review Inquiries</button>
-          <div class="form-field-full feature-box">
-            <div class="feature-hd"><i class="ti ti-star"></i> Home screen placement</div>
-            <div class="form-grid">
-              <div class="form-field"><label>Feature on app Home?</label><select id="pkg-featured"><option value="false">No &mdash; show under Suggestions only</option><option value="true">Yes &mdash; show in Featured Packages</option></select></div>
-              <div class="form-field"><label>Featured order (1 = first)</label><input type="number" id="pkg-featured-order" min="1" placeholder="1"></div>
-              <div class="form-field"><label>Featured until (optional)</label><input type="date" id="pkg-featured-until"></div>
-            </div>
-            <p class="feature-note">Featured = bagong package o may promo na gusto mong i-push. Lahat ng hindi featured ay lalabas pa rin sa <b>Recommended for you</b>, naka-rank ayon sa budget &amp; tour type ng user.</p>
-          </div>
-          <div class="form-field" style="grid-column:span 2"><label>Stops and highlights (comma-separated)</label><input id="pkg-route" placeholder="e.g. Big Lagoon, Secret Lagoon, Shimizu Island"></div>
-          <div class="form-field-full"><label>Inclusions (one per line)</label><textarea id="pkg-inc" class="reply-textarea" placeholder="3 Nights Hotel Stay&#10;Daily Breakfast" oninput="renderIncPreview()"></textarea></div>
-          <div class="form-field-full cp-box">
-            <div class="feature-hd"><i class="ti ti-layout-cards"></i> Card preview (ito ang lalabas sa app card) <span class="cp-auto" id="cp-mode">AUTO</span></div>
-            <div class="cp-chips" id="cp-chips"><span class="feature-note">Maglagay ng inclusions sa taas para lumabas ang preview.</span></div>
-            <div class="cp-label">Gusto mong ibang inclusion? I-click para i-pin (max 3)</div>
-            <div class="cp-pick" id="cp-pick"></div>
-            <p class="feature-note">Auto-pick ang pinaka-importante (hotel, breakfast, transfer, flight, ferry...). Ang na-pin mo ang unang ilalabas. Sa app, ang <b>kasya lang sa lapad ng card</b> ang makikita (karaniwan 2-3); ang natitira ay "+N more". Ang dashed na chip ay maaaring hindi kasya sa maliliit na phone.</p>
-          </div>
-          <div class="form-field-full"><label>Exclusions (one per line)</label><textarea id="pkg-exc" class="reply-textarea" placeholder="Airfare Tickets&#10;Travel Insurance"></textarea></div>
-          <div class="form-field-full"><label>Day-by-Day Itinerary</label><textarea id="pkg-itin" class="reply-textarea" placeholder="Day 1: Airport pickup and hotel check-in&#10;Day 2: Island hopping tour"></textarea></div>
-          <div class="form-field-full"><label>Package photos * (lalabas sa package details; i-swipe sa app kung higit sa isa)</label>
-            <div class="upload-box"><input type="file" id="gal-file" accept="image/*" multiple onchange="addGalleryFiles(event)"><i class="ti ti-photos"></i><span>Click or drag one or more tour photos (PNG, JPG). Pwedeng pumili ng marami nang sabay.</span></div>
-            <div class="gal-grid" id="gal-grid"></div>
-            <p class="feature-note"><b>Ang unang larawan</b> ang magiging <b>cover sa Home</b>. Gamitin ang mga arrow para ayusin ang pagkakasunod. Malinis na photo ang ilagay dito (walang text/poster).</p>
-          </div>
-          <div class="form-field-full"><label>Agency poster (optional)</label>
-            <div class="upload-box"><input type="file" id="pkg-file" accept="image/*" onchange="previewImg(event,'pkg-prev','pkg-hint','pkg')"><i class="ti ti-cloud-upload"></i><span id="pkg-hint">Click or drag the agency poster (PNG, JPG)</span><img id="pkg-prev" class="upload-preview" alt="Poster preview"></div>
-            <div class="scan-row"><button type="button" class="btn-outline" id="btn-scan" onclick="scanPoster()"><i class="ti ti-scan"></i> Scan poster &amp; auto-fill</button><label class="scan-ow"><input type="checkbox" id="scan-overwrite"> Palitan din ang mga may laman na</label><span class="scan-status" id="scan-status"></span></div>
-            <p class="feature-note">Binabasa ng browser mo ang poster (OCR) at pino-fill lang ang <b>Package name</b> at <b>Inclusions</b>. <b>Laging i-check</b> ang mga orange na fields bago i-save. Hindi ito ginagamit bilang cover; para lang sa scan.</p>
-          </div>
+          <button class="btn-orange" onclick="go('inquiries',null)"><i class="ti ti-clipboard-list"></i> Review inquiries</button>
+          <button class="btn-ghost btn-outline-light" onclick="go('revenue',null)"><i class="ti ti-cash"></i> View paid bookings</button>
         </div>
-        <div class="form-actions"><button class="btn-outline" onclick="closePkgForm()">Cancel</button><button class="btn-orange" id="btn-save-pkg" onclick="savePackage()"><i class="ti ti-check"></i> Save package</button></div>
-      </div>
-      <div class="tbl-wrap"><table><thead><tr><th>Photo</th><th>Code</th><th>Package name</th><th>Destination</th><th>Region</th><th>Duration</th><th>Price / pax</th><th>Rating</th><th>Featured</th><th>Actions</th></tr></thead>
-      <tbody id="pkg-body"><tr><td colspan="10" class="empty-row">Loading packages from Firestore...</td></tr></tbody></table></div>
-    </div>
-
-    <div class="section" id="sec-promos">
-      <div class="filter-row">
-        <div class="ph" style="margin:0"><div class="ph-ico"><i class="ti ti-discount-2"></i></div><div><h2>App promo banners &amp; vouchers</h2><p>These promos sync with the mobile app banner feed.</p></div></div>
-        <button class="btn-orange" onclick="toggleAddPromoForm()"><i class="ti ti-tag"></i> Add promo banner</button>
-      </div>
-      <div class="add-form" id="add-promo-form" style="border-top-color:var(--gold)">
-        <div class="add-form-title">Upload a new promo banner</div>
-        <div class="form-grid">
-          <div class="form-field"><label>Promo title</label><input id="new-promo-title" placeholder="e.g. Summer Island Fiesta 50% Off"></div>
-          <div class="form-field"><label>Voucher code</label><input id="new-promo-code" placeholder="e.g. SUMMER50"></div>
-          <div class="form-field"><label>Discount badge</label><input id="new-promo-discount" placeholder="e.g. 50% OFF"></div>
-          <div class="form-field"><label>Valid until</label><input type="date" id="new-promo-expiry"></div>
-          <div class="form-field" style="grid-column:span 2"><label>Short description</label><input id="new-promo-desc" placeholder="Applies to all Palawan and Boracay packages."></div>
-          <div class="form-field-full"><label>Promo banner image (landscape)</label>
-            <div class="upload-box"><input type="file" id="promo-file-input" accept="image/*" onchange="previewImg(event,'promo-preview-img','promo-upload-hint','promo')"><i class="ti ti-photo-heart"></i><span id="promo-upload-hint">Click or drag the promo image here</span><img id="promo-preview-img" class="upload-preview" alt="Promo preview"></div>
-          </div>
-        </div>
-        <svg viewBox="0 0 400 160" preserveAspectRatio="xMaxYMid slice" aria-hidden="true"><path d="M20 130 C110 130 120 40 210 70 S320 110 380 30" fill="none" stroke="#49C9F0" stroke-width="2" stroke-dasharray="6 7" stroke-linecap="round"/><circle cx="20" cy="130" r="6" fill="#FFBF49"/><circle cx="210" cy="70" r="5" fill="#49C9F0"/><circle cx="380" cy="30" r="7" fill="#FD7830"/><circle cx="380" cy="30" r="14" fill="none" stroke="#FD7830" stroke-opacity=".4"/></svg>
+        <a class="hero-credit" href="https://www.thepoortraveler.net/2020/03/things-to-do-philippines/" target="_blank" rel="noopener">Photo: Twin Lagoon, Coron · The Poor Traveler</a>
       </div>
       <div class="kpi-grid">
         <div class="kpi-card"><i class="ti ti-clipboard-list kpi-ico"></i><div class="kpi-label">Total inquiries &amp; bookings</div><div class="kpi-val" id="kpi-total-bookings">0</div></div>
@@ -338,64 +344,77 @@ tbody tr:hover{background:var(--soft)}tbody tr:last-child td{border:none}
       <div class="add-form" id="pkg-form">
         <div class="add-form-title" id="pkg-form-title">Add a new destination package</div>
         <input type="hidden" id="pkg-id"><input type="hidden" id="pkg-old-poster">
-        <div class="form-grid">
-          <div class="form-field"><label>Package Code</label><input id="pkg-code" placeholder="e.g. PLEN4A1"></div>
-          <div class="form-field"><label>Package Name</label><input id="pkg-name" placeholder="e.g. Island Escape Palawan 2026"></div>
-          <div class="form-field"><label>Destination Location</label><input id="pkg-dest" placeholder="e.g. El Nido, Palawan"></div>
-          <div class="form-field"><label>Region</label><select id="pkg-region"><option>Luzon</option><option>Visayas</option><option>Mindanao</option></select></div>
-          <div class="form-field"><label>Duration</label><input id="pkg-dur" placeholder="e.g. 4D - 3N"></div>
-          <div class="form-field"><label>Package type (label sa card)</label><input id="pkg-type" list="pkg-type-list" placeholder="e.g. Land Arrangement"><datalist id="pkg-type-list"><option value="Land Arrangement"><option value="Free &amp; Easy"><option value="Joiner Tour"><option value="Private Tour"><option value="Day Tour"></datalist></div>
-          <div class="form-field"><label>Price per person (₱)</label><input type="number" id="pkg-price" placeholder="12500"></div>
-          <div class="form-field"><label>Category</label><select id="pkg-cat"><option>Beach &amp; Island</option><option>Nature &amp; Eco</option><option>Adventure</option><option>Leisure</option></select></div>
-          <div class="form-field" style="grid-column:span 2"><label>Stops and highlights (comma-separated)</label><input id="pkg-route" placeholder="e.g. Big Lagoon, Secret Lagoon, Shimizu Island"></div>
-          <div class="form-field-full"><label>Inclusions (one per line)</label><textarea id="pkg-inc" class="reply-textarea" placeholder="3 Nights Hotel Stay&#10;Daily Breakfast" oninput="renderIncPreview()"></textarea></div>
-          <div class="form-field-full cp-box">
-            <div class="feature-hd"><i class="ti ti-layout-cards"></i> Card preview (ito ang lalabas sa app card) <span class="cp-auto" id="cp-mode">AUTO</span></div>
-            <div class="cp-chips" id="cp-chips"><span class="feature-note">Maglagay ng inclusions sa taas para lumabas ang preview.</span></div>
-            <div class="cp-label">Gusto mong ibang inclusion? I-click para i-pin (max 3)</div>
-            <div class="cp-pick" id="cp-pick"></div>
-            <p class="feature-note">Auto-pick ang pinaka-importante (hotel, breakfast, transfer, flight, ferry...). Ang na-pin mo ang unang ilalabas. Sa app, ang <b>kasya lang sa lapad ng card</b> ang makikita (karaniwan 2-3); ang natitira ay "+N more". Ang dashed na chip ay maaaring hindi kasya sa maliliit na phone.</p>
-          </div>
-          <div class="form-field-full"><label>Exclusions (one per line)</label><textarea id="pkg-exc" class="reply-textarea" placeholder="Airfare Tickets&#10;Travel Insurance"></textarea></div>
-          <div class="form-field-full"><label>Day-by-Day Itinerary</label><textarea id="pkg-itin" class="reply-textarea" placeholder="Day 1: Airport pickup and hotel check-in&#10;Day 2: Island hopping tour"></textarea></div>
-          <div class="form-field-full"><label>Package photos * (lalabas sa package details; i-swipe sa app kung higit sa isa)</label>
-            <div class="upload-box"><input type="file" id="gal-file" accept="image/*" multiple onchange="addGalleryFiles(event)"><i class="ti ti-photos"></i><span>Click or drag one or more tour photos (PNG, JPG). Pwedeng pumili ng marami nang sabay.</span></div>
-            <div class="gal-grid" id="gal-grid"></div>
-            <p class="feature-note"><b>Ang unang larawan</b> ang magiging <b>cover sa Home</b>. Gamitin ang mga arrow para ayusin ang pagkakasunod. Malinis na photo ang ilagay dito (walang text/poster).</p>
-          </div>
-          <div class="form-field-full"><label>Agency poster (optional)</label>
-            <div class="upload-box"><input type="file" id="pkg-file" accept="image/*" onchange="previewImg(event,'pkg-prev','pkg-hint','pkg')"><i class="ti ti-cloud-upload"></i><span id="pkg-hint">Click or drag the agency poster (PNG, JPG)</span><img id="pkg-prev" class="upload-preview" alt="Poster preview"></div>
-            <div class="scan-row"><button type="button" class="btn-outline" id="btn-scan" onclick="scanPoster()"><i class="ti ti-scan"></i> Scan poster &amp; auto-fill</button><label class="scan-ow"><input type="checkbox" id="scan-overwrite"> Palitan din ang mga may laman na</label><span class="scan-status" id="scan-status"></span></div>
-            <p class="feature-note">Binabasa ng browser mo ang poster (OCR) at pino-fill lang ang <b>Package name</b> at <b>Inclusions</b>. <b>Laging i-check</b> ang mga orange na fields bago i-save. Hindi ito ginagamit bilang cover; para lang sa scan.</p>
-          </div>
+        <div class="form-body">
+          <section class="form-sec">
+            <div class="form-sec-hd"><span class="n">1</span><div><h3>Basic details</h3><p>Ito ang makikita ng traveler sa title at sa card.</p></div></div>
+            <div class="form-grid">
+              <div class="form-field"><label for="pkg-code">Package code</label><input id="pkg-code" placeholder="e.g. PLEN4A1"></div>
+              <div class="form-field" style="grid-column:span 2"><label for="pkg-name">Package name<span class="req">*</span></label><input id="pkg-name" placeholder="e.g. Island Escape Palawan 2026"></div>
+              <div class="form-field"><label for="pkg-dest">Destination<span class="req">*</span></label><input id="pkg-dest" placeholder="e.g. El Nido, Palawan"></div>
+              <div class="form-field"><label for="pkg-region">Region</label><select id="pkg-region"><option>Luzon</option><option>Visayas</option><option>Mindanao</option></select></div>
+              <div class="form-field"><label for="pkg-dur">Duration<span class="req">*</span></label><input id="pkg-dur" placeholder="e.g. 4D - 3N"></div>
+            </div>
+          </section>
+          <section class="form-sec">
+            <div class="form-sec-hd"><span class="n">2</span><div><h3>Pricing &amp; category</h3><p>Presyo bawat tao at uri ng tour.</p></div></div>
+            <div class="form-grid">
+              <div class="form-field"><label for="pkg-price">Price per person (₱)<span class="req">*</span></label><input type="number" id="pkg-price" min="0" placeholder="12500"></div>
+              <div class="form-field"><label for="pkg-type">Package type (label sa card)</label><input id="pkg-type" list="pkg-type-list" placeholder="e.g. Land Arrangement"><datalist id="pkg-type-list"><option value="Land Arrangement"><option value="Free &amp; Easy"><option value="Joiner Tour"><option value="Private Tour"><option value="Day Tour"></datalist></div>
+              <div class="form-field"><label for="pkg-cat">Category</label><select id="pkg-cat"><option>Beach &amp; Island</option><option>Nature &amp; Eco</option><option>Adventure</option><option>Leisure</option></select></div>
+            </div>
+          </section>
+          <section class="form-sec">
+            <div class="form-sec-hd"><span class="n">3</span><div><h3>Home screen placement</h3><p>Optional. Piliin kung ipu-push sa Featured Packages ng app.</p></div></div>
+            <div class="feature-box">
+              <div class="form-grid">
+                <div class="form-field"><label for="pkg-featured">Feature on app Home?</label><select id="pkg-featured"><option value="false">No &mdash; show under Suggestions only</option><option value="true">Yes &mdash; show in Featured Packages</option></select></div>
+                <div class="form-field"><label for="pkg-featured-order">Featured order (1 = first)</label><input type="number" id="pkg-featured-order" min="1" placeholder="1"></div>
+                <div class="form-field"><label for="pkg-featured-until">Featured until (optional)</label><input type="date" id="pkg-featured-until"></div>
+              </div>
+              <p class="feature-note">Lahat ng hindi featured ay lalabas pa rin sa <b>Recommended for you</b>, naka-rank ayon sa budget &amp; tour type ng user.</p>
+            </div>
+          </section>
+          <section class="form-sec">
+            <div class="form-sec-hd"><span class="n">4</span><div><h3>Inclusions &amp; card preview</h3><p>Isang inclusion kada linya. Auto-generate ang chips sa app card.</p></div></div>
+            <div class="form-grid">
+              <div class="form-field-full"><label for="pkg-route">Stops and highlights (comma-separated)</label><input id="pkg-route" placeholder="e.g. Big Lagoon, Secret Lagoon, Shimizu Island"></div>
+              <div class="form-field-full"><label for="pkg-inc">Inclusions (one per line)</label><textarea id="pkg-inc" class="reply-textarea" placeholder="3 Nights Hotel Stay&#10;Daily Breakfast" oninput="renderIncPreview()"></textarea></div>
+              <div class="form-field-full cp-box">
+                <div class="feature-hd"><i class="ti ti-layout-cards"></i> Card preview (ito ang lalabas sa app card) <span class="cp-auto" id="cp-mode">AUTO</span></div>
+                <div class="cp-chips" id="cp-chips"><span class="feature-note">Maglagay ng inclusions sa taas para lumabas ang preview.</span></div>
+                <div class="cp-label">Gusto mong ibang inclusion? I-click para i-pin (max 3)</div>
+                <div class="cp-pick" id="cp-pick"></div>
+                <p class="feature-note">Auto-pick ang pinaka-importante (hotel, breakfast, transfer, flight, ferry...). Ang na-pin mo ang unang ilalabas. Sa app, ang <b>kasya lang sa lapad ng card</b> ang makikita (karaniwan 2-3); ang natitira ay "+N more". Ang dashed na chip ay maaaring hindi kasya sa maliliit na phone.</p>
+              </div>
+            </div>
+          </section>
+          <section class="form-sec">
+            <div class="form-sec-hd"><span class="n">5</span><div><h3>Itinerary &amp; exclusions</h3><p>Lalabas sa package details.</p></div></div>
+            <div class="form-grid">
+              <div class="form-field-full"><label for="pkg-exc">Exclusions (one per line)</label><textarea id="pkg-exc" class="reply-textarea" placeholder="Airfare Tickets&#10;Travel Insurance"></textarea></div>
+              <div class="form-field-full"><label for="pkg-itin">Day-by-day itinerary</label><textarea id="pkg-itin" class="reply-textarea" placeholder="Day 1: Airport pickup and hotel check-in&#10;Day 2: Island hopping tour"></textarea></div>
+            </div>
+          </section>
+          <section class="form-sec">
+            <div class="form-sec-hd"><span class="n">6</span><div><h3>Photos &amp; poster</h3><p>Ang unang photo ang cover sa Home.</p></div></div>
+            <div class="form-grid">
+              <div class="form-field-full"><label>Package photos<span class="req">*</span> (i-swipe sa app kung higit sa isa)</label>
+                <div class="upload-box"><input type="file" id="gal-file" accept="image/*" multiple onchange="addGalleryFiles(event)" aria-label="Upload package photos"><i class="ti ti-photos"></i><span>Click or drag one or more tour photos (PNG, JPG). Pwedeng pumili ng marami nang sabay.</span></div>
+                <div class="gal-grid" id="gal-grid"></div>
+                <p class="feature-note"><b>Ang unang larawan</b> ang magiging <b>cover sa Home</b>. Gamitin ang mga arrow para ayusin ang pagkakasunod. Malinis na photo ang ilagay dito (walang text/poster).</p>
+              </div>
+              <div class="form-field-full"><label>Agency poster (optional)</label>
+                <div class="upload-box"><input type="file" id="pkg-file" accept="image/*" onchange="previewImg(event,'pkg-prev','pkg-hint','pkg')" aria-label="Upload agency poster"><i class="ti ti-cloud-upload"></i><span id="pkg-hint">Click or drag the agency poster (PNG, JPG)</span><img id="pkg-prev" class="upload-preview" alt="Poster preview"></div>
+                <div class="scan-row"><button type="button" class="btn-outline" id="btn-scan" onclick="scanPoster()"><i class="ti ti-scan"></i> Scan poster &amp; auto-fill</button><label class="scan-ow"><input type="checkbox" id="scan-overwrite"> Palitan din ang mga may laman na</label><span class="scan-status" id="scan-status" aria-live="polite"></span></div>
+                <p class="feature-note">Binabasa ng browser mo ang poster (OCR) at pino-fill lang ang <b>Package name</b> at <b>Inclusions</b>. <b>Laging i-check</b> ang mga orange na fields bago i-save. Hindi ito ginagamit bilang cover; para lang sa scan.</p>
+              </div>
+            </div>
+          </section>
         </div>
-        <div class="form-actions"><button class="btn-outline" onclick="closePkgForm()">Cancel</button><button class="btn-orange" id="btn-save-pkg" onclick="savePackage()"><i class="ti ti-check"></i> Save package</button></div>
+        <div class="form-actions"><button type="button" class="btn-outline" onclick="closePkgForm()">Cancel</button><button class="btn-orange" id="btn-save-pkg" onclick="savePackage()"><i class="ti ti-check"></i> Save package</button></div>
       </div>
       <div class="tbl-wrap"><table><thead><tr><th>Photo</th><th>Code</th><th>Package name</th><th>Destination</th><th>Region</th><th>Duration</th><th>Price / pax</th><th>Rating</th><th>Featured</th><th>Actions</th></tr></thead>
       <tbody id="pkg-body"><tr><td colspan="10" class="empty-row">Loading packages from Firestore...</td></tr></tbody></table></div>
-    </div>
-
-    <div class="section" id="sec-promos">
-      <div class="filter-row">
-        <div class="ph" style="margin:0"><div class="ph-ico"><i class="ti ti-discount-2"></i></div><div><h2>App promo banners &amp; vouchers</h2><p>These promos sync with the mobile app banner feed.</p></div></div>
-        <button class="btn-orange" onclick="toggleAddPromoForm()"><i class="ti ti-tag"></i> Add promo banner</button>
-      </div>
-      <div class="add-form" id="add-promo-form" style="border-top-color:var(--gold)">
-        <div class="add-form-title">Upload a new promo banner</div>
-        <div class="form-grid">
-          <div class="form-field"><label>Promo title</label><input id="new-promo-title" placeholder="e.g. Summer Island Fiesta 50% Off"></div>
-          <div class="form-field"><label>Voucher code</label><input id="new-promo-code" placeholder="e.g. SUMMER50"></div>
-          <div class="form-field"><label>Discount badge</label><input id="new-promo-discount" placeholder="e.g. 50% OFF"></div>
-          <div class="form-field"><label>Valid until</label><input type="date" id="new-promo-expiry"></div>
-          <div class="form-field" style="grid-column:span 2"><label>Short description</label><input id="new-promo-desc" placeholder="Applies to all Palawan and Boracay packages."></div>
-          <div class="form-field-full"><label>Promo banner image (landscape)</label>
-            <div class="upload-box"><input type="file" id="promo-file-input" accept="image/*" onchange="previewImg(event,'promo-preview-img','promo-upload-hint','promo')"><i class="ti ti-photo-heart"></i><span id="promo-upload-hint">Click or drag the promo image here</span><img id="promo-preview-img" class="upload-preview" alt="Promo preview"></div>
-          </div>
-        </div>
-        <div class="form-actions"><button class="btn-outline" onclick="toggleAddPromoForm()">Cancel</button><button class="btn-orange" id="btn-save-promo" onclick="saveNewPromo()"><i class="ti ti-check"></i> Post to app</button></div>
-      </div>
-      <div class="tbl-wrap"><table><thead><tr><th>Banner</th><th>Promo title</th><th>Voucher code</th><th>Discount</th><th>Valid until</th><th>Status</th><th>Actions</th></tr></thead>
-      <tbody id="promo-body"><tr><td colspan="7" class="empty-row">Loading promo banners...</td></tr></tbody></table></div>
     </div>
 
     <div class="section" id="sec-inquiries">
@@ -485,7 +504,7 @@ tbody tr:hover{background:var(--soft)}tbody tr:last-child td{border:none}
     <!-- Payments & Revenue Ledger Section -->
     <div class="section" id="sec-revenue">
       <div class="ph">
-        <div class="ph-ico" style="background:linear-gradient(135deg,var(--green),#4ADE80)"><i class="ti ti-cash"></i></div>
+        <div class="ph-ico"><i class="ti ti-cash"></i></div>
         <div>
           <h2>Payments &amp; Revenue Ledger</h2>
           <p>List of paid transactions.</p>
@@ -493,25 +512,25 @@ tbody tr:hover{background:var(--soft)}tbody tr:last-child td{border:none}
       </div>
 
       <div class="kpi-grid">
-        <div class="kpi-card" style="border-top-color:var(--green)">
-          <i class="ti ti-cash-banknote kpi-ico" style="background:rgba(22,163,74,.15);color:var(--green)"></i>
+        <div class="kpi-card">
+          <i class="ti ti-cash-banknote kpi-ico"></i>
           <div class="kpi-label">Total Collected Revenue</div>
           <div class="kpi-val" id="rev-total-collected">₱0</div>
           <div class="kpi-note" id="rev-paid-count">0 confirmed bookings</div>
         </div>
-        <div class="kpi-card" style="border-top-color:var(--sky)">
+        <div class="kpi-card">
           <i class="ti ti-qrcode kpi-ico"></i>
           <div class="kpi-label">UnionBank QR Ph Volume</div>
           <div class="kpi-val" id="rev-ub-volume">₱0</div>
           <div class="kpi-note" id="rev-ub-count">0 transactions</div>
         </div>
-        <div class="kpi-card" style="border-top-color:var(--gold)">
+        <div class="kpi-card">
           <i class="ti ti-building-bank kpi-ico"></i>
           <div class="kpi-label">BPI Direct Payments</div>
           <div class="kpi-val" id="rev-bpi-volume">₱0</div>
           <div class="kpi-note" id="rev-bpi-count">0 transactions</div>
         </div>
-        <div class="kpi-card" style="border-top-color:var(--orange)">
+        <div class="kpi-card">
           <i class="ti ti-chart-arrows kpi-ico"></i>
           <div class="kpi-label">Average Booking Value</div>
           <div class="kpi-val" id="rev-avg-value">₱0</div>
@@ -561,11 +580,24 @@ tbody tr:hover{background:var(--soft)}tbody tr:last-child td{border:none}
     </div>
 
     <div class="section" id="sec-chatbot">
-      <div class="ph"><div class="ph-ico"><i class="ti ti-message-dots"></i></div><div><h2>Chatbot Logs</h2><p>Review customer questions and automated assistance logs.</p></div></div>
+      <div class="ph"><div class="ph-ico"><i class="ti ti-message-dots"></i></div><div><h2>Chatbot Logs</h2><p>Review chats, and reply directly when a traveler asks for our team.</p></div></div>
       <div class="chat-layout">
-        <div class="chat-list"><div class="chat-list-hd">Live sessions</div><div id="chat-session-list"></div></div>
+        <div class="chat-list"><div class="chat-list-hd">Conversations</div>
+          <div class="chat-filters" id="chat-filters">
+            <button class="filt-btn on" onclick="filterChats('all',this)">All</button>
+            <button class="filt-btn" onclick="filterChats('need',this)">Needs reply<span id="chat-need-count"></span></button>
+            <button class="filt-btn" onclick="filterChats('resolved',this)">Resolved</button>
+          </div>
+          <div id="chat-session-list"></div></div>
         <div class="chat-win"><div class="chat-win-hd"><div id="chat-active-name">MKDWander Live Support</div><div class="chat-win-sub" id="chat-active-sub">Real-time chatbot feed</div></div>
-          <div class="chat-msgs" id="chat-msgs-container"><div class="empty-row">Select a session to view its conversation.</div></div></div>
+          <div class="chat-msgs" id="chat-msgs-container"><div class="empty-row">Select a session to view its conversation.</div></div>
+          <div class="chat-reply" id="chat-reply-bar" style="display:none">
+            <textarea id="chat-reply-text" class="reply-textarea" rows="2" placeholder="Type your reply to the traveler..." aria-label="Reply to traveler"></textarea>
+            <div class="chat-reply-actions">
+              <button class="btn-outline" id="btn-chat-resolve" onclick="resolveChat()"><i class="ti ti-circle-check"></i> Mark resolved</button>
+              <button class="btn-orange" id="btn-chat-send" onclick="sendChatReply()"><i class="ti ti-send"></i> Send reply</button>
+            </div>
+          </div></div>
       </div>
     </div>
 
