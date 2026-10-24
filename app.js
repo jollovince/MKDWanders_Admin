@@ -762,7 +762,7 @@ export function exportInquiries() {
 }
 
 // Room type galing sa booking (quad / triple / twin)
-const roomLabel = i => ({ quad: "Quad sharing", triple: "Triple sharing", twin: "Twin sharing" }[i.roomSharing] || "");
+const roomLabel = i => ({ quad: "Quad sharing", triple: "Triple sharing", twin: "Twin sharing", "twin+triple": "Twin + Triple (to confirm)" }[i.roomSharing] || "");
 
 export function openDetail(id) {
   const i = inquiries.find(x => x.id === id);

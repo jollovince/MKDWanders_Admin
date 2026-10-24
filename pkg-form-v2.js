@@ -82,7 +82,8 @@ function init(){
   price.append(
     field('Triple sharing surcharge (+₱ per pax)',h('input',{type:'number',id:'pkg-triple',min:'0',placeholder:'2000'})),
     field('Twin sharing surcharge (+₱ per pax)',h('input',{type:'number',id:'pkg-twin',min:'0',placeholder:'3000'})),
-    field('Price note',h('input',{id:'pkg-price-note',placeholder:'e.g. Based on quad sharing'})));
+    field('Price note',h('input',{id:'pkg-price-note',placeholder:'e.g. Based on quad sharing'})),
+    field('Minimum travelers',h('input',{type:'number',id:'pkg-minpax',min:'1',placeholder:'2'})));
 
   /* NEW: Flight & travel dates */
   const sel=h('select',{id:'pkg-flight'},h('option',{value:'true'},'✈ May flight — included (fixed travel dates)'),h('option',{value:'false'},'🏝 Land arrangement — flight NOT included'));
@@ -153,7 +154,7 @@ window.pkgV2={
       flightIncluded:on,
       airline:on?$('pkg-airline').value.trim():'',flightRoute:on?$('pkg-flight-route').value.trim():'',baggage:on?$('pkg-baggage').value.trim():'',
       travelDates:on?dateRows().filter(d=>d.start):[],
-      sharing:{triple:+$('pkg-triple').value||0,twin:+$('pkg-twin').value||0},priceNote:$('pkg-price-note').value.trim(),
+      sharing:{triple:+$('pkg-triple').value||0,twin:+$('pkg-twin').value||0},priceNote:$('pkg-price-note').value.trim(),groupMin:Math.max(1,+$('pkg-minpax').value||1),
       itineraryDays:days.get().filter(d=>d.title||d.activities.length),
       highlightGroups:hls.get().filter(x=>x.places.length),highlightNote:$('pkg-hl-note').value.trim(),
       inclusions:inc.get(),exclusions:exc.get()
@@ -163,7 +164,7 @@ window.pkgV2={
     init();
     $('pkg-flight').value=String(p.flightIncluded!==false&&(p.flightIncluded||(p.travelDates||[]).length>0));
     $('pkg-airline').value=p.airline||'';$('pkg-flight-route').value=p.flightRoute||'';$('pkg-baggage').value=p.baggage||'';
-    $('pkg-triple').value=p.sharing?.triple||'';$('pkg-twin').value=p.sharing?.twin||'';$('pkg-price-note').value=p.priceNote||'';
+    $('pkg-triple').value=p.sharing?.triple||'';$('pkg-twin').value=p.sharing?.twin||'';$('pkg-price-note').value=p.priceNote||'';$('pkg-minpax').value=(p.groupMin>1?p.groupMin:'');
     $('pkg-hl-note').value=p.highlightNote||'';
     const box=document.querySelector('#pkg-form .v2-date')?.parentElement;
     if(box){box.replaceChildren();(p.travelDates?.length?p.travelDates:[{}]).forEach(d=>{const r=h('div',{class:'v2-date'},h('input',{type:'date',value:d.start||''}),'→',h('input',{type:'date',value:d.end||''}),h('button',{type:'button',class:'btn-danger',onclick:()=>r.remove()},'Remove'));box.append(r)})}
