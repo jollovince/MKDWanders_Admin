@@ -364,7 +364,11 @@ function applyScan(passes) {
   const titles = passes.map(p => parseTitle(p.raw)).sort((a, b) => b.length - a.length);
 
   put("pkg-name", titles[0], "Package name");
-  if (incs.length) put("pkg-inc", incs.join("\n"), `Inclusions (${incs.length})`);
+  if (incs.length) {
+    put("pkg-inc", incs.join("\n"), `Inclusions (${incs.length})`);
+    // I-sync ang chips editor (pkg-form-v2.js) sa na-scan na inclusions
+    window.pkgV2?.setInclusions?.(incs);
+  }
 
   renderIncPreview();
   $("scan-status").textContent = filled.length
@@ -448,6 +452,14 @@ export function openPkgForm(id) {
   }
   $("pkg-itin").value = itinText;
 
+  // v2 form (flight, travel dates, sharing, itinerary days, highlights, chips)
+  window.pkgV2?.setData({
+    ...(pkg || {}),
+    inclusions: incItems(),
+    exclusions: val("pkg-exc").split("\n").map(s => s.trim()).filter(Boolean)
+  });
+  renderIncPreview();
+
   const prev = $("pkg-prev");
   prev.src = pkg ? (pkg.poster || "") : "";
   prev.style.display = prev.src ? "block" : "none";
@@ -498,6 +510,9 @@ export async function savePackage() {
   if (gal.length === 0) {
     return toast("Mag-upload ng kahit isang Package photo (ang una ang cover sa Home).", "err");
   }
+  // Flight included -> kailangan ng travel dates; kailangan ng inclusions
+  const v2err = window.pkgV2?.validate?.();
+  if (v2err) return toast(v2err, "err");
 
   const btn = $("btn-save-pkg");
   btn.disabled = true;
@@ -553,7 +568,10 @@ export async function savePackage() {
       // Home screen placement (Featured Packages sa mobile app)
       featured: $("pkg-featured").value === "true",
       featuredOrder: Number($("pkg-featured-order").value) || null,
-      featuredUntil: $("pkg-featured-until").value || null
+      featuredUntil: $("pkg-featured-until").value || null,
+      // v2: flightIncluded, airline, flightRoute, baggage, travelDates, sharing, priceNote,
+      //     itineraryDays, highlightGroups, highlightNote, inclusions, exclusions
+      ...(window.pkgV2 ? window.pkgV2.getData() : {})
     };
 
     if (id) {
@@ -633,7 +651,7 @@ export function renderPkgs() {
     <tr>
       <td><img src="${esc(p.imageUrl || p.poster)}" class="poster-thumb" alt="${esc(p.name || p.title)}"></td>
       <td class="td-mono" style="font-weight:700;color:var(--head)">${esc(p.code || "TOUR")}</td>
-      <td class="td-bold">${esc(p.name || p.title)}</td>
+      <td class="td-bold">${esc(p.name || p.title)}<div style="margin-top:4px">${p.flightIncluded ? '<span class="pill pill-view">✈ Flight incl.</span>' : '<span class="pill pill-off">Land only</span>'}</div></td>
       <td class="td-muted">${esc(p.dest || p.destination || p.location)}</td>
       <td>${pillRegion(p.region)}</td>
       <td class="td-muted">${esc(p.dur || p.durationLabel)}</td>
@@ -716,7 +734,7 @@ export function renderInquiries() {
 export function exportInquiries() {
   const rows = filteredInquiries();
   if (!rows.length) return toast("Nothing to export.", "err");
-  const head = ["Ref", "Client", "Phone", "Email", "Package", "Pax", "Total", "Payment", "Status", "Travel Date", "Special Requests", "Submitted"];
+  const head = ["Ref", "Client", "Phone", "Email", "Package", "Pax", "Room", "Flight", "Total", "Payment", "Status", "Travel Date", "Special Requests", "Submitted"];
   const lines = rows.map(i => [
     i.code || i.reference || i.id, 
     i.client || i.name || "", 
@@ -724,6 +742,8 @@ export function exportInquiries() {
     i.email || "",
     pkgName(i), 
     i.pax || 1, 
+    roomLabel(i),
+    i.flightIncluded ? "Included" : "Not included",
     amount(i), 
     i.paymentMethod || "UnionBank QR Ph", 
     i.status || "pending", 
@@ -741,6 +761,9 @@ export function exportInquiries() {
   toast("CSV exported.");
 }
 
+// Room type galing sa booking (quad / triple / twin)
+const roomLabel = i => ({ quad: "Quad sharing", triple: "Triple sharing", twin: "Twin sharing" }[i.roomSharing] || "");
+
 export function openDetail(id) {
   const i = inquiries.find(x => x.id === id);
   if (!i) return;
@@ -751,14 +774,14 @@ export function openDetail(id) {
   $("det-pkg").textContent = pkgName(i);
   $("det-phone").textContent = i.phone || "Not provided";
   $("det-email").textContent = i.email || "Not provided";
-  $("det-pax").textContent = `${i.pax || 1} traveler${(i.pax || 1) > 1 ? 's' : ''}`;
+  $("det-pax").textContent = `${i.pax || 1} traveler${(i.pax || 1) > 1 ? 's' : ''}` + (roomLabel(i) ? ` · ${roomLabel(i)}` : "");
   $("det-price").textContent = peso(amount(i));
   $("det-pay").textContent = i.paymentMethod || "UnionBank QR Ph";
   
   const dateStr = i.travelDate 
     ? `${i.travelDate}${i.travelEndDate ? ' – ' + i.travelEndDate : ''}` 
     : "Flexible / To be confirmed";
-  $("det-travel-date").textContent = dateStr;
+  $("det-travel-date").textContent = dateStr + (i.flightIncluded ? " · ✈ Flight included" : (i.flightIncluded === false ? " · Flight not included" : ""));
   $("det-date").textContent = i.date || fmtDate(i.createdAt);
   
   const reqBox = $("box-special-requests");
