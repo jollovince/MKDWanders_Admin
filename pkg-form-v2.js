@@ -68,6 +68,16 @@ const hlRow=(d,rm,chg)=>{
   return{el,get:()=>({label:l.value.trim(),places:p.value.split(',').map(x=>x.trim()).filter(Boolean)})};
 };
 
+/* ---------- Travel date row: start -> end (+ optional dagdag ₱/pax) ---------- */
+const dateRow=(d={})=>{
+  const r=h('div',{class:'v2-date'},
+    h('input',{type:'date','aria-label':'Departure',value:d.start||''}),'→',
+    h('input',{type:'date','aria-label':'Return',value:d.end||''}),
+    h('input',{type:'number',min:'0',placeholder:'+₱/pax',title:'Dagdag na presyo bawat pax sa petsang ito (optional)','aria-label':'Extra per pax (optional)',style:'width:120px',value:d.extra>0?String(d.extra):''}),
+    h('button',{type:'button',class:'btn-danger',onclick:()=>r.remove()},'Remove'));
+  return r;
+};
+
 /* ---------- Build UI ---------- */
 let inc,exc,days,hls,dates,datesBox,flightBox;
 function secEl(title,sub,...body){return h('section',{class:'form-sec'},h('div',{class:'form-sec-hd'},h('span',{class:'n'},'0'),h('div',{},h('h3',{},title),h('p',{},sub))),...body)}
@@ -92,12 +102,10 @@ function init(){
     field('Route',h('input',{id:'pkg-flight-route',placeholder:'Manila – Caticlan – Manila'})),
     field('Baggage',h('input',{id:'pkg-baggage',placeholder:'7kg hand carry & 20kg check-in'})));
   datesBox=h('div');dates=h('div');
-  const addDate=(d={})=>{const r=h('div',{class:'v2-date'},
-    h('input',{type:'date','aria-label':'Departure',value:d.start||''}),'→',h('input',{type:'date','aria-label':'Return',value:d.end||''}),
-    h('button',{type:'button',class:'btn-danger',onclick:()=>r.remove()},'Remove'));dates.append(r)};
+  const addDate=(d={})=>{dates.append(dateRow(d))};
   datesBox.append(h('label',{style:'display:block;font-size:13px;font-weight:600;margin:12px 0 6px'},'Travel dates (departure → return)'),dates,
     h('button',{type:'button',class:'btn-outline',onclick:()=>addDate()},'+ Add date'),
-    h('p',{class:'feature-note'},'Isang row kada schedule (hal. Nov 6 → Nov 9). Lalabas sa app na naka-group per year.'));
+    h('p',{class:'feature-note'},'Isang row kada schedule (hal. Nov 6 → Nov 9). Lalabas sa app na naka-group per year. Ang “+₱/pax” ay optional: ilagay lang kung may dagdag sa presyo sa petsang iyon (hal. peak season, 1000). Idadagdag ito sa total ng traveler.'));
   const noFlight=h('p',{class:'feature-note',id:'v2-noflight'},'Hindi kasama ang flight — traveler ang magbu-book ng sariling flight. Walang fixed travel dates; idadagdag ang “Airfare Tickets” sa Exclusions.');
   const fsec=secEl('Flight & travel dates','Piliin kung kasama na ang flight sa package.',
     h('div',{class:'form-grid'},field('Flight coverage',sel,'form-field-full')),flightBox,datesBox,noFlight);
@@ -146,14 +154,14 @@ function refreshFlightLine(modeChanged){
 }
 
 /* ---------- Public API ---------- */
-const dateRows=()=>[...document.querySelectorAll('#pkg-form .v2-date')].map(r=>{const[i,o]=r.querySelectorAll('input');return{start:i.value,end:o.value}});
+const dateRows=()=>[...document.querySelectorAll('#pkg-form .v2-date')].map(r=>{const[i,o,x]=r.querySelectorAll('input');return{start:i.value,end:o.value,extra:Math.max(0,+x.value||0)}});
 window.pkgV2={
   getData(){
     const on=flightOn();
     return{
       flightIncluded:on,
       airline:on?$('pkg-airline').value.trim():'',flightRoute:on?$('pkg-flight-route').value.trim():'',baggage:on?$('pkg-baggage').value.trim():'',
-      travelDates:on?dateRows().filter(d=>d.start):[],
+      travelDates:on?dateRows().filter(d=>d.start).map(d=>d.extra>0?d:{start:d.start,end:d.end}):[],
       sharing:{triple:+$('pkg-triple').value||0,twin:+$('pkg-twin').value||0},priceNote:$('pkg-price-note').value.trim(),groupMin:Math.max(1,+$('pkg-minpax').value||1),
       itineraryDays:days.get().filter(d=>d.title||d.activities.length),
       highlightGroups:hls.get().filter(x=>x.places.length),highlightNote:$('pkg-hl-note').value.trim(),
@@ -167,7 +175,7 @@ window.pkgV2={
     $('pkg-triple').value=p.sharing?.triple||'';$('pkg-twin').value=p.sharing?.twin||'';$('pkg-price-note').value=p.priceNote||'';$('pkg-minpax').value=(p.groupMin>1?p.groupMin:'');
     $('pkg-hl-note').value=p.highlightNote||'';
     const box=document.querySelector('#pkg-form .v2-date')?.parentElement;
-    if(box){box.replaceChildren();(p.travelDates?.length?p.travelDates:[{}]).forEach(d=>{const r=h('div',{class:'v2-date'},h('input',{type:'date',value:d.start||''}),'→',h('input',{type:'date',value:d.end||''}),h('button',{type:'button',class:'btn-danger',onclick:()=>r.remove()},'Remove'));box.append(r)})}
+    if(box){box.replaceChildren();(p.travelDates?.length?p.travelDates:[{}]).forEach(d=>box.append(dateRow(d)))}
     inc.set(p.inclusions||($('pkg-inc').value?$('pkg-inc').value.split('\n'):[]));
     exc.set(p.exclusions||[]);
     let dd=p.itineraryDays;

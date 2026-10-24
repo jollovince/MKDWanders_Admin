@@ -832,6 +832,9 @@ export function filterRev(mode, btn) {
   renderRevenue();
 }
 
+// QR Ph ay dumadaan sa UnionBank (kapareho ng label ng card: "UnionBank QR Ph")
+const isUB = m => /unionbank|qr/i.test(String(m || ""));
+
 function getPaidInquiries() {
   const q = val("revenue-search").toLowerCase();
   return inquiries.filter(i => {
@@ -839,7 +842,7 @@ function getPaidInquiries() {
     if (!isPaid) return false;
     const method = String(i.paymentMethod || "").toLowerCase();
     const matchChannel = (revFilter === "all") ||
-      (revFilter === "ub" && method.includes("unionbank")) ||
+      (revFilter === "ub" && isUB(method)) ||
       (revFilter === "bpi" && method.includes("bpi"));
     const matchQuery = !q || [i.client, i.name, pkgName(i), i.id, i.code, i.reference, i.paymentMethod].some(v => String(v || "").toLowerCase().includes(q));
     return matchChannel && matchQuery;
@@ -851,7 +854,7 @@ export function renderRevenue() {
   const allPaid = inquiries.filter(i => ["confirmed", "paid"].includes(i.status));
 
   const totalCollected = allPaid.reduce((sum, item) => sum + amount(item), 0);
-  const ubItems = allPaid.filter(i => String(i.paymentMethod || "").toLowerCase().includes("unionbank"));
+  const ubItems = allPaid.filter(i => isUB(i.paymentMethod));
   const bpiItems = allPaid.filter(i => String(i.paymentMethod || "").toLowerCase().includes("bpi"));
 
   const ubVol = ubItems.reduce((sum, item) => sum + amount(item), 0);
