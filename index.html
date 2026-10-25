@@ -431,6 +431,8 @@ tbody tr{transition:background .12s}tbody tr:hover{background:var(--soft)}tbody 
           <button class="filt-btn on" onclick="filterInq('all',this)">All</button>
           <button class="filt-btn" onclick="filterInq('pending',this)">Pending</button>
           <button class="filt-btn" onclick="filterInq('responded',this)">Responded</button>
+          <button class="filt-btn" onclick="filterInq('awaiting_payment',this)">Awaiting payment</button>
+          <button class="filt-btn" onclick="filterInq('payment_submitted',this)">Payment submitted</button>
           <button class="filt-btn" onclick="filterInq('confirmed',this)">Confirmed</button>
           <button class="filt-btn" onclick="filterInq('cancelled',this)">Cancelled</button>
         </div>
@@ -488,12 +490,27 @@ tbody tr{transition:background .12s}tbody tr:hover{background:var(--soft)}tbody 
           <p id="det-special-requests" style="font-size:12px;color:var(--text);white-space:pre-wrap;"></p>
         </div>
 
+        <div class="det-box" id="box-payment-proof" style="display:none;">
+          <div class="det-box-lbl">Payment submitted by traveler</div>
+          <div class="det-row"><span class="det-key">Reference no.:</span><span class="det-val" id="det-pay-ref">—</span></div>
+          <div class="det-row"><span class="det-key">Method used:</span><span class="det-val" id="det-pay-method2">—</span></div>
+          <div class="det-row"><span class="det-key">Submitted:</span><span class="det-val" id="det-pay-when">—</span></div>
+          <p class="feature-note">I-verify muna sa bank/e-wallet app mo na pumasok ang bayad bago i-confirm.</p>
+        </div>
+
+        <div class="form-field-full" style="margin-bottom:12px;max-width:320px;" id="box-final-amount">
+          <label for="final-amount">Final amount to pay (₱)</label>
+          <input type="number" id="final-amount" min="0" placeholder="e.g. 68998">
+          <p class="feature-note">Para sa solo o special rate, ilagay dito ang final quote. Ito ang ipapakita sa traveler sa payment screen.</p>
+        </div>
+
         <div class="form-field-full" style="margin-bottom:12px;">
           <label style="font-weight:700;display:block;margin-bottom:6px;">Admin Remarks / Reply Note</label>
           <textarea class="reply-textarea" id="reply-text" placeholder="Maglagay ng mensahe o tagubilin para sa booking na ito..."></textarea>
         </div>
 
         <div class="reply-row" style="gap:8px;flex-wrap:wrap;">
+          <button class="btn-orange" id="btn-req-pay" onclick="requestPayment()"><i class="ti ti-cash"></i> Request payment</button>
           <button class="btn-confirm" onclick="confirmInquiry()"><i class="ti ti-check"></i> Mark as Paid &amp; Confirmed</button>
           <button class="btn-send" onclick="sendInquiryReply()"><i class="ti ti-message-share"></i> Send Note</button>
           <button class="btn-danger" style="padding:10px 14px;border-radius:10px;" onclick="cancelInquiry()"><i class="ti ti-x"></i> Reject / Cancel</button>
@@ -536,6 +553,51 @@ tbody tr{transition:background .12s}tbody tr:hover{background:var(--soft)}tbody 
           <div class="kpi-val" id="rev-avg-value">₱0</div>
           <div class="kpi-note">Per confirmed passenger ticket</div>
         </div>
+      </div>
+
+      <div class="card" id="paydet-card" style="margin-bottom:24px">
+        <div class="card-title">Payment instructions (ipinapakita sa traveler)</div>
+        <p class="feature-note" style="margin:-8px 0 16px">Lalabas ito sa app kapag nag-request ka ng payment sa booking. Para sa testing, gumamit ng "TEST" na detalye at placeholder na QR. Huwag maglagay ng password, PIN o OTP.</p>
+        <div class="feature-box" data-method="QR Ph" style="margin-bottom:12px">
+          <div class="feature-hd"><i class="ti ti-qrcode"></i> QR Ph</div>
+          <div class="form-grid">
+            <div class="form-field"><label>Account name</label><input data-f="accountName" placeholder="TEST ACCOUNT"></div>
+            <div class="form-field"><label>Account / mobile number</label><input data-f="accountNumber" placeholder="0000-0000-0000"></div>
+            <div class="form-field"><label>Bank / wallet</label><input data-f="bank" placeholder="UnionBank"></div>
+            <div class="form-field-full"><label>Instructions (optional)</label><input data-f="note" placeholder="e.g. Ilagay ang booking reference sa notes ng transfer"></div>
+            <div class="form-field-full"><label>QR code image (optional)</label>
+              <input type="file" data-f="qrFile" accept="image/*">
+              <img data-f="qrPrev" class="upload-preview" alt="QR preview" style="max-width:200px;object-fit:contain">
+            </div>
+          </div>
+        </div>
+        <div class="feature-box" data-method="UnionBank" style="margin-bottom:12px">
+          <div class="feature-hd"><i class="ti ti-building-bank"></i> UnionBank</div>
+          <div class="form-grid">
+            <div class="form-field"><label>Account name</label><input data-f="accountName" placeholder="TEST ACCOUNT"></div>
+            <div class="form-field"><label>Account / mobile number</label><input data-f="accountNumber" placeholder="0000-0000-0000"></div>
+            <div class="form-field"><label>Bank / wallet</label><input data-f="bank" placeholder="UnionBank of the Philippines"></div>
+            <div class="form-field-full"><label>Instructions (optional)</label><input data-f="note" placeholder="e.g. Ilagay ang booking reference sa notes ng transfer"></div>
+            <div class="form-field-full"><label>QR code image (optional)</label>
+              <input type="file" data-f="qrFile" accept="image/*">
+              <img data-f="qrPrev" class="upload-preview" alt="QR preview" style="max-width:200px;object-fit:contain">
+            </div>
+          </div>
+        </div>
+        <div class="feature-box" data-method="BPI" style="margin-bottom:12px">
+          <div class="feature-hd"><i class="ti ti-building-bank"></i> BPI</div>
+          <div class="form-grid">
+            <div class="form-field"><label>Account name</label><input data-f="accountName" placeholder="TEST ACCOUNT"></div>
+            <div class="form-field"><label>Account / mobile number</label><input data-f="accountNumber" placeholder="0000-0000-0000"></div>
+            <div class="form-field"><label>Bank / wallet</label><input data-f="bank" placeholder="BPI"></div>
+            <div class="form-field-full"><label>Instructions (optional)</label><input data-f="note" placeholder="e.g. Ilagay ang booking reference sa notes ng transfer"></div>
+            <div class="form-field-full"><label>QR code image (optional)</label>
+              <input type="file" data-f="qrFile" accept="image/*">
+              <img data-f="qrPrev" class="upload-preview" alt="QR preview" style="max-width:200px;object-fit:contain">
+            </div>
+          </div>
+        </div>
+        <button class="btn-orange" id="btn-save-paydet" onclick="savePaymentDetails()"><i class="ti ti-check"></i> Save payment details</button>
       </div>
 
       <div class="filter-row">

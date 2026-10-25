@@ -1,6 +1,6 @@
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.9.0/firebase-app.js";
 import {
-  getFirestore, collection, addDoc, deleteDoc, updateDoc, doc,
+  getFirestore, collection, addDoc, deleteDoc, updateDoc, setDoc, doc,
   onSnapshot, query, orderBy, serverTimestamp, collectionGroup, arrayUnion, Timestamp
 } from "https://www.gstatic.com/firebasejs/10.9.0/firebase-firestore.js";
 import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.9.0/firebase-auth.js";
@@ -27,6 +27,7 @@ const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 const PKG_COLLECTION = "tour_packages";
 
 let packages = [], inquiries = [], usersList = [], chats = [];
+let payDetails = {}; // { 'QR Ph': {accountName, accountNumber, bank, note, qrUrl}, UnionBank:{...}, BPI:{...} }
 let reviewStats = {}; // packageId -> { sum, count } (totoong reviews galing sa app users)
 let chatFilter = "all";
 let pkgFilter = "All", inqFilter = "all", revFilter = "all", activeChat = null, currentInq = null;
@@ -678,6 +679,8 @@ function pillStatus(s) {
     pending: ["pill-pend", "Pending"], 
     paid: ["pill-conf", "Paid"], 
     responded: ["pill-resp", "Responded"], 
+    awaiting_payment: ["pill-resp", "Awaiting payment"],
+    payment_submitted: ["pill-pend", "Payment submitted"],
     confirmed: ["pill-conf", "Confirmed"],
     cancelled: ["pill-off", "Cancelled"]
   };
@@ -722,7 +725,7 @@ export function renderInquiries() {
         </td>
         <td class="td-muted">${esc(pkgName(i))}</td>
         <td class="td-bold" style="font-size:12px;color:var(--nav);">${dateRange}</td>
-        <td>${i.pax || 1} pax</td>
+        <td>${i.pax || 1} pax${i.roomNeedsCheck ? `<div class="td-muted" style="font-size:11px">${i.soloRateRequest ? "⚠ Solo: send rate" : "⚠ Check room"}</div>` : ""}</td>
         <td class="td-navy">${peso(amount(i))}</td>
         <td class="td-mono">${esc(i.paymentMethod || "UnionBank QR Ph")}</td>
         <td>${pillStatus(i.status || "pending")}</td>
@@ -762,7 +765,7 @@ export function exportInquiries() {
 }
 
 // Room type galing sa booking (quad / triple / twin)
-const roomLabel = i => ({ quad: "Quad sharing", triple: "Triple sharing", twin: "Twin sharing", "twin+triple": "Twin + Triple (to confirm)" }[i.roomSharing] || "");
+const roomLabel = i => ({ quad: "Quad sharing", triple: "Triple sharing", twin: "Twin sharing", "twin+triple": "Twin + Triple (to confirm)" }[i.roomSharing] || (i.soloRateRequest ? "Solo: send final rate" : i.roomNeedsCheck ? "Odd pax: confirm room" : ""));
 
 export function openDetail(id) {
   const i = inquiries.find(x => x.id === id);
@@ -793,6 +796,19 @@ export function openDetail(id) {
   }
 
   $("reply-text").value = i.adminNote || "";
+
+  // Final amount (solo / special rate) + proof galing sa traveler
+  const open = !["confirmed", "paid", "cancelled"].includes(i.status);
+  $("box-final-amount").style.display = open ? "block" : "none";
+  $("btn-req-pay").style.display = open ? "inline-flex" : "none";
+  $("final-amount").value = i.finalAmount || amount(i) || "";
+  const hasProof = !!i.paymentReference;
+  $("box-payment-proof").style.display = hasProof ? "block" : "none";
+  if (hasProof) {
+    $("det-pay-ref").textContent = i.paymentReference;
+    $("det-pay-method2").textContent = i.paymentMethod || "—";
+    $("det-pay-when").textContent = fmtDate(i.paymentSubmittedAt);
+  }
   
   $("inq-detail").style.display = "block";
   $("inq-detail").scrollIntoView({ behavior: "smooth", block: "nearest" });
@@ -803,10 +819,10 @@ export function closeDetail() {
   currentInq = null; 
 }
 
-async function setStatus(status, stamp, msg) {
+async function setStatus(status, stamp, msg, extra = {}) {
   if (!currentInq) return;
   try {
-    const data = { status, [stamp]: serverTimestamp() };
+    const data = { status, [stamp]: serverTimestamp(), ...extra };
     const note = val("reply-text");
     if (note) data.adminNote = note;
     await updateDoc(doc(db, "booking_inquiries", currentInq.id), data);
@@ -817,8 +833,69 @@ async function setStatus(status, stamp, msg) {
   }
 }
 
-export const sendInquiryReply = () => setStatus("responded", "respondedAt", "Inquiry marked as responded with notes.");
-export const confirmInquiry = () => setStatus("confirmed", "confirmedAt", "Booking inquiry confirmed as paid.");
+// Huwag ibalik sa "responded" kapag nasa payment stage na
+export const sendInquiryReply = () => {
+  const keep = ["awaiting_payment", "payment_submitted"].includes(currentInq?.status);
+  return setStatus(keep ? currentInq.status : "responded", "respondedAt", "Note sent to traveler.");
+};
+export const confirmInquiry = () =>
+  setStatus("confirmed", "confirmedAt", "Booking inquiry confirmed as paid.", currentInq ? { amountPaid: amount(currentInq) } : {});
+
+export function requestPayment() {
+  if (!currentInq) return;
+  if (["confirmed", "paid", "cancelled"].includes(currentInq.status)) return toast("Tapos na ang booking na ito.", "err");
+  const final = Number($("final-amount").value) || 0;
+  if (final <= 0) return toast("Ilagay ang final amount na babayaran.", "err");
+  const ready = Object.values(payDetails).some(d => d && (d.accountNumber || d.qrUrl));
+  if (!ready) return toast("Wala pang payment details. I-save muna sa Payments & Revenue.", "err");
+  return setStatus("awaiting_payment", "paymentRequestedAt", "Payment requested. Makikita na ng traveler ang payment details.", {
+    finalAmount: final,
+    total: final,
+    estimatedTotal: currentInq.estimatedTotal ?? amount(currentInq)
+  });
+}
+
+/* ---------- Payment instructions (settings/payment_details) ---------- */
+function renderPayDetails() {
+  document.querySelectorAll("#paydet-card [data-method]").forEach(box => {
+    const d = payDetails[box.dataset.method] || {};
+    box.querySelectorAll("input[data-f]").forEach(inp => {
+      if (inp.type === "file" || document.activeElement === inp) return;
+      inp.value = d[inp.dataset.f] || "";
+    });
+    const prev = box.querySelector('img[data-f="qrPrev"]');
+    if (prev) { prev.src = d.qrUrl || ""; prev.style.display = d.qrUrl ? "block" : "none"; }
+  });
+}
+
+export async function savePaymentDetails() {
+  const btn = $("btn-save-paydet");
+  btn.disabled = true;
+  try {
+    const methods = {};
+    for (const box of document.querySelectorAll("#paydet-card [data-method]")) {
+      const m = box.dataset.method;
+      const f = k => box.querySelector(`input[data-f="${k}"]`);
+      const entry = {
+        accountName: f("accountName").value.trim(),
+        accountNumber: f("accountNumber").value.trim(),
+        bank: f("bank").value.trim(),
+        note: f("note").value.trim(),
+        qrUrl: payDetails[m]?.qrUrl || ""
+      };
+      const file = f("qrFile").files[0];
+      if (file) { entry.qrUrl = await uploadImage(file, "payment-qr"); f("qrFile").value = ""; }
+      methods[m] = entry;
+    }
+    await setDoc(doc(db, "settings", "payment_details"), { methods, updatedAt: serverTimestamp() });
+    toast("Payment details saved.");
+  } catch (err) {
+    console.error(err);
+    toast("Could not save: " + err.message, "err");
+  } finally {
+    btn.disabled = false;
+  }
+}
 export const cancelInquiry = () => {
   if (!confirm("Reject or cancel this inquiry?")) return;
   setStatus("cancelled", "cancelledAt", "Booking marked as cancelled.");
@@ -1048,7 +1125,7 @@ export async function resolveChat() {
 /* ---------- Dashboard & Analytics ---------- */
 function renderDashboardData() {
   const total = inquiries.length;
-  const pending = inquiries.filter(i => (i.status || "pending") === "pending");
+  const pending = inquiries.filter(i => ["pending", "payment_submitted"].includes(i.status || "pending"));
   const confirmed = inquiries.filter(i => ["confirmed", "paid"].includes(i.status));
   const pipeline = inquiries.reduce((s, i) => s + amount(i), 0);
   const revenue = confirmed.reduce((s, i) => s + amount(i), 0);
@@ -1157,6 +1234,10 @@ function initFirestoreRealtime() {
     renderRevenue();
     renderDashboardData(); 
   });
+  snap(doc(db, "settings", "payment_details"), s => {
+    payDetails = s.exists() ? (s.data().methods || {}) : {};
+    renderPayDetails();
+  });
   snap(collection(db, "users"), s => { 
     usersList = s.docs.map(d => ({ id: d.id, ...d.data() })); 
     renderUsers(); 
@@ -1173,5 +1254,5 @@ Object.assign(window, {
   go, toggleSidebar, toggleTheme, logout, openPkgForm, closePkgForm, previewImg, filterPkg, savePackage, addGalleryFiles, galMove, galDel, scanPoster, renderIncPreview, toggleIncPin, removePkg, renderPkgs, toggleFeatured,
   filterInq, renderInquiries, exportInquiries,
   filterRev, renderRevenue, exportRevenue,
-  openDetail, closeDetail, sendInquiryReply, confirmInquiry, cancelInquiry, renderUsers, openChat, filterChats, sendChatReply, resolveChat
+  openDetail, closeDetail, sendInquiryReply, confirmInquiry, cancelInquiry, requestPayment, savePaymentDetails, renderUsers, openChat, filterChats, sendChatReply, resolveChat
 });
