@@ -1210,6 +1210,35 @@ function renderDashboardData() {
 }
 
 /* ---------- Realtime Firestore Listeners ---------- */
+$("recommend-form").addEventListener("submit", async event => {
+  event.preventDefault();
+  const button = $("recommend-submit"), results = $("recommend-results");
+  button.disabled = true;
+  results.textContent = "Finding matching packages...";
+  const catalog = packages.map(p => ({
+    id: p.id, name: p.name || p.title || "", destination: p.dest || p.destination || p.location || "",
+    category: p.category || "", description: p.description || "", durationLabel: p.dur || p.durationLabel || "",
+    price: Number(p.price) || 0, status: p.status || "Active", isActive: p.isActive !== false
+  }));
+  try {
+    const budget = $("recommend-budget").value;
+    const response = await fetch("/api/recommendations", {
+      method: "POST", headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ packages: catalog, preferences: {
+        interests: $("recommend-interests").value.trim(), ...(budget !== "" ? { budget: Number(budget) } : {})
+      }, limit: 5 })
+    });
+    const data = await response.json();
+    if (!response.ok) throw new Error(data.error || "Could not load recommendations");
+    results.innerHTML = data.recommendations.length ? data.recommendations.map(r => {
+      const p = catalog.find(p => p.id === r.id);
+      return `<p><strong>${esc(p.name)}</strong> — ${esc(p.destination)} · ${peso(p.price)} · Similarity: ${Math.round(r.score * 100)}%</p>`;
+    }).join("") : "No matching packages. Try different interests or increase the budget.";
+  } catch (err) {
+    results.textContent = err.message;
+  } finally { button.disabled = false; }
+});
+
 const snap = (q, fn) => onSnapshot(q, fn, err => { console.error(err); toast("Firestore: " + err.message, "err"); });
 
 function initFirestoreRealtime() {

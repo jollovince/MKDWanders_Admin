@@ -327,6 +327,16 @@ tbody tr{transition:background .12s}tbody tr:hover{background:var(--soft)}tbody 
     </div>
 
     <div class="section" id="sec-packages">
+      <form id="recommend-form" class="card" style="padding:20px;margin-bottom:20px">
+        <h2>Tour recommendations</h2>
+        <p>Find packages that match a traveler's interests and budget.</p>
+        <div class="filter-row" style="margin-top:12px">
+          <label>Interests or destination <input class="search" id="recommend-interests" placeholder="e.g. beach island Palawan" maxlength="500" required></label>
+          <label>Maximum budget (PHP) <input class="search" id="recommend-budget" type="number" min="0" step="any" placeholder="Optional"></label>
+          <button class="btn-orange" id="recommend-submit" type="submit">Find recommendations</button>
+        </div>
+        <div id="recommend-results" aria-live="polite"></div>
+      </form>
       <div class="ph"><div class="ph-ico"><i class="ti ti-photo-plus"></i></div><div><h2>Tour Packages</h2><p>Manage destinations, itinerary, inclusions, and prices shown in the app.</p></div></div>
       <div class="filter-row">
         <div class="filter-btns" id="pkg-filters">
