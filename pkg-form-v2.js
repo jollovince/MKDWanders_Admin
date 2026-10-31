@@ -1,7 +1,7 @@
 /* MKDWander Admin — Package form v2
-   Idagdag sa admin HTML bago </body>:  <script src="pkg-form-v2.js" defer></script>
-   Hindi binabago ang existing fields (#pkg-inc, #pkg-exc, #pkg-itin, #pkg-route) — ini-sync lang ito,
-   kaya gumagana pa rin ang lumang app.js. Bagong data: window.pkgV2.getData() / setData() / validate(). */
+   Add to the admin HTML before </body>: <script src="pkg-form-v2.js" defer></script>
+   Keeps existing fields (#pkg-inc, #pkg-exc, #pkg-itin, #pkg-route) synchronized
+   for compatibility with app.js. New data: window.pkgV2.getData() / setData() / validate(). */
 (()=>{
 const $=id=>document.getElementById(id);
 const h=(t,a={},...k)=>{const e=document.createElement(t);for(const[x,v]of Object.entries(a)){if(x==='class')e.className=v;else if(x.startsWith('on'))e.addEventListener(x.slice(2),v);else e.setAttribute(x,v)}k.flat().forEach(c=>e.append(c));return e};
@@ -54,26 +54,26 @@ function repeater(rowFn,addLabel,onChange){
 }
 const dayRow=(d,rm,chg)=>{
   const t=h('input',{placeholder:'Title, e.g. Arrival & hotel check-in',value:d.title||''});
-  const a=h('textarea',{rows:'4',placeholder:'Isang activity kada linya\nArrival at Caticlan Airport\nMeet by tour coordinator'});a.value=(d.activities||[]).join('\n');
+  const a=h('textarea',{rows:'4',placeholder:'One activity per line\nArrival at Caticlan Airport\nMeet by tour coordinator'});a.value=(d.activities||[]).join('\n');
   const lab=h('b',{},'Day 1');
   const el=h('div',{class:'v2-row'},h('div',{class:'v2-top'},lab,t,h('button',{type:'button',class:'btn-danger',onclick:rm},'Remove')),a);
   [t,a].forEach(x=>x.addEventListener('input',chg));
   return{el,setIdx:i=>lab.textContent='Day '+i,get:()=>({title:t.value.trim(),activities:a.value.split('\n').map(x=>x.trim()).filter(Boolean)})};
 };
 const hlRow=(d,rm,chg)=>{
-  const l=h('input',{placeholder:'Label, e.g. Habagat Off Season (optional)',value:d.label||''});
+  const l=h('input',{placeholder:'Label, e.g. Southwest Monsoon Off Season (optional)',value:d.label||''});
   const p=h('input',{placeholder:'Places, comma-separated: Puka Beach, Crocodile Island, Crystal Cove',value:(d.places||[]).join(', ')});
   const el=h('div',{class:'v2-row'},h('div',{class:'v2-top'},l,h('button',{type:'button',class:'btn-danger',onclick:rm},'Remove')),p);
   [l,p].forEach(x=>x.addEventListener('input',chg));
   return{el,get:()=>({label:l.value.trim(),places:p.value.split(',').map(x=>x.trim()).filter(Boolean)})};
 };
 
-/* ---------- Travel date row: start -> end (+ optional dagdag ₱/pax) ---------- */
+/* ---------- Travel date row: start -> end (+ optional surcharge per person) ---------- */
 const dateRow=(d={})=>{
   const r=h('div',{class:'v2-date'},
     h('input',{type:'date','aria-label':'Departure',value:d.start||''}),'→',
     h('input',{type:'date','aria-label':'Return',value:d.end||''}),
-    h('input',{type:'number',min:'0',placeholder:'+₱/pax',title:'Dagdag na presyo bawat pax sa petsang ito (optional)','aria-label':'Extra per pax (optional)',style:'width:120px',value:d.extra>0?String(d.extra):''}),
+    h('input',{type:'number',min:'0',placeholder:'+₱/pax',title:'Additional price per person for this date (optional)','aria-label':'Extra per pax (optional)',style:'width:120px',value:d.extra>0?String(d.extra):''}),
     h('button',{type:'button',class:'btn-danger',onclick:()=>r.remove()},'Remove'));
   return r;
 };
@@ -96,7 +96,7 @@ function init(){
     field('Minimum travelers',h('input',{type:'number',id:'pkg-minpax',min:'1',placeholder:'2'})));
 
   /* NEW: Flight & travel dates */
-  const sel=h('select',{id:'pkg-flight'},h('option',{value:'true'},'✈ May flight — included'),h('option',{value:'false'},'🏝 Land arrangement — flight NOT included'));
+  const sel=h('select',{id:'pkg-flight'},h('option',{value:'true'},'✈ Flight — included'),h('option',{value:'false'},'🏝 Land arrangement — flight NOT included'));
   flightBox=h('div',{class:'form-grid'},
     field('Airline',h('input',{id:'pkg-airline',placeholder:'AirAsia'})),
     field('Route',h('input',{id:'pkg-flight-route',placeholder:'Manila – Caticlan – Manila'})),
@@ -105,17 +105,17 @@ function init(){
   const addDate=(d={})=>{dates.append(dateRow(d))};
   datesBox.append(h('label',{style:'display:block;font-size:13px;font-weight:600;margin:12px 0 6px'},'Travel dates (departure → return)'),dates,
     h('button',{type:'button',class:'btn-outline',onclick:()=>addDate()},'+ Add date'),
-    h('p',{class:'feature-note'},'Isang row kada schedule (hal. Nov 6 → Nov 9). Lalabas sa app na naka-group per year. Ang “+₱/pax” ay optional: ilagay lang kung may dagdag sa presyo sa petsang iyon (hal. peak season, 1000). Idadagdag ito sa total ng traveler.'));
-  const noFlight=h('p',{class:'feature-note',id:'v2-noflight'},'Hindi kasama ang flight — traveler ang magbu-book ng sariling flight. idadagdag ang “Airfare Tickets” sa Exclusions.');
-  const fsec=secEl('Flight & travel dates','Piliin kung kasama na ang flight sa package.',
+    h('p',{class:'feature-note'},'One row per schedule (e.g. Nov 6 to Nov 9). Dates appear in the app grouped by year. The additional price per person is optional: enter it only for dates with a surcharge (e.g. peak season, 1000). It will be added to the traveler total.'));
+  const noFlight=h('p',{class:'feature-note',id:'v2-noflight'},'Flights are not included. Travelers must book their own flights. Airfare Tickets will be added to Exclusions.');
+  const fsec=secEl('Flight & travel dates','Choose whether flights are included in the package.',
     h('div',{class:'form-grid'},field('Flight coverage',sel,'form-field-full')),flightBox,datesBox,noFlight);
   secs[1].after(fsec);
   addDate._=addDate;
 
   /* Inclusions + Exclusions chips */
-  inc=tagEditor('pkg-inc','Mag-type ng inclusion, Enter para idagdag (pwede ring mag-paste ng maraming linya)',
+  inc=tagEditor('pkg-inc','Type an inclusion and press Enter to add it (you can also paste multiple lines)',
     ['4D3N Hotel Accommodation','Daily Hotel Buffet Breakfast',"Free use of the Hotel's facilities",'Hotel Taxes and Surcharges','Round Trip Land and Sea Transfers (Airport-Hotel-Airport)','Environmental Fee & Terminal Fee']);
-  exc=tagEditor('pkg-exc','Mag-type ng exclusion, Enter para idagdag',['Airfare Tickets','Hotel Security Deposit','Snorkeling Gear','Travel Insurance','Fuel Surcharge: 400 per pax (subject to change)']);
+  exc=tagEditor('pkg-exc','Type an exclusion and press Enter to add it',['Airfare Tickets','Hotel Security Deposit','Snorkeling Gear','Travel Insurance','Fuel Surcharge: 400 per pax (subject to change)']);
   const incBox=$('pkg-inc').closest('.form-field-full'),routeBox=$('pkg-route').closest('.form-field-full');
   hide(routeBox);hide(incBox);incBox.before(h('div',{class:'form-field-full'},h('label',{},'Inclusions'),inc.root));
   const excBox=$('pkg-exc').closest('.form-field-full');hide(excBox);excBox.before(h('div',{class:'form-field-full'},h('label',{},'Exclusions'),exc.root));
@@ -123,7 +123,7 @@ function init(){
   /* Highlights (own section, inserted before itinerary) */
   hls=repeater(hlRow,'Add highlight group',syncHL);
   const note=h('input',{id:'pkg-hl-note',placeholder:'e.g. Snorkeling fee ₱100/person, collected at the site (one-time)'});
-  const hsec=secEl('Tour highlights','Pwedeng may label (hal. Habagat / Amihan) o diretso lang ang listahan ng places.',hls.root,field('Note / reminder (optional)',note,'form-field-full'));
+  const hsec=secEl('Tour highlights','Add an optional label (e.g. Southwest / Northeast Monsoon) or simply list the places.',hls.root,field('Note / reminder (optional)',note,'form-field-full'));
   secs[3].after(hsec);
 
   /* Itinerary: structured days */
@@ -190,9 +190,9 @@ window.pkgV2={
   },
   validate(){
     const g=this.getData();
-    if(fixedSchedule()&&!g.travelDates.length)return 'Fixed schedule — maglagay ng kahit isang travel date.';
-    if(g.travelDates.some(d=>d.end&&d.end<d.start))return 'May travel date na mas maaga ang return kaysa departure.';
-    if(!g.inclusions.length)return 'Maglagay ng kahit isang inclusion.';
+    if(fixedSchedule()&&!g.travelDates.length)return 'Fixed schedule: add at least one travel date.';
+    if(g.travelDates.some(d=>d.end&&d.end<d.start))return 'A return date is earlier than its departure date.';
+    if(!g.inclusions.length)return 'Add at least one inclusion.';
     return '';
   }
 };

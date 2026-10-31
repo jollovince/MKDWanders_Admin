@@ -356,7 +356,7 @@ tbody tr{transition:background .12s}tbody tr:hover{background:var(--soft)}tbody 
         <input type="hidden" id="pkg-id"><input type="hidden" id="pkg-old-poster">
         <div class="form-body">
           <section class="form-sec">
-            <div class="form-sec-hd"><span class="n">1</span><div><h3>Basic details</h3><p>Ito ang makikita ng traveler sa title at sa card.</p></div></div>
+            <div class="form-sec-hd"><span class="n">1</span><div><h3>Basic details</h3><p>Travelers will see these details in the title and on the card.</p></div></div>
             <div class="form-grid">
               <div class="form-field"><label for="pkg-code">Package code</label><input id="pkg-code" placeholder="e.g. PLEN4A1"></div>
               <div class="form-field" style="grid-column:span 2"><label for="pkg-name">Package name<span class="req">*</span></label><input id="pkg-name" placeholder="e.g. Island Escape Palawan 2026"></div>
@@ -371,7 +371,7 @@ tbody tr{transition:background .12s}tbody tr:hover{background:var(--soft)}tbody 
     <span class="n">2</span>
     <div>
       <h3>Pricing &amp; category</h3>
-      <p>Presyo bawat tao, uri ng tour, at travel schedule.</p>
+      <p>Price per person, tour type, and travel schedule.</p>
     </div>
   </div>
 
@@ -392,7 +392,7 @@ tbody tr{transition:background .12s}tbody tr:hover{background:var(--soft)}tbody 
 
     <!-- Package Type -->
     <div class="form-field">
-      <label for="pkg-type">Package type (label sa card)</label>
+      <label for="pkg-type">Package type (card label)</label>
       <input
         id="pkg-type"
         list="pkg-type-list"
@@ -447,49 +447,49 @@ tbody tr{transition:background .12s}tbody tr:hover{background:var(--soft)}tbody 
 
              
           <section class="form-sec">
-            <div class="form-sec-hd"><span class="n">3</span><div><h3>Home screen placement</h3><p>Optional. Piliin kung ipu-push sa Featured Packages ng app.</p></div></div>
+            <div class="form-sec-hd"><span class="n">3</span><div><h3>Home screen placement</h3><p>Optional. Choose whether to display this in the app's Featured Packages.</p></div></div>
             <div class="feature-box">
               <div class="form-grid">
                 <div class="form-field"><label for="pkg-featured">Feature on app Home?</label><select id="pkg-featured"><option value="false">No &mdash; show under Suggestions only</option><option value="true">Yes &mdash; show in Featured Packages</option></select></div>
                 <div class="form-field"><label for="pkg-featured-order">Featured order (1 = first)</label><input type="number" id="pkg-featured-order" min="1" placeholder="1"></div>
                 <div class="form-field"><label for="pkg-featured-until">Featured until (optional)</label><input type="date" id="pkg-featured-until"></div>
               </div>
-              <p class="feature-note">Lahat ng hindi featured ay lalabas pa rin sa <b>Recommended for you</b>, naka-rank ayon sa budget &amp; tour type ng user.</p>
+              <p class="feature-note">Packages that are not featured will still appear in <b>Recommended for you</b>, ranked by the user's budget &amp; tour type.</p>
             </div>
           </section>
           <section class="form-sec">
-            <div class="form-sec-hd"><span class="n">4</span><div><h3>Inclusions &amp; card preview</h3><p>Isang inclusion kada linya. Auto-generate ang chips sa app card.</p></div></div>
+            <div class="form-sec-hd"><span class="n">4</span><div><h3>Inclusions &amp; card preview</h3><p>One inclusion per line. Chips on the app card are generated automatically.</p></div></div>
             <div class="form-grid">
               <div class="form-field-full"><label for="pkg-route">Stops and highlights (comma-separated)</label><input id="pkg-route" placeholder="e.g. Big Lagoon, Secret Lagoon, Shimizu Island"></div>
               <div class="form-field-full"><label for="pkg-inc">Inclusions (one per line)</label><textarea id="pkg-inc" class="reply-textarea" placeholder="3 Nights Hotel Stay&#10;Daily Breakfast" oninput="renderIncPreview()"></textarea></div>
               <div class="form-field-full cp-box">
-                <div class="feature-hd"><i class="ti ti-layout-cards"></i> Card preview (ito ang lalabas sa app card) <span class="cp-auto" id="cp-mode">AUTO</span></div>
-                <div class="cp-chips" id="cp-chips"><span class="feature-note">Maglagay ng inclusions sa taas para lumabas ang preview.</span></div>
-                <div class="cp-label">Gusto mong ibang inclusion? I-click para i-pin (max 3)</div>
+                <div class="feature-hd"><i class="ti ti-layout-cards"></i> Card preview (shown on the app card) <span class="cp-auto" id="cp-mode">AUTO</span></div>
+                <div class="cp-chips" id="cp-chips"><span class="feature-note">Add inclusions above to display the preview.</span></div>
+                <div class="cp-label">Prefer a different inclusion? Click to pin it (up to 3)</div>
                 <div class="cp-pick" id="cp-pick"></div>
-                <p class="feature-note">Auto-pick ang pinaka-importante (hotel, breakfast, transfer, flight, ferry...). Ang na-pin mo ang unang ilalabas. Sa app, ang <b>kasya lang sa lapad ng card</b> ang makikita (karaniwan 2-3); ang natitira ay "+N more". Ang dashed na chip ay maaaring hindi kasya sa maliliit na phone.</p>
+                <p class="feature-note">The most relevant inclusions are selected automatically (hotel, breakfast, transfer, flight, ferry...). Pinned items appear first. The app shows <b>only the chips that fit the card width</b> (usually 2-3); the rest appear as "+N more". Dashed chips may not fit on smaller phones.</p>
               </div>
             </div>
           </section>
           <section class="form-sec">
-            <div class="form-sec-hd"><span class="n">5</span><div><h3>Itinerary &amp; exclusions</h3><p>Lalabas sa package details.</p></div></div>
+            <div class="form-sec-hd"><span class="n">5</span><div><h3>Itinerary &amp; exclusions</h3><p>Shown in the package details.</p></div></div>
             <div class="form-grid">
               <div class="form-field-full"><label for="pkg-exc">Exclusions (one per line)</label><textarea id="pkg-exc" class="reply-textarea" placeholder="Airfare Tickets&#10;Travel Insurance"></textarea></div>
               <div class="form-field-full"><label for="pkg-itin">Day-by-day itinerary</label><textarea id="pkg-itin" class="reply-textarea" placeholder="Day 1: Airport pickup and hotel check-in&#10;Day 2: Island hopping tour"></textarea></div>
             </div>
           </section>
           <section class="form-sec">
-            <div class="form-sec-hd"><span class="n">6</span><div><h3>Photos &amp; poster</h3><p>Ang unang photo ang cover sa Home.</p></div></div>
+            <div class="form-sec-hd"><span class="n">6</span><div><h3>Photos &amp; poster</h3><p>The first photo is the cover on the Home screen.</p></div></div>
             <div class="form-grid">
-              <div class="form-field-full"><label>Package photos<span class="req">*</span> (i-swipe sa app kung higit sa isa)</label>
-                <div class="upload-box"><input type="file" id="gal-file" accept="image/*" multiple onchange="addGalleryFiles(event)" aria-label="Upload package photos"><i class="ti ti-photos"></i><span>Click or drag one or more tour photos (PNG, JPG). Pwedeng pumili ng marami nang sabay.</span></div>
+              <div class="form-field-full"><label>Package photos<span class="req">*</span> (swipe in the app to view multiple photos)</label>
+                <div class="upload-box"><input type="file" id="gal-file" accept="image/*" multiple onchange="addGalleryFiles(event)" aria-label="Upload package photos"><i class="ti ti-photos"></i><span>Click or drag one or more tour photos (PNG, JPG). You can select multiple photos at once.</span></div>
                 <div class="gal-grid" id="gal-grid"></div>
-                <p class="feature-note"><b>Ang unang larawan</b> ang magiging <b>cover sa Home</b>. Gamitin ang mga arrow para ayusin ang pagkakasunod. Malinis na photo ang ilagay dito (walang text/poster).</p>
+                <p class="feature-note"><b>The first photo</b> becomes the <b>Home screen cover</b>. Use the arrows to reorder photos. Upload clear photos without text or posters.</p>
               </div>
               <div class="form-field-full"><label>Agency poster (optional)</label>
                 <div class="upload-box"><input type="file" id="pkg-file" accept="image/*" onchange="previewImg(event,'pkg-prev','pkg-hint','pkg')" aria-label="Upload agency poster"><i class="ti ti-cloud-upload"></i><span id="pkg-hint">Click or drag the agency poster (PNG, JPG)</span><img id="pkg-prev" class="upload-preview" alt="Poster preview"></div>
-                <div class="scan-row"><button type="button" class="btn-outline" id="btn-scan" onclick="scanPoster()"><i class="ti ti-scan"></i> Scan poster &amp; auto-fill</button><label class="scan-ow"><input type="checkbox" id="scan-overwrite"> Palitan din ang mga may laman na</label><span class="scan-status" id="scan-status" aria-live="polite"></span></div>
-                <p class="feature-note">Binabasa ng browser mo ang poster (OCR) at pino-fill lang ang <b>Package name</b> at <b>Inclusions</b>. <b>Laging i-check</b> ang mga orange na fields bago i-save. Hindi ito ginagamit bilang cover; para lang sa scan.</p>
+                <div class="scan-row"><button type="button" class="btn-outline" id="btn-scan" onclick="scanPoster()"><i class="ti ti-scan"></i> Scan poster &amp; auto-fill</button><label class="scan-ow"><input type="checkbox" id="scan-overwrite"> Overwrite existing values</label><span class="scan-status" id="scan-status" aria-live="polite"></span></div>
+                <p class="feature-note">Your browser reads the poster using OCR and fills in only the <b>Package name</b> and <b>Inclusions</b>. <b>Always review</b> the orange fields before saving. The poster is used only for scanning, not as the cover.</p>
               </div>
             </div>
           </section>
@@ -578,18 +578,18 @@ tbody tr{transition:background .12s}tbody tr:hover{background:var(--soft)}tbody 
           <div class="det-row"><span class="det-key">Reference no.:</span><span class="det-val" id="det-pay-ref">—</span></div>
           <div class="det-row"><span class="det-key">Method used:</span><span class="det-val" id="det-pay-method2">—</span></div>
           <div class="det-row"><span class="det-key">Submitted:</span><span class="det-val" id="det-pay-when">—</span></div>
-          <p class="feature-note">I-verify muna sa bank/e-wallet app mo na pumasok ang bayad bago i-confirm.</p>
+          <p class="feature-note">Verify that the payment was received in your bank or e-wallet app before confirming.</p>
         </div>
 
         <div class="form-field-full" style="margin-bottom:12px;max-width:320px;" id="box-final-amount">
           <label for="final-amount">Final amount to pay (₱)</label>
           <input type="number" id="final-amount" min="0" placeholder="e.g. 68998">
-          <p class="feature-note">Para sa solo o special rate, ilagay dito ang final quote. Ito ang ipapakita sa traveler sa payment screen.</p>
+          <p class="feature-note">For solo travelers or special rates, enter the final quote here. Travelers will see this amount on the payment screen.</p>
         </div>
 
         <div class="form-field-full" style="margin-bottom:12px;">
           <label style="font-weight:700;display:block;margin-bottom:6px;">Admin Remarks / Reply Note</label>
-          <textarea class="reply-textarea" id="reply-text" placeholder="Maglagay ng mensahe o tagubilin para sa booking na ito..."></textarea>
+          <textarea class="reply-textarea" id="reply-text" placeholder="Enter a message or instructions for this booking..."></textarea>
         </div>
 
         <div class="reply-row" style="gap:8px;flex-wrap:wrap;">
@@ -639,15 +639,15 @@ tbody tr{transition:background .12s}tbody tr:hover{background:var(--soft)}tbody 
       </div>
 
       <div class="card" id="paydet-card" style="margin-bottom:24px">
-        <div class="card-title">Payment instructions (ipinapakita sa traveler)</div>
-        <p class="feature-note" style="margin:-8px 0 16px">Lalabas ito sa app kapag nag-request ka ng payment sa booking. Para sa testing, gumamit ng "TEST" na detalye at placeholder na QR. Huwag maglagay ng password, PIN o OTP.</p>
+        <div class="card-title">Payment instructions (shown to travelers)</div>
+        <p class="feature-note" style="margin:-8px 0 16px">These details appear in the app when you request payment for a booking. For testing, use "TEST" details and a placeholder QR code. Do not enter passwords, PINs, or OTPs.</p>
         <div class="feature-box" data-method="QR Ph" style="margin-bottom:12px">
           <div class="feature-hd"><i class="ti ti-qrcode"></i> QR Ph</div>
           <div class="form-grid">
             <div class="form-field"><label>Account name</label><input data-f="accountName" placeholder="TEST ACCOUNT"></div>
             <div class="form-field"><label>Account / mobile number</label><input data-f="accountNumber" placeholder="0000-0000-0000"></div>
             <div class="form-field"><label>Bank / wallet</label><input data-f="bank" placeholder="UnionBank"></div>
-            <div class="form-field-full"><label>Instructions (optional)</label><input data-f="note" placeholder="e.g. Ilagay ang booking reference sa notes ng transfer"></div>
+            <div class="form-field-full"><label>Instructions (optional)</label><input data-f="note" placeholder="e.g. Include the booking reference in the transfer notes"></div>
             <div class="form-field-full"><label>QR code image (optional)</label>
               <input type="file" data-f="qrFile" accept="image/*">
               <img data-f="qrPrev" class="upload-preview" alt="QR preview" style="max-width:200px;object-fit:contain">
@@ -660,7 +660,7 @@ tbody tr{transition:background .12s}tbody tr:hover{background:var(--soft)}tbody 
             <div class="form-field"><label>Account name</label><input data-f="accountName" placeholder="TEST ACCOUNT"></div>
             <div class="form-field"><label>Account / mobile number</label><input data-f="accountNumber" placeholder="0000-0000-0000"></div>
             <div class="form-field"><label>Bank / wallet</label><input data-f="bank" placeholder="UnionBank of the Philippines"></div>
-            <div class="form-field-full"><label>Instructions (optional)</label><input data-f="note" placeholder="e.g. Ilagay ang booking reference sa notes ng transfer"></div>
+            <div class="form-field-full"><label>Instructions (optional)</label><input data-f="note" placeholder="e.g. Include the booking reference in the transfer notes"></div>
             <div class="form-field-full"><label>QR code image (optional)</label>
               <input type="file" data-f="qrFile" accept="image/*">
               <img data-f="qrPrev" class="upload-preview" alt="QR preview" style="max-width:200px;object-fit:contain">
@@ -673,7 +673,7 @@ tbody tr{transition:background .12s}tbody tr:hover{background:var(--soft)}tbody 
             <div class="form-field"><label>Account name</label><input data-f="accountName" placeholder="TEST ACCOUNT"></div>
             <div class="form-field"><label>Account / mobile number</label><input data-f="accountNumber" placeholder="0000-0000-0000"></div>
             <div class="form-field"><label>Bank / wallet</label><input data-f="bank" placeholder="BPI"></div>
-            <div class="form-field-full"><label>Instructions (optional)</label><input data-f="note" placeholder="e.g. Ilagay ang booking reference sa notes ng transfer"></div>
+            <div class="form-field-full"><label>Instructions (optional)</label><input data-f="note" placeholder="e.g. Include the booking reference in the transfer notes"></div>
             <div class="form-field-full"><label>QR code image (optional)</label>
               <input type="file" data-f="qrFile" accept="image/*">
               <img data-f="qrPrev" class="upload-preview" alt="QR preview" style="max-width:200px;object-fit:contain">

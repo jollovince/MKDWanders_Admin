@@ -28,11 +28,11 @@ const PKG_COLLECTION = "tour_packages";
 
 let packages = [], inquiries = [], usersList = [], chats = [];
 let payDetails = {}; // { 'QR Ph': {accountName, accountNumber, bank, note, qrUrl}, UnionBank:{...}, BPI:{...} }
-let reviewStats = {}; // packageId -> { sum, count } (totoong reviews galing sa app users)
+let reviewStats = {}; // packageId -> { sum, count } from actual app user reviews
 let chatFilter = "all";
 let pkgFilter = "All", inqFilter = "all", revFilter = "all", activeChat = null, currentInq = null;
 const files = { pkg: null };
-let gal = []; // {url?, file?, src}  — gallery ng package; [0] = cover sa Home
+let gal = []; // {url?, file?, src}: package gallery; [0] is the Home screen cover
 
 /* ---------- Helper Functions ---------- */
 const $ = id => document.getElementById(id);
@@ -244,12 +244,12 @@ export function go(sec, btn) {
 
 export const toggleSidebar = () => $("sidebar").classList.toggle("collapsed");
 
-/* ---------- Card highlights: auto-generate mula sa inclusions ----------
-   Kapareho ng logic ng mobile app (home_screen.dart: _inclusionRank /
-   _shortInclusion / _inclusionIcon) para pareho ang preview at ang card. */
+/* ---------- Card highlights: generated automatically from inclusions ----------
+   Matches the mobile app logic (home_screen.dart: _inclusionRank /
+   _shortInclusion / _inclusionIcon) to keep the preview consistent with the card. */
 let pinnedInc = [];
-// Kapareho ng _incKind sa home_screen.dart. Tinatanggal muna ang (...) para
-// ang "Airport Transfers (Airport-Hotel-Airport)" ay transfer, hindi hotel.
+// Matches _incKind in home_screen.dart. Remove parenthesized text first so
+// "Airport Transfers (Airport-Hotel-Airport)" is classified as a transfer, not a hotel.
 const incHas = (l, ...w) => w.some(x => l.includes(x));
 const incKindName = label => {
   const l = label.toLowerCase().replace(/\([^)]*\)/g, " ");
@@ -295,13 +295,13 @@ export function renderIncPreview() {
   const items = incItems();
   pinnedInc = pinnedInc.filter(x => items.includes(x));
   const sorted = [...items].sort((a, b) => incKind(a).rank - incKind(b).rank);
-  // Pinned muna, sunod ang auto-rank. Sa app, ang kasya lang sa lapad ng card ang lalabas.
+  // Pinned items first, then automatic ranking. The app shows only chips that fit the card width.
   const ordered = [...pinnedInc, ...sorted.filter(x => !pinnedInc.includes(x))];
   const head = ordered.slice(0, 3);
-  const chip = (l, i) => `<span class="cp-chip ${i === 2 ? "maybe" : ""}" ${i === 2 ? 'title="Lalabas lang kung kasya sa lapad ng phone"' : ""}><i class="ti ${incKind(l).icon}"></i>${esc(shortInc(l))}</span>`;
+  const chip = (l, i) => `<span class="cp-chip ${i === 2 ? "maybe" : ""}" ${i === 2 ? 'title="Shown only if it fits the phone width"' : ""}><i class="ti ${incKind(l).icon}"></i>${esc(shortInc(l))}</span>`;
   $("cp-chips").innerHTML = items.length
     ? head.map(chip).join("") + (items.length > head.length ? `<span class="cp-chip more">+${items.length - head.length} more</span>` : "")
-    : `<span class="feature-note">Maglagay ng inclusions sa taas para lumabas ang preview.</span>`;
+    : `<span class="feature-note">Add inclusions above to display the preview.</span>`;
   $("cp-pick").innerHTML = items.map((l, i) =>
     `<button type="button" class="cp-pick-btn ${pinnedInc.includes(l) ? "on" : ""}" onclick="toggleIncPin(${i})"><i class="ti ${incKind(l).icon}"></i>${esc(l)}</button>`
   ).join("");
@@ -315,16 +315,16 @@ export function toggleIncPin(i) {
   if (!l) return;
   if (pinnedInc.includes(l)) pinnedInc = pinnedInc.filter(x => x !== l);
   else if (pinnedInc.length < 3) pinnedInc.push(l);
-  else return toast("Max 3 lang ang pwedeng i-pin. Alisin muna ang isa.", "err");
+  else return toast("You can pin up to 3 items. Remove one first.", "err");
   renderIncPreview();
 }
 
-/* ---------- Poster scan (OCR) -> Package name + Inclusions lang ----------
-   Tesseract.js tumatakbo sa browser (walang server/API key).
-   - Inclusions: kinukuha lang ang listahan; tinatanggal ang "ingay" na galing
-     sa mga litrato sa tabi ng text (low-confidence / hindi-salitang tokens).
-   - Title: hinahango mula sa mga pangalan ng destinasyon (hal. "Cebu with Bohol")
-     kasi hindi nababasa nang maayos ng OCR ang stylized na letra. */
+/* ---------- Poster scan (OCR) -> Package name + Inclusions only ----------
+   Tesseract.js runs in the browser without a server or API key.
+   - Inclusions: extract only list items; remove noise from photos next to
+     the text (low-confidence tokens and nonwords).
+   - Title: derive it from destination names (e.g. "Cebu with Bohol")
+     because OCR does not reliably recognize stylized lettering. */
 const PH_PLACES = [
   "Batanes", "Baguio", "Vigan", "Ilocos", "Pagudpud", "Sagada", "Banaue", "La Union", "Zambales", "Subic", "Bicol", "Albay", "Donsol", "Palawan", "El Nido", "Coron", "Puerto Princesa", "Mindoro", "Puerto Galera", "Batangas", "Tagaytay", "Pampanga", "Cagayan", "Manila",
   "Cebu", "Bohol", "Boracay", "Iloilo", "Bacolod", "Siquijor", "Dumaguete", "Negros", "Leyte", "Samar", "Panglao", "Moalboal", "Oslob", "Malapascua", "Bantayan", "Guimaras", "Antique", "Kalibo",
@@ -347,11 +347,11 @@ function goodToken(tx, conf, caps) {
   if (conf != null && conf < 60) return false;
   if (DICT.has(w)) return true;
   if (w.length <= 2 || !/[aeiou]/.test(w)) return false;
-  if (!caps && /^[A-Z]{3,}$/.test(tx)) return false; // random ALL-CAPS sa title-case na linya = ingay
+  if (!caps && /^[A-Z]{3,}$/.test(tx)) return false; // Random ALL-CAPS in a title-case line indicates noise
   return true;
 }
 
-// Putulin ang linya sa unang "ingay"; kumpletuhin ang salitang naputol ng litrato.
+// Stop the line at the first noise token; complete words clipped by a photo.
 function cleanTokens(tokens) {
   const raw = tokens.map(t => t.t).join(" ");
   const caps = /[A-Z]/.test(raw) && !/[a-z]/.test(raw);
@@ -384,7 +384,7 @@ function parseInclusions(lines) {
   for (const toks of cand) {
     const text = joined(toks);
     if (/(per\s*(pax|person)|\bphp\b|₱)/i.test(text) && !INC_KW.test(text)) continue;
-    // "FOR AS LOW AS ..." galing sa price tag sa tabi ng listahan
+    // "FOR AS LOW AS ..." comes from the price tag next to the list.
     const cut = toks.findIndex((t, i) => /^(for|as)$/i.test(t.t) && /^as$/i.test((toks[i + (/^for$/i.test(t.t) ? 1 : 0)] || {}).t || "") && /^low$/i.test((toks[i + (/^for$/i.test(t.t) ? 2 : 1)] || {}).t || ""));
     const use = cut >= 0 ? toks.slice(0, cut) : toks;
     let l = titleCaseCaps(cleanTokens(use)).trim();
@@ -411,7 +411,7 @@ function parseTitle(rawLines) {
       else if (seen && CONNECT.has(toks[i])) found.push(toks[i]);
     }
     if (found.some(x => !CONNECT.has(x))) { pieces.push(...found); started = true; }
-    else if (started && found.length) pieces.push(...found);   // "with" sa sariling linya
+    else if (started && found.length) pieces.push(...found);   // "with" on its own line
     else if (started) break;
   }
   while (pieces.length && CONNECT.has(pieces[pieces.length - 1])) pieces.pop();
@@ -437,7 +437,7 @@ async function preparePass(file, invert) {
   return c;
 }
 
-// Kunin ang lines na may words+confidence (v5: data.lines; v6: data.blocks).
+// Extract lines with words and confidence scores (v5: data.lines; v6: data.blocks).
 function toLines(data) {
   let lines = data.lines;
   if (!lines && data.blocks) lines = data.blocks.flatMap(b => b.paragraphs.flatMap(p => p.lines));
@@ -452,13 +452,13 @@ const loadTess = () => (tessLoad ||= new Promise((res, rej) => {
   const s = document.createElement("script");
   s.src = "https://cdn.jsdelivr.net/npm/tesseract.js@5.1.1/dist/tesseract.min.js";
   s.onload = () => res(window.Tesseract);
-  s.onerror = () => { tessLoad = null; rej(new Error("Hindi ma-load ang OCR engine. Check ang internet.")); };
+  s.onerror = () => { tessLoad = null; rej(new Error("Could not load the OCR engine. Check your internet connection.")); };
   document.head.appendChild(s);
 }));
 
 export async function scanPoster() {
   const file = files.pkg;
-  if (!file) return toast("Mag-upload muna ng poster, tapos i-scan.", "err");
+  if (!file) return toast("Upload a poster first, then scan it.", "err");
   const btn = $("btn-scan"), st = $("scan-status");
   btn.disabled = true;
   try {
@@ -499,14 +499,14 @@ function applyScan(passes) {
   put("pkg-name", titles[0], "Package name");
   if (incs.length) {
     put("pkg-inc", incs.join("\n"), `Inclusions (${incs.length})`);
-    // I-sync ang chips editor (pkg-form-v2.js) sa na-scan na inclusions
+    // Sync the chips editor (pkg-form-v2.js) with the scanned inclusions.
     window.pkgV2?.setInclusions?.(incs);
   }
 
   renderIncPreview();
   $("scan-status").textContent = filled.length
-    ? `Na-fill: ${filled.join(", ")}. Pakicheck ang mga orange na fields bago i-save.`
-    : "Walang malinaw na nabasa. Subukan ang mas malinaw na image, o i-type manually.";
+    ? `Filled in: ${filled.join(", ")}. Review the orange fields before saving.`
+    : "No clear text was detected. Try a clearer image or enter the details manually.";
 }
 
 document.addEventListener("input", e => e.target?.classList?.remove("autofilled"));
@@ -549,7 +549,7 @@ export function openPkgForm(id) {
   $("scan-status").textContent = "";
   $("pkg-id").value = pkg?.id || "";
   $("pkg-old-poster").value = pkg ? (pkg.poster || "") : "";
-  // Gallery: [imageUrl, ...gallery] na walang doble; ang una ang cover sa Home.
+  // Gallery: [imageUrl, ...gallery] without duplicates; the first image is the Home cover.
   const urls = [...new Set([...(Array.isArray(pkg?.gallery) ? pkg.gallery : []), ...(pkg?.imageUrl ? [pkg.imageUrl] : [])].filter(Boolean))];
   if (pkg?.imageUrl && urls[0] !== pkg.imageUrl && !(pkg.gallery || []).includes(pkg.imageUrl)) urls.unshift(pkg.imageUrl);
   gal = urls.map(u => ({ url: u, src: u }));
@@ -628,7 +628,7 @@ export function previewImg(event, imgId, hintId, kind) {
   };
   reader.readAsDataURL(file);
   $(hintId).textContent = file.name;
-  if (kind === "pkg") $("scan-status").textContent = "I-click ang \"Scan poster & auto-fill\" para ma-fill ang form mula sa image.";
+  if (kind === "pkg") $("scan-status").textContent = "Click \"Scan poster & auto-fill\" to fill in the form from the image.";
 }
 
 export function filterPkg(type, btn) {
@@ -654,9 +654,9 @@ if (!["fixed", "flexible"].includes(scheduleType)) {
     return toast("Fill in Name, Destination, Duration, and Price.", "err");
   }
   if (gal.length === 0) {
-    return toast("Mag-upload ng kahit isang Package photo (ang una ang cover sa Home).", "err");
+    return toast("Upload at least one package photo (the first is the Home screen cover).", "err");
   }
-  // Flight included -> kailangan ng travel dates; kailangan ng inclusions
+  // Flight packages require travel dates and inclusions.
   const v2err = window.pkgV2?.validate?.();
   if (v2err) return toast(v2err, "err");
 
@@ -665,14 +665,14 @@ if (!["fixed", "flexible"].includes(scheduleType)) {
   btn.innerHTML = `<i class="ti ti-loader"></i> Saving...`;
 
   try {
-    // Package photos: i-upload ang bago, panatilihin ang pagkakasunod. [0] = cover sa Home.
+    // Upload new package photos and preserve their order. [0] is the Home cover.
     const galleryUrls = [];
     for (let i = 0; i < gal.length; i++) {
       if (gal[i].url) { galleryUrls.push(gal[i].url); continue; }
       btn.innerHTML = `<i class="ti ti-loader"></i> Uploading photo ${i + 1}/${gal.length}...`;
       galleryUrls.push(await uploadImage(gal[i].file, "gallery"));
     }
-    // Poster = optional, para lang sa scan (hindi cover).
+    // The optional poster is used only for scanning, not as the cover.
     let poster = val("pkg-old-poster");
     if (files.pkg) poster = await uploadImage(files.pkg, "posters");
 
@@ -705,13 +705,13 @@ if (!["fixed", "flexible"].includes(scheduleType)) {
       activity: "Easy",
       highlights: stopsList,
       bestFor: ["Couples", "Barkada", "Solo", "Families"],
-      // Walang fake default: kung walang nilagay, walang ipapakita sa app.
+      // No fabricated defaults: empty fields are not displayed in the app.
       packageType: val("pkg-type"),
       inclusions: incList,
       cardHighlights: pinnedInc.filter(x => incList.includes(x)).slice(0, 3),
       exclusions: excList,
       itineraryText: val("pkg-itin"),
-      // Home screen placement (Featured Packages sa mobile app)
+      // Home screen placement (Featured Packages in the mobile app)
       featured: $("pkg-featured").value === "true",
       featuredOrder: Number($("pkg-featured-order").value) || null,
       featuredUntil: $("pkg-featured-until").value || null,
@@ -757,7 +757,7 @@ export async function removePkg(id) {
   }
 }
 
-/* Featured = featured:true at hindi pa lampas sa featuredUntil */
+/* Featured = featured:true and featuredUntil has not passed. */
 const todayStr = () => new Date().toISOString().slice(0, 10);
 const isFeaturedNow = p => p.featured === true && (!p.featuredUntil || p.featuredUntil >= todayStr());
 
@@ -767,7 +767,7 @@ export async function toggleFeatured(id) {
   const turnOn = p.featured !== true;
   const data = { featured: turnOn, updatedAt: serverTimestamp() };
   if (turnOn) {
-    // expired na dati? i-clear para hindi agad mawala; ilagay sa dulo ng order
+    // Clear an expired date so the package stays visible; append it to the display order.
     if (p.featuredUntil && p.featuredUntil < todayStr()) data.featuredUntil = null;
     if (!p.featuredOrder) {
       data.featuredOrder = Math.max(0, ...packages.map(x => Number(x.featuredOrder) || 0)) + 1;
@@ -910,7 +910,7 @@ export function exportInquiries() {
   toast("CSV exported.");
 }
 
-// Room type galing sa booking (quad / triple / twin)
+// Room type from the booking (quad / triple / twin)
 const roomLabel = i => ({ quad: "Quad sharing", triple: "Triple sharing", twin: "Twin sharing", "twin+triple": "Twin + Triple (to confirm)" }[i.roomSharing] || (i.soloRateRequest ? "Solo: send final rate" : i.roomNeedsCheck ? "Odd pax: confirm room" : ""));
 
 export function openDetail(id) {
@@ -943,7 +943,7 @@ export function openDetail(id) {
 
   $("reply-text").value = i.adminNote || "";
 
-  // Final amount (solo / special rate) + proof galing sa traveler
+  // Final amount (solo / special rate) and payment proof submitted by the traveler
   const open = !["confirmed", "paid", "cancelled"].includes(i.status);
   $("box-final-amount").style.display = open ? "block" : "none";
   $("btn-req-pay").style.display = open ? "inline-flex" : "none";
@@ -979,7 +979,7 @@ async function setStatus(status, stamp, msg, extra = {}) {
   }
 }
 
-// Huwag ibalik sa "responded" kapag nasa payment stage na
+// Do not revert to "responded" once the booking has reached the payment stage.
 export const sendInquiryReply = () => {
   const keep = ["awaiting_payment", "payment_submitted"].includes(currentInq?.status);
   return setStatus(keep ? currentInq.status : "responded", "respondedAt", "Note sent to traveler.");
@@ -989,12 +989,12 @@ export const confirmInquiry = () =>
 
 export function requestPayment() {
   if (!currentInq) return;
-  if (["confirmed", "paid", "cancelled"].includes(currentInq.status)) return toast("Tapos na ang booking na ito.", "err");
+  if (["confirmed", "paid", "cancelled"].includes(currentInq.status)) return toast("This booking is already closed.", "err");
   const final = Number($("final-amount").value) || 0;
-  if (final <= 0) return toast("Ilagay ang final amount na babayaran.", "err");
+  if (final <= 0) return toast("Enter the final amount to be paid.", "err");
   const ready = Object.values(payDetails).some(d => d && (d.accountNumber || d.qrUrl));
-  if (!ready) return toast("Wala pang payment details. I-save muna sa Payments & Revenue.", "err");
-  return setStatus("awaiting_payment", "paymentRequestedAt", "Payment requested. Makikita na ng traveler ang payment details.", {
+  if (!ready) return toast("No payment details are available yet. Save them in Payments & Revenue first.", "err");
+  return setStatus("awaiting_payment", "paymentRequestedAt", "Payment requested. The traveler can now view the payment details.", {
     finalAmount: final,
     total: final,
     estimatedTotal: currentInq.estimatedTotal ?? amount(currentInq)
@@ -1055,7 +1055,7 @@ export function filterRev(mode, btn) {
   renderRevenue();
 }
 
-// QR Ph ay dumadaan sa UnionBank (kapareho ng label ng card: "UnionBank QR Ph")
+// QR Ph payments go through UnionBank (matching the "UnionBank QR Ph" card label).
 const isUB = m => /unionbank|qr/i.test(String(m || ""));
 
 function getPaidInquiries() {
@@ -1190,7 +1190,7 @@ function renderChats() {
 
   const list = chats
     .filter(c => chatFilter === "all" || (chatFilter === "need" ? chatState(c) === "escalated" : chatState(c) === chatFilter))
-    // Kailangan ng reply = nasa itaas, tapos pinakabago
+    // Put conversations needing a reply first, then sort by most recent.
     .sort((a, b) => (chatState(b) === "escalated") - (chatState(a) === "escalated") || chatTime(b) - chatTime(a));
 
   if (!list.length) {
@@ -1249,7 +1249,7 @@ export async function sendChatReply() {
       updatedAt: serverTimestamp()
     });
     $("chat-reply-text").value = "";
-    toast("Reply sent. Makikita ito ng traveler sa app agad.");
+    toast("Reply sent. The traveler will see it in the app immediately.");
   } catch (err) {
     toast("Could not send: " + err.message, "err");
   } finally {
