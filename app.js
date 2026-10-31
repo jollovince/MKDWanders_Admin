@@ -3,7 +3,7 @@ import {
   getFirestore, collection, addDoc, deleteDoc, updateDoc, setDoc, doc,
   onSnapshot, query, orderBy, serverTimestamp, collectionGroup, arrayUnion, Timestamp
 } from "https://www.gstatic.com/firebasejs/10.9.0/firebase-firestore.js";
-import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.9.0/firebase-auth.js";
+import { getAuth, onAuthStateChanged, getIdTokenResult, signOut } from "https://www.gstatic.com/firebasejs/10.9.0/firebase-auth.js";
 import { createClient } from "https://cdn.jsdelivr.net/npm/@supabase/supabase-js/+esm";
 
 const firebaseConfig = {
@@ -73,9 +73,141 @@ async function uploadImage(file, folder) {
   return supabase.storage.from("package-posters").getPublicUrl(path).data.publicUrl;
 }
 
+/* ========== MKDWander Human Agent Presence ========== */
+
+const AGENT_PRESENCE_REF = doc(
+  db,
+  "agent_presence",
+  "support"
+);
+
+const AGENT_HEARTBEAT_MS = 25000;
+
+let agentPresenceTimer = null;
+let agentPresenceUser = null;
+let agentHeartbeatBusy = false;
+
+// Update human agent availability in Firestore
+async function agentHeartbeat() {
+  if (
+    !agentPresenceUser ||
+    document.hidden ||
+    agentHeartbeatBusy
+  ) {
+    return;
+  }
+
+  agentHeartbeatBusy = true;
+
+  try {
+    await setDoc(
+      AGENT_PRESENCE_REF,
+      {
+        agentId: agentPresenceUser.uid,
+        lastSeen: serverTimestamp(),
+        updatedAt: serverTimestamp()
+      },
+      { merge: true }
+    );
+
+    const indicator = $("human-agent-status");
+
+    if (indicator) {
+      indicator.textContent = "Online";
+      indicator.className = "pill pill-conf";
+    }
+
+  } catch (error) {
+    console.error("Agent heartbeat failed:", error);
+
+    const indicator = $("human-agent-status");
+
+    if (indicator) {
+      indicator.textContent = "Offline";
+      indicator.className = "pill pill-off";
+    }
+  } finally {
+    agentHeartbeatBusy = false;
+  }
+}
+
+// Stop sending heartbeats
+function stopAgentPresence() {
+  if (agentPresenceTimer) {
+    clearInterval(agentPresenceTimer);
+  }
+
+  agentPresenceTimer = null;
+  agentPresenceUser = null;
+
+  const indicator = $("human-agent-status");
+
+  if (indicator) {
+    indicator.textContent = "Offline";
+    indicator.className = "pill pill-off";
+  }
+}
+
+// Start authenticated agent heartbeat
+async function startAgentPresence(user) {
+  stopAgentPresence();
+
+  const token = await getIdTokenResult(user);
+  console.log("Agent UID:", user.uid);
+  console.log("Firebase Custom Claims:", token.claims);
+
+  if (auth.currentUser?.uid !== user.uid) {
+    return;
+  }
+
+  const permitted =
+    token.claims.admin === true ||
+    token.claims.supportAgent === true;
+
+  if (!permitted) {
+    console.warn(
+      "Agent presence requires an authorized staff role."
+    );
+
+    const indicator = $("human-agent-status");
+
+    if (indicator) {
+      indicator.textContent = "Staff role required";
+      indicator.className = "pill pill-off";
+    }
+
+    return;
+  }
+
+  agentPresenceUser = user;
+
+  await agentHeartbeat();
+
+  agentPresenceTimer = setInterval(
+    agentHeartbeat,
+    AGENT_HEARTBEAT_MS
+  );
+}
+
+// Resume heartbeat when dashboard becomes visible
+document.addEventListener("visibilitychange", () => {
+  if (!document.hidden) {
+    agentHeartbeat();
+  }
+});
+
+// Stop heartbeat when page closes
+window.addEventListener(
+  "pagehide",
+  stopAgentPresence
+);
+
 /* ---------- Auth & Shell ---------- */
 onAuthStateChanged(auth, user => {
-  if (!user) { window.location.href = "login.html"; return; }
+  if (!user) {  stopAgentPresence(); window.location.href = "login.html"; return; }
+  startAgentPresence(user).catch(error => {
+    console.error("Agent presence initialization failed:", error);
+  });
   const name = user.displayName || user.email?.split("@")[0] || "Admin";
   $("user-name").textContent = name;
   $("user-avatar").textContent = name.slice(0, 2).toUpperCase();
