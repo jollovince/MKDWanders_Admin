@@ -96,7 +96,7 @@ function init(){
     field('Minimum travelers',h('input',{type:'number',id:'pkg-minpax',min:'1',placeholder:'2'})));
 
   /* NEW: Flight & travel dates */
-  const sel=h('select',{id:'pkg-flight'},h('option',{value:'true'},'✈ May flight — included (fixed travel dates)'),h('option',{value:'false'},'🏝 Land arrangement — flight NOT included'));
+  const sel=h('select',{id:'pkg-flight'},h('option',{value:'true'},'✈ May flight — included'),h('option',{value:'false'},'🏝 Land arrangement — flight NOT included'));
   flightBox=h('div',{class:'form-grid'},
     field('Airline',h('input',{id:'pkg-airline',placeholder:'AirAsia'})),
     field('Route',h('input',{id:'pkg-flight-route',placeholder:'Manila – Caticlan – Manila'})),
@@ -106,7 +106,7 @@ function init(){
   datesBox.append(h('label',{style:'display:block;font-size:13px;font-weight:600;margin:12px 0 6px'},'Travel dates (departure → return)'),dates,
     h('button',{type:'button',class:'btn-outline',onclick:()=>addDate()},'+ Add date'),
     h('p',{class:'feature-note'},'Isang row kada schedule (hal. Nov 6 → Nov 9). Lalabas sa app na naka-group per year. Ang “+₱/pax” ay optional: ilagay lang kung may dagdag sa presyo sa petsang iyon (hal. peak season, 1000). Idadagdag ito sa total ng traveler.'));
-  const noFlight=h('p',{class:'feature-note',id:'v2-noflight'},'Hindi kasama ang flight — traveler ang magbu-book ng sariling flight. Walang fixed travel dates; idadagdag ang “Airfare Tickets” sa Exclusions.');
+  const noFlight=h('p',{class:'feature-note',id:'v2-noflight'},'Hindi kasama ang flight — traveler ang magbu-book ng sariling flight. idadagdag ang “Airfare Tickets” sa Exclusions.');
   const fsec=secEl('Flight & travel dates','Piliin kung kasama na ang flight sa package.',
     h('div',{class:'form-grid'},field('Flight coverage',sel,'form-field-full')),flightBox,datesBox,noFlight);
   secs[1].after(fsec);
@@ -130,6 +130,7 @@ function init(){
   days=repeater(dayRow,'Add day',syncItin);
   const itinBox=$('pkg-itin').closest('.form-field-full');hide(itinBox);itinBox.before(h('div',{class:'form-field-full'},h('label',{},'Day-by-day itinerary'),days.root));
 
+  $('pkg-schedule-type').addEventListener('change',applyFlightVis);
   sel.addEventListener('change',()=>{applyFlightVis();refreshFlightLine(true)});
   ['pkg-airline','pkg-baggage'].forEach(i=>$(i).addEventListener('input',()=>refreshFlightLine(false)));
 
@@ -143,7 +144,8 @@ function syncHL(){$('pkg-route').value=hls.get().flatMap(x=>x.places).join(', ')
 
 const FL='Round-Trip Airfare';
 function flightOn(){return $('pkg-flight').value==='true'}
-function applyFlightVis(){const on=flightOn();flightBox.style.display=on?'':'none';datesBox.style.display=on?'':'none';$('v2-noflight').style.display=on?'none':''}
+function fixedSchedule(){return $('pkg-schedule-type').value==='fixed'}
+function applyFlightVis(){const on=flightOn();flightBox.style.display=on?'':'none';datesBox.style.display=fixedSchedule()?'':'none';$('v2-noflight').style.display=on?'none':''}
 function refreshFlightLine(modeChanged){
   if(!inc)return;const on=flightOn();
   if(on){
@@ -161,7 +163,7 @@ window.pkgV2={
     return{
       flightIncluded:on,
       airline:on?$('pkg-airline').value.trim():'',flightRoute:on?$('pkg-flight-route').value.trim():'',baggage:on?$('pkg-baggage').value.trim():'',
-      travelDates:on?dateRows().filter(d=>d.start).map(d=>d.extra>0?d:{start:d.start,end:d.end}):[],
+      travelDates:fixedSchedule()?dateRows().filter(d=>d.start).map(d=>d.extra>0?d:{start:d.start,end:d.end}):[],
       sharing:{triple:+$('pkg-triple').value||0,twin:+$('pkg-twin').value||0},priceNote:$('pkg-price-note').value.trim(),groupMin:Math.max(1,+$('pkg-minpax').value||1),
       itineraryDays:days.get().filter(d=>d.title||d.activities.length),
       highlightGroups:hls.get().filter(x=>x.places.length),highlightNote:$('pkg-hl-note').value.trim(),
@@ -188,7 +190,7 @@ window.pkgV2={
   },
   validate(){
     const g=this.getData();
-    if(g.flightIncluded&&!g.travelDates.length)return 'Flight included — maglagay ng kahit isang travel date.';
+    if(fixedSchedule()&&!g.travelDates.length)return 'Fixed schedule — maglagay ng kahit isang travel date.';
     if(g.travelDates.some(d=>d.end&&d.end<d.start))return 'May travel date na mas maaga ang return kaysa departure.';
     if(!g.inclusions.length)return 'Maglagay ng kahit isang inclusion.';
     return '';

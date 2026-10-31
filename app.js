@@ -560,7 +560,15 @@ export function openPkgForm(id) {
   $("pkg-region").value = g("region", "Luzon");
   $("pkg-dur").value = pkg ? (pkg.dur || pkg.durationLabel || "") : "";
   $("pkg-price").value = g("price", "");
-  $("pkg-cat").value = g("category", "Beach & Island");
+$("pkg-cat").value = g("category", "Beach & Island");
+
+// Load existing travel schedule
+const savedSchedule = String(g("scheduleType", "")).toLowerCase();
+
+$("pkg-schedule-type").value =
+  ["fixed", "flexible"].includes(savedSchedule)
+    ? savedSchedule
+    : "";
   $("pkg-route").value = g("route");
   $("pkg-featured").value = pkg?.featured === true ? "true" : "false";
   $("pkg-featured-order").value = g("featuredOrder", "");
@@ -636,6 +644,11 @@ export async function savePackage() {
   const dest = val("pkg-dest");
   const dur = val("pkg-dur");
   const price = Number($("pkg-price").value) || 0;
+  const scheduleType = val("pkg-schedule-type");
+
+if (!["fixed", "flexible"].includes(scheduleType)) {
+  return toast("Please select Fixed or Flexible travel dates.", "err");
+}
 
   if (!name || !dest || !dur || price <= 0) {
     return toast("Fill in Name, Destination, Duration, and Price.", "err");
@@ -679,9 +692,9 @@ export async function savePackage() {
       dur: dur,
       durationLabel: dur,
       durationKey: dur,
-      price: price,
-      category: val("pkg-cat"),
-      route: routeText,
+     price: price,
+    category: val("pkg-cat"),
+  route: routeText,
       poster: poster,
       imageUrl: galleryUrls[0],
       gallery: galleryUrls,
@@ -704,7 +717,8 @@ export async function savePackage() {
       featuredUntil: $("pkg-featured-until").value || null,
       // v2: flightIncluded, airline, flightRoute, baggage, travelDates, sharing, priceNote,
       //     itineraryDays, highlightGroups, highlightNote, inclusions, exclusions
-      ...(window.pkgV2 ? window.pkgV2.getData() : {})
+      ...(window.pkgV2 ? window.pkgV2.getData() : {}),
+scheduleType: scheduleType
     };
 
     if (id) {

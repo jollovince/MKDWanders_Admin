@@ -365,14 +365,87 @@ tbody tr{transition:background .12s}tbody tr:hover{background:var(--soft)}tbody 
               <div class="form-field"><label for="pkg-dur">Duration<span class="req">*</span></label><input id="pkg-dur" placeholder="e.g. 4D - 3N"></div>
             </div>
           </section>
-          <section class="form-sec">
-            <div class="form-sec-hd"><span class="n">2</span><div><h3>Pricing &amp; category</h3><p>Presyo bawat tao at uri ng tour.</p></div></div>
-            <div class="form-grid">
-              <div class="form-field"><label for="pkg-price">Price per person (₱)<span class="req">*</span></label><input type="number" id="pkg-price" min="0" placeholder="12500"></div>
-              <div class="form-field"><label for="pkg-type">Package type (label sa card)</label><input id="pkg-type" list="pkg-type-list" placeholder="e.g. Land Arrangement"><datalist id="pkg-type-list"><option value="Land Arrangement"><option value="Free &amp; Easy"><option value="Joiner Tour"><option value="Private Tour"><option value="Day Tour"></datalist></div>
-              <div class="form-field"><label for="pkg-cat">Category</label><select id="pkg-cat"><option>Beach &amp; Island</option><option>Nature &amp; Eco</option><option>Adventure</option><option>Leisure</option></select></div>
-            </div>
-          </section>
+         
+<section class="form-sec">
+  <div class="form-sec-hd">
+    <span class="n">2</span>
+    <div>
+      <h3>Pricing &amp; category</h3>
+      <p>Presyo bawat tao, uri ng tour, at travel schedule.</p>
+    </div>
+  </div>
+
+  <div class="form-grid">
+
+    <!-- Package Price -->
+    <div class="form-field">
+      <label for="pkg-price">
+        Price per person (₱)<span class="req">*</span>
+      </label>
+      <input
+        type="number"
+        id="pkg-price"
+        min="0"
+        placeholder="12500"
+      >
+    </div>
+
+    <!-- Package Type -->
+    <div class="form-field">
+      <label for="pkg-type">Package type (label sa card)</label>
+      <input
+        id="pkg-type"
+        list="pkg-type-list"
+        placeholder="e.g. Land Arrangement"
+      >
+      <datalist id="pkg-type-list">
+        <option value="Land Arrangement">
+        <option value="Free &amp; Easy">
+        <option value="Joiner Tour">
+        <option value="Private Tour">
+        <option value="Day Tour">
+      </datalist>
+    </div>
+
+    <!-- Category -->
+    <div class="form-field">
+      <label for="pkg-cat">Category</label>
+      <select id="pkg-cat">
+        <option>Beach &amp; Island</option>
+        <option>Nature &amp; Eco</option>
+        <option>Adventure</option>
+        <option>Leisure</option>
+      </select>
+    </div>
+
+    <!-- NEW: Travel Schedule -->
+    <div class="form-field">
+      <label for="pkg-schedule-type">
+        Travel Schedule<span class="req">*</span>
+      </label>
+
+      <select id="pkg-schedule-type" required>
+        <option value="" selected disabled>
+          Select travel schedule
+        </option>
+        <option value="flexible">
+          Flexible Dates
+        </option>
+        <option value="fixed">
+          Fixed Dates
+        </option>
+      </select>
+
+      <p class="feature-note">
+        Flexible: Travelers can choose dates.
+        Fixed: Only scheduled travel dates are allowed.
+      </p>
+    </div>
+
+  </div>
+</section>
+
+             
           <section class="form-sec">
             <div class="form-sec-hd"><span class="n">3</span><div><h3>Home screen placement</h3><p>Optional. Piliin kung ipu-push sa Featured Packages ng app.</p></div></div>
             <div class="feature-box">
