@@ -1,0 +1,26 @@
+/* Full-screen travel backdrop with a centered sign-in form. */
+body{display:flex;flex-direction:column;min-height:100vh;min-height:100dvh;background:#04264B;color:#fff;isolation:isolate}
+.login-backdrop{position:fixed;inset:0;z-index:-1;pointer-events:none;background:#04264B}
+.travel-photo{width:100%;height:100%;object-fit:cover;object-position:center 42%}
+.login-backdrop::after{content:"";position:absolute;inset:0;background:linear-gradient(180deg,rgba(3,28,56,.38),rgba(3,28,56,.15) 40%,rgba(3,28,56,.45))}
+.brand{position:relative;padding:24px 36px;flex-shrink:0;font-size:16px}
+.brand i{width:40px;height:40px;border-radius:11px}.brand small{color:#E0EAF4}
+.panel{flex:1;min-height:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:26px;padding:16px 24px 44px;background:transparent}
+.copy{text-align:center;width:100%;max-width:760px;flex-shrink:0}
+.copy h2{max-width:none;font-size:clamp(28px,3.5vw,44px);font-weight:700;line-height:1.2;letter-spacing:-.045em;text-shadow:0 2px 20px rgba(3,28,56,.5)}
+.copy h2 span{color:#FFD0A8;white-space:nowrap}.copy p{display:block;max-width:none;font-size:13px;color:#F0F5FA;margin-top:12px}
+.box{width:100%;max-width:420px;margin:0;padding:30px 32px;border-radius:20px;background:rgba(3,28,56,.78);border:1px solid rgba(255,255,255,.22);backdrop-filter:none;-webkit-backdrop-filter:none;box-shadow:0 24px 64px rgba(0,15,32,.25)}
+.logo{display:none}.login-eyebrow{font-size:10px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:#D1DFEA;margin-bottom:10px}
+.box h1{font-size:28px;font-weight:700;letter-spacing:-.035em}.sub{font-size:13px;line-height:1.6;color:#D1DFEA;margin:9px 0 24px}
+label{font-size:12px;color:#F1F5F9;letter-spacing:0}.field{margin-bottom:20px}
+input{min-height:50px;border-radius:10px;background:rgba(3,28,56,.45);border-color:#71879D;font-size:14px;color:#fff}
+input::placeholder{color:#B9C9D8}.inp svg{stroke:#B9C9D8}input:focus{transform:none;background:rgba(3,28,56,.7);border-color:#FFD0A8;box-shadow:0 0 0 3px rgba(255,208,168,.18)}
+.eye{color:#DFE9F2;min-height:40px}.eye:hover{color:#fff;background:rgba(255,255,255,.12)}
+.btn{min-height:50px;border-radius:10px;font-size:14px;background:#C74713;box-shadow:none;margin-top:4px}.btn:hover{background:#AD3B0D;transform:none;box-shadow:none}.btn::after{display:none}
+.foot{font-size:11px;color:#CEDCE8;margin-top:24px;padding-top:18px;border-top:1px solid rgba(255,255,255,.18)}
+.login-status{min-height:18px;margin-top:12px;text-align:center;font-size:12px;line-height:1.5;color:#D1DFEA}
+.box .err.show{animation:none;color:#FFE1DD;background:#542C32;border-color:#A16A70;line-height:1.6}
+.btn:disabled{opacity:1;background:#8B431F;cursor:wait}
+:focus-visible{outline:3px solid #FFD0A8;outline-offset:3px}
+@media(max-width:600px){.brand{padding:20px 24px;font-size:14px}.brand i{width:34px;height:34px}.panel{padding:12px 20px 28px;gap:22px}.copy h2{font-size:30px}.copy p{display:block;font-size:12px}.box{padding:26px 24px;margin:0}.box h1{font-size:25px}.travel-photo{object-position:48% center}}
+@media(prefers-reduced-motion:reduce){*,*::before,*::after{animation:none!important;transition:none!important}}

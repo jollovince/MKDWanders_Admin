@@ -1,6 +1,6 @@
 /* MKDWander Admin - count-up numbers + button ripple (plain script, no changes to app.js needed) */
 (() => {
-  const reduce = false;
+  const reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
   /* ---------- Count-up for KPI numbers ---------- */
   const ids = [

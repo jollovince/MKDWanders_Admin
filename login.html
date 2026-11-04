@@ -90,53 +90,6 @@ input:focus{border-color:var(--gold);background:rgba(255,255,255,.09);box-shadow
 @keyframes shake{10%,90%{transform:translateX(-2px)}20%,80%{transform:translateX(4px)}30%,50%,70%{transform:translateX(-7px)}40%,60%{transform:translateX(7px)}}
 :focus-visible{outline:2px solid var(--sky);outline-offset:2px}
 
-/* ---------- Verification popup ---------- */
-.vmodal{position:fixed;inset:0;z-index:100;display:flex;align-items:center;justify-content:center;padding:20px;background:rgba(2,14,30,.65);backdrop-filter:blur(8px);opacity:0;visibility:hidden;transition:opacity .35s var(--ease),visibility .35s}
-.vmodal.open{opacity:1;visibility:visible}
-.vcard{position:relative;overflow:hidden;width:100%;max-width:380px;padding:34px 30px 30px;text-align:center;border-radius:26px;background:linear-gradient(160deg,#0B2F57,#05213F);border:1px solid rgba(255,255,255,.12);box-shadow:0 40px 90px rgba(0,0,0,.55);transform:translateY(24px) scale(.92);opacity:0;transition:transform .5s var(--ease),opacity .4s}
-.vmodal.open .vcard{transform:none;opacity:1}
-.vmodal.error .vcard{animation:shake .45s .3s cubic-bezier(.36,.07,.19,.97)}
-.ring{position:relative;width:96px;height:96px;margin:0 auto 18px}
-.ring svg{width:100%;height:100%}
-.ring .track{fill:none;stroke:rgba(255,255,255,.1);stroke-width:6}
-.ring .arc{fill:none;stroke:url(#vg);stroke-width:6;stroke-linecap:round;stroke-dasharray:70 206;transform-origin:50px 50px;animation:spin 1s linear infinite}
-.ring .lock{fill:none;stroke:rgba(255,255,255,.85);stroke-width:4;stroke-linecap:round;stroke-linejoin:round;transition:opacity .25s;animation:floaty 2.4s ease-in-out infinite}
-.ring .check,.ring .x{fill:none;stroke-width:7;stroke-linecap:round;stroke-linejoin:round;stroke-dasharray:80;stroke-dashoffset:80}
-.ring .check{stroke:#22C55E}.ring .x{stroke:#FF5B50}
-.vmodal.success .arc{stroke:#22C55E;animation:fillRing .6s var(--ease) forwards}
-.vmodal.error .arc{stroke:#FF5B50;animation:fillRing .6s var(--ease) forwards}
-.vmodal.success .lock,.vmodal.error .lock{opacity:0;animation:none}
-.vmodal.success .check{animation:draw .5s .4s var(--ease) forwards}
-.vmodal.error .x{animation:draw .45s .4s var(--ease) forwards}
-.vmodal.success .ring::before{content:"";position:absolute;inset:-6px;border-radius:50%;border:2px solid #22C55E;animation:ping 1s .5s ease-out both}
-@keyframes fillRing{from{stroke-dasharray:70 206}to{stroke-dasharray:276 0}}
-@keyframes draw{to{stroke-dashoffset:0}}
-@keyframes ping{from{transform:scale(.9);opacity:.8}to{transform:scale(1.5);opacity:0}}
-.vcard h3{font-size:20px;font-weight:800;letter-spacing:-.02em;min-height:26px}
-.vcard .vsub{font-size:13px;color:rgba(255,255,255,.62);margin:6px 0 20px;min-height:20px}
-.vsteps{list-style:none;text-align:left;display:grid;gap:10px;margin:0 0 20px;padding:14px 16px;border-radius:14px;background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.08)}
-.vstep{display:flex;align-items:center;gap:12px;font-size:13px;font-weight:600;color:rgba(255,255,255,.4);transition:color .3s}
-.vstep .dot{position:relative;flex-shrink:0;width:20px;height:20px;border-radius:50%;border:2px solid rgba(255,255,255,.2);transition:all .3s var(--ease)}
-.vstep[data-state=active]{color:#fff}
-.vstep[data-state=active] .dot{border-color:rgba(255,255,255,.2);border-top-color:var(--gold);animation:spin .7s linear infinite}
-.vstep[data-state=done]{color:rgba(255,255,255,.9)}
-.vstep[data-state=done] .dot{background:#22C55E;border-color:#22C55E;animation:popDot .4s var(--ease)}
-.vstep[data-state=done] .dot::after,.vstep[data-state=fail] .dot::after{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:800;color:#fff}
-.vstep[data-state=done] .dot::after{content:"\2713"}
-.vstep[data-state=fail]{color:#FF8A82}
-.vstep[data-state=fail] .dot{background:#FF5B50;border-color:#FF5B50;animation:popDot .4s var(--ease)}
-.vstep[data-state=fail] .dot::after{content:"\00D7"}
-@keyframes popDot{0%{transform:scale(.4)}60%{transform:scale(1.25)}100%{transform:scale(1)}}
-.vbar{height:5px;border-radius:99px;background:rgba(255,255,255,.1);overflow:hidden}
-.vbar i{display:block;height:100%;width:var(--p,0%);border-radius:99px;background:linear-gradient(90deg,var(--sky),var(--gold),var(--orange));transition:width .7s var(--ease)}
-.vmodal.success .vbar i{background:linear-gradient(90deg,#22C55E,#7EE2A0)}
-.vretry{display:none;width:100%;margin-top:4px;padding:13px;border:none;border-radius:12px;background:linear-gradient(135deg,var(--orange),#FF9448);color:#fff;font:inherit;font-size:14px;font-weight:700;cursor:pointer;transition:transform .2s var(--ease)}
-.vretry:hover{transform:translateY(-2px)}.vretry:active{transform:scale(.97)}
-.vmodal.error .vretry{display:block;animation:rise .5s .6s var(--ease) both}
-.vmodal.error .vbar{display:none}
-.cf{position:absolute;left:50%;top:82px;width:8px;height:8px;border-radius:2px;pointer-events:none;animation:burst .95s var(--ease) forwards}
-@keyframes burst{from{transform:translate(0,0) scale(.4);opacity:1}to{transform:translate(var(--dx),var(--dy)) rotate(var(--r)) scale(1);opacity:0}}
-
 @media(max-width:900px){
   body{grid-template-columns:1fr}
   .art{min-height:230px;padding:22px 24px}
@@ -145,135 +98,27 @@ input:focus{border-color:var(--gold);background:rgba(255,255,255,.09);box-shadow
   .box{margin-top:-28px;position:relative;z-index:3}
 }
 </style>
+<link rel="stylesheet" href="login-design.css">
 </head>
 <body>
 
-<section class="art" aria-hidden="true">
-  <svg class="scene" viewBox="0 0 800 1000" preserveAspectRatio="xMidYMid slice" xmlns="http://www.w3.org/2000/svg">
-    <defs>
-      <linearGradient id="sky" x1="0" y1="0" x2="0" y2="1">
-        <stop offset="0" stop-color="#04264B"/><stop offset=".38" stop-color="#0F4C8A"/>
-        <stop offset=".58" stop-color="#E5663A"/><stop offset=".68" stop-color="#FFBF49"/><stop offset="1" stop-color="#FFD98A"/>
-      </linearGradient>
-      <linearGradient id="sea" x1="0" y1="0" x2="0" y2="1">
-        <stop offset="0" stop-color="#F58A4B"/><stop offset=".25" stop-color="#1D6FA8"/><stop offset="1" stop-color="#04264B"/>
-      </linearGradient>
-      <radialGradient id="sunGlow"><stop offset="0" stop-color="#FFE29A" stop-opacity=".95"/><stop offset="1" stop-color="#FFBF49" stop-opacity="0"/></radialGradient>
-      <linearGradient id="sunFill" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#FFF3C9"/><stop offset="1" stop-color="#FFBF49"/></linearGradient>
-      <path id="wv" d="M0 0 q50 -18 100 0 t100 0 t100 0 t100 0 t100 0 t100 0 t100 0 t100 0 t100 0 t100 0 t100 0 t100 0 t100 0 t100 0 t100 0 t100 0 V400 H0 Z"/>
-      <g id="palm">
-        <path d="M0 0 C6 -50 -2 -100 8 -150" fill="none" stroke="#0B2A47" stroke-width="7" stroke-linecap="round"/>
-        <g transform="translate(8 -150)" fill="#0B2A47">
-          <ellipse cx="34" cy="-4" rx="40" ry="8" transform="rotate(-12 0 0)"/>
-          <ellipse cx="-34" cy="-4" rx="40" ry="8" transform="rotate(12 0 0)"/>
-          <ellipse cx="26" cy="12" rx="36" ry="7" transform="rotate(35 0 0)"/>
-          <ellipse cx="-26" cy="12" rx="36" ry="7" transform="rotate(-35 0 0)"/>
-          <ellipse cx="0" cy="-26" rx="8" ry="32"/>
-        </g>
-      </g>
-    </defs>
-
-    <rect width="800" height="1000" fill="url(#sky)"/>
-
-    <g fill="#fff">
-      <circle class="star" cx="90" cy="110" r="1.8"/><circle class="star" style="animation-delay:-1s" cx="250" cy="70" r="1.4"/>
-      <circle class="star" style="animation-delay:-2s" cx="470" cy="130" r="1.8"/><circle class="star" style="animation-delay:-.5s" cx="650" cy="80" r="1.5"/>
-      <circle class="star" style="animation-delay:-1.6s" cx="730" cy="210" r="1.3"/><circle class="star" style="animation-delay:-2.4s" cx="150" cy="250" r="1.3"/>
-    </g>
-
-    <!-- sun -->
-    <circle class="glow" cx="400" cy="610" r="230" fill="url(#sunGlow)"/>
-    <circle class="sun" cx="400" cy="610" r="92" fill="url(#sunFill)"/>
-
-    <!-- clouds -->
-    <g class="cloud" opacity=".85" fill="#fff"><ellipse cx="0" cy="190" rx="70" ry="16" opacity=".35"/><ellipse cx="30" cy="180" rx="44" ry="14" opacity=".45"/></g>
-    <g class="cloud c2" fill="#FFE7C2"><ellipse cx="0" cy="380" rx="90" ry="14" opacity=".5"/><ellipse cx="-30" cy="372" rx="50" ry="12" opacity=".5"/></g>
-    <g class="cloud c3" fill="#fff"><ellipse cx="0" cy="290" rx="60" ry="11" opacity=".3"/></g>
-
-    <!-- flight path + plane -->
-    <path class="trail" d="M-40 330 C 180 200, 460 420, 840 210" fill="none" stroke="#fff" stroke-opacity=".7" stroke-width="2" stroke-dasharray="6 9" stroke-linecap="round"/>
-    <g>
-      <animateMotion dur="14s" repeatCount="indefinite" rotate="auto" path="M-40 330 C 180 200, 460 420, 840 210"/>
-      <path d="M-14 0 L-4 -3 L-8 -13 L-4 -13 L6 -4 L14 -4 C18 -4 18 4 14 4 L6 4 L-4 13 L-8 13 L-4 3 Z" fill="#fff"/>
-    </g>
-
-    <!-- far islands -->
-    <path d="M0 640 C60 600 110 585 170 622 C210 600 250 600 290 640 Z" fill="#0A3563" opacity=".75"/>
-    <path d="M520 640 C560 612 610 596 660 628 C700 604 760 606 800 636 L800 640 Z" fill="#0A3563" opacity=".75"/>
-
-    <!-- sea -->
-    <rect y="640" width="800" height="360" fill="url(#sea)"/>
-    <g fill="#FFE29A">
-      <rect class="shimmer" x="360" y="652" width="80" height="4" rx="2"/>
-      <rect class="shimmer" style="animation-delay:-1s" x="372" y="668" width="56" height="4" rx="2"/>
-      <rect class="shimmer" style="animation-delay:-2s" x="350" y="686" width="100" height="4" rx="2"/>
-      <rect class="shimmer" style="animation-delay:-.6s" x="382" y="706" width="36" height="4" rx="2"/>
-      <rect class="shimmer" style="animation-delay:-1.7s" x="366" y="728" width="68" height="4" rx="2"/>
-    </g>
-    <g class="wave w3"><use href="#wv" y="720" fill="#2B86C0" opacity=".45"/></g>
-    <g class="wave w2"><use href="#wv" y="790" fill="#145C95" opacity=".6"/></g>
-    <g class="wave"><use href="#wv" y="860" fill="#0A3563" opacity=".85"/></g>
-
-    <!-- sailboat -->
-    <g transform="translate(610 698)"><g class="boat">
-      <path d="M-20 0 L20 0 L13 9 L-13 9 Z" fill="#fff"/>
-      <path d="M0 -2 L0 -38 L18 -2 Z" fill="#fff"/>
-      <path d="M-3 -2 L-3 -28 L-15 -2 Z" fill="#FFE7C2"/>
-    </g></g>
-
-    <!-- beach -->
-    <defs>
-      <linearGradient id="sand" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#FFE3B0"/><stop offset="1" stop-color="#E9AE6A"/></linearGradient>
-      <clipPath id="canopy"><path d="M488 872 Q548 788 608 872 Z"/></clipPath>
-    </defs>
-    <path d="M0 902 C120 876 260 922 400 902 C540 882 680 922 800 897 L800 1000 L0 1000 Z" fill="#B98350" opacity=".7"/>
-    <path d="M0 916 C120 890 260 936 400 916 C540 896 680 936 800 911 L800 1000 L0 1000 Z" fill="url(#sand)"/>
-    <g class="foam" fill="none" stroke="#fff" stroke-linecap="round">
-      <path d="M0 903 C120 877 260 923 400 903 C540 883 680 923 800 898" stroke-width="5" opacity=".85"/>
-      <path d="M0 893 C120 867 260 913 400 893 C540 873 680 913 800 888" stroke-width="2.5" opacity=".5"/>
-    </g>
-
-    <!-- palms -->
-    <g transform="translate(70 975)"><use class="palm" href="#palm"/></g>
-    <g transform="translate(735 972) scale(.85)"><use class="palm" style="animation-delay:-3s" href="#palm"/></g>
-
-    <!-- umbrella, towel, chair -->
-    <ellipse cx="548" cy="958" rx="70" ry="7" fill="#7A4B22" opacity=".25"/>
-    <path d="M470 946 L545 940 L556 962 L474 970 Z" fill="#fff"/>
-    <path d="M488 944 L500 943 L506 967 L492 968 Z M524 941 L536 940 L544 964 L530 965 Z" fill="#FD7830"/>
-    <g transform="rotate(-8 548 930)">
-      <path d="M548 800 L548 950" stroke="#6B4423" stroke-width="5" stroke-linecap="round"/>
-      <g clip-path="url(#canopy)">
-        <rect x="488" y="780" width="120" height="100" fill="#FD7830"/>
-        <path d="M518 780 L518 880 L548 880 L548 780 Z M578 780 L578 880 L608 880 L608 780 Z" fill="#fff"/>
-      </g>
-      <circle cx="548" cy="800" r="4" fill="#FFBF49"/>
-    </g>
-    <g transform="translate(600 0)">
-      <path d="M20 952 L68 938 L78 948 L30 964 Z" fill="#49C9F0"/>
-      <path d="M68 938 L84 910 L96 917 L78 948 Z" fill="#49C9F0"/>
-      <path d="M26 964 L22 976 M74 950 L78 962" stroke="#E5E9F0" stroke-width="3" stroke-linecap="round"/>
-    </g>
-    <path transform="translate(380 966) rotate(15)" d="M0 -11 L3 -3 L11 -3 L5 2 L7 10 L0 5 L-7 10 L-5 2 L-11 -3 L-3 -3 Z" fill="#FD7830"/>
-    <ellipse cx="300" cy="975" rx="9" ry="6" fill="#FFF3E0"/>
-  </svg>
-
-  <div class="brand">
-    <i><img src="images/logo.png" alt="" onerror="this.style.display='none'"></i>
-    <div>MKDWander<small>Travel &amp; Tours</small></div>
-  </div>
-  <div class="copy">
-    <h2>Plan the trips.<br><span>Answer the travelers.</span></h2>
-    <p>Manage packages, promos and booking inquiries for the MKDWander app in one place.</p>
-    <div class="chips"><span>Tour packages</span><span>Promos</span><span>Bookings</span></div>
-  </div>
-</section>
-
+<div class="login-backdrop" aria-hidden="true">
+  <img class="travel-photo" src="images/login-el-nido.jpg" alt="" fetchpriority="high">
+</div>
+<header class="brand">
+  <i><img src="images/logo.png" alt=""></i>
+  <div>MKDWander<small>Travel &amp; Tours</small></div>
+</header>
 <main class="panel">
+  <div class="copy">
+    <h2>Every great trip <span>starts here.</span></h2>
+    <p>A fresh perspective. A new adventure.</p>
+  </div>
   <div class="box">
     <div class="logo"><img src="images/logo.png" alt="MKDWander logo" onerror="this.style.display='none'"></div>
-    <h1 class="rise" style="--i:1">Admin sign in</h1>
-    <p class="sub rise" style="--i:2">Use your MKDWander admin account.</p>
+    <p class="login-eyebrow">MKDWander admin portal</p>
+    <h1 class="rise" style="--i:1">Welcome back.</h1>
+    <p class="sub rise" style="--i:2">Sign in to manage your travel workspace.</p>
     <form id="login-form">
       <div class="field rise" style="--i:3">
         <label for="email">Email</label>
@@ -292,34 +137,11 @@ input:focus{border-color:var(--gold);background:rgba(255,255,255,.09);box-shadow
       </div>
       <div class="err" id="error-msg" role="alert"></div>
       <button type="submit" class="btn rise" style="--i:5" id="submit-btn">Sign in</button>
+      <p class="login-status" id="login-status" role="status" aria-live="polite"></p>
     </form>
     <p class="foot rise" style="--i:6">Authorized MKDWander staff only</p>
   </div>
 </main>
-
-<div class="vmodal" id="vmodal" role="dialog" aria-modal="true" aria-labelledby="v-title">
-  <div class="vcard">
-    <div class="ring">
-      <svg viewBox="0 0 100 100" aria-hidden="true">
-        <defs><linearGradient id="vg" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#49C9F0"/><stop offset="1" stop-color="#FFBF49"/></linearGradient></defs>
-        <circle class="track" cx="50" cy="50" r="44"/>
-        <circle class="arc" cx="50" cy="50" r="44"/>
-        <g class="lock"><rect x="37" y="48" width="26" height="18" rx="5"/><path d="M42 48v-5a8 8 0 0 1 16 0v5"/></g>
-        <path class="check" d="M33 52 L45 64 L68 38"/>
-        <path class="x" d="M37 37 L63 63 M63 37 L37 63"/>
-      </svg>
-    </div>
-    <h3 id="v-title">Verifying your account</h3>
-    <p class="vsub" id="v-sub">Please wait a moment...</p>
-    <ul class="vsteps">
-      <li class="vstep" data-state="idle"><span class="dot"></span>Checking credentials</li>
-      <li class="vstep" data-state="idle"><span class="dot"></span>Verifying admin access</li>
-      <li class="vstep" data-state="idle"><span class="dot"></span>Preparing your dashboard</li>
-    </ul>
-    <div class="vbar"><i id="v-bar"></i></div>
-    <button type="button" class="vretry" id="v-retry">Try again</button>
-  </div>
-</div>
 
 <script type="module">
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.9.0/firebase-app.js";
@@ -333,9 +155,9 @@ const app = initializeApp({
 });
 const auth = getAuth(app);
 const $ = id => document.getElementById(id);
-const sleep = ms => new Promise(r => setTimeout(r, ms));
 
-// Don't redirect instantly while the verification popup is running
+
+// The submit handler owns navigation while signing in.
 let signingIn = false;
 onAuthStateChanged(auth, u => { if (u && !signingIn) window.location.replace("index.html"); });
 
@@ -354,83 +176,34 @@ $("eye").onclick = () => {
   $("eye").textContent = show ? "Hide" : "Show";
 };
 
-/* ---------- Verification popup ---------- */
-const modal = $("vmodal");
-const steps = [...modal.querySelectorAll(".vstep")];
-const setStep = (i, state) => { steps[i].dataset.state = state; };
-const setProgress = pct => $("v-bar").style.setProperty("--p", pct + "%");
-const setText = (t, s) => { $("v-title").textContent = t; $("v-sub").textContent = s; };
-
-function openModal() {
-  steps.forEach((_, i) => setStep(i, "idle"));
-  modal.querySelectorAll(".cf").forEach(n => n.remove());
-  setProgress(0);
-  setText("Verifying your account", "Please wait a moment...");
-  modal.className = "vmodal open";
-  requestAnimationFrame(() => setProgress(12));
-}
-
-function confetti() {
-  const card = modal.querySelector(".vcard");
-  const colors = ["#FD7830", "#FFBF49", "#49C9F0", "#22C55E", "#fff"];
-  for (let i = 0; i < 18; i++) {
-    const c = document.createElement("span");
-    const ang = (Math.PI * 2 * i) / 18 + Math.random() * .4, dist = 70 + Math.random() * 60;
-    c.className = "cf";
-    c.style.background = colors[i % colors.length];
-    c.style.setProperty("--dx", Math.cos(ang) * dist + "px");
-    c.style.setProperty("--dy", Math.sin(ang) * dist + "px");
-    c.style.setProperty("--r", Math.random() * 360 + "deg");
-    c.style.animationDelay = ".45s";
-    card.appendChild(c);
-  }
-}
-
-function fail(msg) {
-  const active = steps.findIndex(s => s.dataset.state === "active");
-  setStep(active < 0 ? 0 : active, "fail");
-  setText("Verification failed", msg);
-  modal.classList.add("error");
-}
-
-$("v-retry").onclick = () => {
-  modal.className = "vmodal";
-  signingIn = false;
-  $("submit-btn").disabled = false;
-  $("submit-btn").textContent = "Sign in";
-  $("password").focus();
-};
-
+/* ---------- Inline sign-in feedback ---------- */
 $("login-form").onsubmit = async e => {
   e.preventDefault();
+  if (signingIn) return;
   const btn = $("submit-btn");
-  btn.disabled = true;
+  const error = $("error-msg");
+  const status = $("login-status");
   signingIn = true;
-  openModal();
-  setStep(0, "active");
-  const t0 = Date.now();
+  btn.disabled = true;
+  $("login-form").setAttribute("aria-busy", "true");
+  error.classList.remove("show");
+  error.textContent = "";
+  btn.innerHTML = '<span class="spin" aria-hidden="true"></span> Signing in...';
+  status.textContent = "Checking your account...";
 
   try {
-    const cred = await signInWithEmailAndPassword(auth, $("email").value.trim(), $("password").value);
-    await sleep(Math.max(0, 800 - (Date.now() - t0)));
-    setStep(0, "done"); setProgress(40);
-
-    setStep(1, "active"); await sleep(900);
-    setStep(1, "done"); setProgress(72);
-
-    setStep(2, "active"); await sleep(900);
-    setStep(2, "done"); setProgress(100);
-
-    await sleep(300);
-    const u = cred.user;
-    const name = u.displayName || (u.email || "").split("@")[0] || "Admin";
-    setText("Welcome back, " + name + "!", "Redirecting to your dashboard...");
-    modal.classList.add("success");
-    confetti();
-    await sleep(1700);
+    await signInWithEmailAndPassword(auth, $("email").value.trim(), $("password").value);
+    btn.textContent = "Signed in";
+    status.textContent = "Opening your dashboard...";
     window.location.replace("index.html");
   } catch (err) {
-    fail(messages[err.code] || "Could not sign in: " + err.message);
+    status.textContent = "";
+    error.textContent = messages[err.code] || "Could not sign in. Please try again.";
+    error.classList.add("show");
+    signingIn = false;
+    btn.disabled = false;
+    btn.textContent = "Sign in";
+    $("login-form").setAttribute("aria-busy", "false");
   }
 };
 </script>

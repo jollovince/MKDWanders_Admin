@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>MKDWander Admin Dashboard</title>
 <link rel="icon" type="image/png" href="images/logo.png">
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@latest/tabler-icons.min.css">
 <style>
 /* ============ MKDWander Admin — design tokens ============
@@ -20,7 +20,7 @@
   --ring:0 0 0 3px rgba(73,201,240,.35)}
 [data-theme=dark]{--bg:#0A1424;--card:#111E33;--soft:#16253D;--border:#22344F;--border-s:#2F4565;--muted:#9AA9C2;--text:#DCE4F2;--head:#fff;--cta:#F26A21;--cta-h:#FF7F3D;--shadow:0 1px 2px rgba(0,0,0,.3),0 4px 12px rgba(0,0,0,.25)}
 html{scroll-behavior:smooth}
-body{font-family:'Inter',system-ui,-apple-system,'Segoe UI',sans-serif;background:var(--bg);color:var(--text);display:flex;height:100vh;overflow:hidden;font-size:14px;line-height:1.55;-webkit-font-smoothing:antialiased}
+body{font-family:'Plus Jakarta Sans',system-ui,-apple-system,'Segoe UI',sans-serif;background:var(--bg);color:var(--text);display:flex;height:100vh;overflow:hidden;font-size:14px;line-height:1.55;-webkit-font-smoothing:antialiased}
 button,input,select,textarea{font-family:inherit;font-size:inherit;color:inherit}
 button{cursor:pointer}
 td,.td-bold,.td-navy,.kpi-val{font-variant-numeric:tabular-nums}
@@ -256,30 +256,31 @@ tbody tr{transition:background .12s}tbody tr:hover{background:var(--soft)}tbody 
 @media(max-width:560px){.kpi-grid,.form-grid{grid-template-columns:1fr}.hero-credit{display:none}.form-body{padding:8px 16px 0}.form-actions{padding:12px 16px}}
 </style>
 <link rel="stylesheet" href="animations.css">
+<link rel="stylesheet" href="dashboard.css">
 </head>
 <body>
 <a class="skip" href="#main">Skip to content</a>
 <div class="sidebar" id="sidebar">
-  <div class="logo">
+  <a class="logo" href="" onclick="window.location.reload(); return false;" aria-label="MKDWander — Reload page" title="Reload page">
     <div class="logo-icon"><img src="images/logo.png" alt="MKDWander logo" onerror="this.outerHTML='<i class=&quot;ti ti-plane&quot;></i>'"></div>
     <div class="logo-texts"><div class="logo-name">MKDWander</div><div class="logo-sub">Travel &amp; Tours</div></div>
-  </div>
+  </a>
   <nav aria-label="Main">
     <div class="nav-group">Overview</div>
-    <button class="nav-btn active" onclick="go('dashboard',this)" data-label="Dashboard"><i class="ti ti-layout-dashboard"></i><span class="nav-label">Dashboard</span></button>
+    <button class="nav-btn active" aria-current="page" onclick="go('dashboard',this)" data-label="Dashboard" aria-label="Dashboard" title="Dashboard"><i class="ti ti-layout-dashboard"></i><span class="nav-label">Dashboard</span></button>
     <div class="nav-group">Catalog</div>
-    <button class="nav-btn" onclick="go('packages',this)" data-label="Tour Packages"><i class="ti ti-photo-plus"></i><span class="nav-label">Tour Packages</span></button>
+    <button class="nav-btn" onclick="go('packages',this)" data-label="Tour Packages" aria-label="Tour Packages" title="Tour Packages"><i class="ti ti-photo-plus"></i><span class="nav-label">Tour Packages</span></button>
     <div class="nav-group">Sales</div>
-    <button class="nav-btn" onclick="go('inquiries',this)" data-label="Booking Inquiries"><i class="ti ti-clipboard-list"></i><span class="nav-label">Booking Inquiries</span><span class="nav-badge" id="nav-inq-badge"></span></button>
-    <button class="nav-btn" onclick="go('revenue',this)" data-label="Payments &amp; Revenue"><i class="ti ti-cash"></i><span class="nav-label">Payments &amp; Revenue</span></button>
+    <button class="nav-btn" onclick="go('inquiries',this)" data-label="Booking Inquiries" aria-label="Booking Inquiries" title="Booking Inquiries"><i class="ti ti-clipboard-list"></i><span class="nav-label">Booking Inquiries</span><span class="nav-badge" id="nav-inq-badge"></span></button>
+    <button class="nav-btn" onclick="go('revenue',this)" data-label="Payments &amp; Revenue" aria-label="Payments &amp; Revenue" title="Payments &amp; Revenue"><i class="ti ti-cash"></i><span class="nav-label">Payments &amp; Revenue</span></button>
     <div class="nav-group">Audience</div>
-    <button class="nav-btn" onclick="go('users',this)" data-label="Users &amp; Accounts"><i class="ti ti-users"></i><span class="nav-label">Users &amp; Accounts</span></button>
-    <button class="nav-btn" onclick="go('chatbot',this)" data-label="Chatbot Logs"><i class="ti ti-message-dots"></i><span class="nav-label">Chatbot Logs</span><span class="nav-badge" id="nav-chat-badge"></span></button>
+    <button class="nav-btn" onclick="go('users',this)" data-label="Users &amp; Accounts" aria-label="Users &amp; Accounts" title="Users &amp; Accounts"><i class="ti ti-users"></i><span class="nav-label">Users &amp; Accounts</span></button>
+    <button class="nav-btn" onclick="go('chatbot',this)" data-label="Chatbot Logs" aria-label="Chatbot Logs" title="Chatbot Logs"><i class="ti ti-message-dots"></i><span class="nav-label">Chatbot Logs</span><span class="nav-badge" id="nav-chat-badge"></span></button>
     <div class="nav-group">Insights</div>
-    <button class="nav-btn" onclick="go('analytics',this)" data-label="Analytics"><i class="ti ti-chart-bar"></i><span class="nav-label">Analytics</span></button>
+    <button class="nav-btn" onclick="go('analytics',this)" data-label="Analytics" aria-label="Analytics" title="Analytics"><i class="ti ti-chart-bar"></i><span class="nav-label">Analytics</span></button>
   </nav>
   <div class="sidebar-foot">
-    <div class="user-row"><div class="avatar" id="user-avatar">MK</div><div class="user-info"><div class="user-name" id="user-name">MKDWander Admin</div><div class="user-role">Firebase Live Portal</div></div></div>
+    <div class="user-row"><div class="avatar" id="user-avatar">MK</div><div class="user-info"><div class="user-name" id="user-name">MKDWander Admin</div><div class="user-role">Workspace administrator</div></div></div>
     <div class="foot-btns">
       <button onclick="toggleTheme()" title="Dark / light mode" aria-label="Toggle theme"><i class="ti ti-moon"></i></button>
       <button onclick="toggleSidebar()" title="Collapse sidebar" aria-label="Collapse sidebar"><i class="ti ti-layout-sidebar-left-collapse"></i></button>
@@ -290,9 +291,9 @@ tbody tr{transition:background .12s}tbody tr:hover{background:var(--soft)}tbody 
 
 <div class="main">
   <div class="topbar">
-    <div><h1 id="page-title">Dashboard</h1><p>MKDWander Travel &amp; Tours · Cloud Firestore realtime sync</p></div>
+    <div><h1 id="page-title">Dashboard</h1><p>Your daily travel operations, in one place.</p></div>
     <div class="topbar-right">
-      <span class="badge-warn" id="topbar-inq-count" onclick="go('inquiries',null)">0 pending inquiries</span>
+      <button type="button" class="badge-warn" id="topbar-inq-count" onclick="go('inquiries',null)">0 pending inquiries</button>
       <div class="online"><div class="online-dot"></div>Live</div>
     </div>
   </div>
@@ -300,7 +301,7 @@ tbody tr{transition:background .12s}tbody tr:hover{background:var(--soft)}tbody 
 
     <div class="section active" id="sec-dashboard">
       <div class="hero">
-        <div class="hero-eyebrow">MKDWander Admin</div>
+        <div class="hero-eyebrow">Your travel workspace</div>
         <h2 id="greeting">Welcome back, MKDWander Admin</h2>
         <p>Review new inquiries, track confirmed revenue and manage your travel packages.</p>
         <div class="hero-actions">
@@ -309,34 +310,25 @@ tbody tr{transition:background .12s}tbody tr:hover{background:var(--soft)}tbody 
         </div>
         <a class="hero-credit" href="https://www.thepoortraveler.net/2020/03/things-to-do-philippines/" target="_blank" rel="noopener">Photo: Twin Lagoon, Coron · The Poor Traveler</a>
       </div>
+      <div class="overview-heading"><div><h2>Business overview</h2><p id="overview-period-note" aria-live="polite">All recorded inquiries and confirmed payments.</p></div><label class="overview-period">Period<select id="overview-period"><option value="all">All time</option><option value="this-month">This month</option><option value="last-month">Last month</option></select></label></div>
       <div class="kpi-grid">
         <div class="kpi-card"><i class="ti ti-clipboard-list kpi-ico"></i><div class="kpi-label">Total inquiries &amp; bookings</div><div class="kpi-val" id="kpi-total-bookings">0</div></div>
         <div class="kpi-card"><i class="ti ti-coin kpi-ico"></i><div class="kpi-label">Confirmed revenue</div><div class="kpi-val" id="kpi-total-revenue">₱0</div><div class="kpi-note" id="kpi-pipeline">Pipeline: ₱0</div></div>
         <div class="kpi-card"><i class="ti ti-clock-hour-4 kpi-ico"></i><div class="kpi-label">Pending inquiries</div><div class="kpi-val" id="kpi-pending-inquiries">0</div></div>
-        <div class="kpi-card"><i class="ti ti-map-2 kpi-ico"></i><div class="kpi-label">Active tour packages</div><div class="kpi-val" id="kpi-active-pkg">0</div></div>
+        <div class="kpi-card"><i class="ti ti-map-2 kpi-ico"></i><div class="kpi-label">Active tour packages</div><div class="kpi-val" id="kpi-active-pkg">0</div><div class="kpi-note">Current total</div></div>
       </div>
       <div class="two-col">
         <div class="card"><div class="card-title">Monthly booking inquiries (last 6 months)</div><div class="bar-chart" id="monthly-chart"></div></div>
         <div class="card"><div class="card-title">Top destinations by inquiries</div><div id="dest-rows"></div></div>
         <div class="card"><div class="card-title">Recent inquiries</div><div id="recent-inq"></div><button class="btn-full" onclick="go('inquiries',null)">View all inquiries</button></div>
-        <div class="card"><div class="card-title">Registered users</div>
-          <div class="users-big"><b id="kpi-total-users">0</b><span>Registered app accounts</span></div>
+        <div class="card registered-users-card"><div class="card-title">Registered users</div>
+          <div class="users-big"><b id="kpi-total-users">0</b><span>Registered app accounts · Current total</span></div>
           <div class="privacy-note"><i class="ti ti-shield-check"></i> Emails and Auth UIDs are masked or hashed before they appear here.</div>
         </div>
       </div>
     </div>
 
     <div class="section" id="sec-packages">
-      <form id="recommend-form" class="card" style="padding:20px;margin-bottom:20px">
-        <h2>Tour recommendations</h2>
-        <p>Find packages that match a traveler's interests and budget.</p>
-        <div class="filter-row" style="margin-top:12px">
-          <label>Interests or destination <input class="search" id="recommend-interests" placeholder="e.g. beach island Palawan" maxlength="500" required></label>
-          <label>Maximum budget (PHP) <input class="search" id="recommend-budget" type="number" min="0" step="any" placeholder="Optional"></label>
-          <button class="btn-orange" id="recommend-submit" type="submit">Find recommendations</button>
-        </div>
-        <div id="recommend-results" aria-live="polite"></div>
-      </form>
       <div class="ph"><div class="ph-ico"><i class="ti ti-photo-plus"></i></div><div><h2>Tour Packages</h2><p>Manage destinations, itinerary, inclusions, and prices shown in the app.</p></div></div>
       <div class="filter-row">
         <div class="filter-btns" id="pkg-filters">
@@ -546,61 +538,49 @@ tbody tr{transition:background .12s}tbody tr:hover{background:var(--soft)}tbody 
         </table>
       </div>
 
-      <!-- Booking Detail Drawer -->
-      <div class="inq-detail" id="inq-detail">
+      <!-- Booking details -->
+      <section class="inq-detail" id="inq-detail" aria-labelledby="booking-detail-title" tabindex="-1">
         <div class="inq-det-hd">
-          <div>
-            <div class="inq-det-name" id="det-name">Traveler Name</div>
-            <div class="inq-det-ref" id="det-ref">Ref: MKD-0000</div>
+          <div><p class="booking-eyebrow">Booking inquiry</p><h2 id="booking-detail-title">Booking details</h2><div class="inq-det-ref" id="det-ref"></div></div>
+          <button type="button" class="close-x" onclick="closeDetail()" aria-label="Close booking details"><i class="ti ti-x" aria-hidden="true"></i></button>
+        </div>
+        <div class="booking-summary">
+          <div><span class="booking-label">Primary traveler</span><div class="inq-det-name" id="det-name"></div><div id="det-status"></div></div>
+          <div class="booking-total"><span class="booking-label">Total booking amount</span><strong id="det-price"></strong></div>
+        </div>
+        <div class="booking-detail-grid">
+          <section class="det-box"><h3 class="det-box-lbl">Trip details</h3>
+            <div class="det-row"><span class="det-key">Package</span><span class="det-val" id="det-pkg"></span></div>
+            <div class="det-row"><span class="det-key">Travel dates</span><span class="det-val" id="det-travel-date"></span></div>
+            <div class="det-row"><span class="det-key">Travelers</span><span class="det-val" id="det-pax"></span></div>
+            <div class="det-row"><span class="det-key">Date received</span><span class="det-val" id="det-date"></span></div>
+          </section>
+          <section class="det-box"><h3 class="det-box-lbl">Contact &amp; payment</h3>
+            <div class="det-row"><span class="det-key">Phone</span><span class="det-val" id="det-phone"></span></div>
+            <div class="det-row"><span class="det-key">Email</span><span class="det-val" id="det-email"></span></div>
+            <div class="det-row"><span class="det-key">Payment method</span><span class="det-val" id="det-pay"></span></div>
+          </section>
+          <section class="det-box" id="box-special-requests" style="display:none"><h3 class="det-box-lbl">Traveler requests</h3><p id="det-special-requests"></p></section>
+          <section class="det-box" id="box-payment-proof" style="display:none"><h3 class="det-box-lbl">Payment submission</h3>
+            <div class="det-row"><span class="det-key">Reference</span><span class="det-val" id="det-pay-ref"></span></div>
+            <div class="det-row"><span class="det-key">Method</span><span class="det-val" id="det-pay-method2"></span></div>
+            <div class="det-row"><span class="det-key">Submitted</span><span class="det-val" id="det-pay-when"></span></div>
+            <p class="feature-note">Check your bank or e-wallet for the payment before confirming.</p>
+          </section>
+        </div>
+        <section class="booking-response" aria-labelledby="booking-response-title">
+          <h3 id="booking-response-title">Manage this inquiry</h3>
+          <div class="form-field-full" id="box-final-amount"><label for="final-amount">Final amount to pay (PHP)</label><input type="number" id="final-amount" min="0" step="0.01" placeholder="e.g. 68998" aria-describedby="final-amount-help"><p class="feature-note" id="final-amount-help">Set the final quote for a solo or special rate. This amount appears on the traveler's payment screen.</p></div>
+          <div class="form-field-full"><label for="reply-text">Message to traveler</label><textarea class="reply-textarea" id="reply-text" placeholder="Write a reply or payment instructions..."></textarea></div>
+          <div class="reply-row booking-actions">
+            <button class="btn-orange" id="btn-req-pay" onclick="requestPayment()"><i class="ti ti-cash"></i> Request payment</button>
+            <button class="btn-confirm" onclick="confirmInquiry()"><i class="ti ti-check"></i> Confirm payment</button>
+            <button class="btn-outline" onclick="sendInquiryReply()"><i class="ti ti-message-share"></i> Send message</button>
+            <button class="btn-danger" onclick="cancelInquiry()"><i class="ti ti-x"></i> Cancel booking</button>
           </div>
-          <button class="close-x" onclick="closeDetail()" aria-label="Close">×</button>
-        </div>
-
-        <div class="det-box">
-          <div class="det-box-lbl">Customer &amp; Trip Summary</div>
-          <div class="det-row"><span class="det-key">Selected Package:</span><span class="det-val" id="det-pkg">—</span></div>
-          <div class="det-row"><span class="det-key">Contact Phone:</span><span class="det-val" id="det-phone">—</span></div>
-          <div class="det-row"><span class="det-key">Email Address:</span><span class="det-val" id="det-email">—</span></div>
-          <div class="det-row"><span class="det-key">Target Travel Dates:</span><span class="det-val" id="det-travel-date">—</span></div>
-          <div class="det-row"><span class="det-key">Travelers (Pax):</span><span class="det-val" id="det-pax">—</span></div>
-          <div class="det-row"><span class="det-key">Total Price:</span><span class="det-val" id="det-price">—</span></div>
-          <div class="det-row"><span class="det-key">Mode of Payment:</span><span class="det-val" id="det-pay">—</span></div>
-          <div class="det-row"><span class="det-key">Date Inquired:</span><span class="det-val" id="det-date">—</span></div>
-        </div>
-
-        <div class="det-box" id="box-special-requests" style="display:none;">
-          <div class="det-box-lbl">Customer Notes / Special Requests</div>
-          <p id="det-special-requests" style="font-size:12px;color:var(--text);white-space:pre-wrap;"></p>
-        </div>
-
-        <div class="det-box" id="box-payment-proof" style="display:none;">
-          <div class="det-box-lbl">Payment submitted by traveler</div>
-          <div class="det-row"><span class="det-key">Reference no.:</span><span class="det-val" id="det-pay-ref">—</span></div>
-          <div class="det-row"><span class="det-key">Method used:</span><span class="det-val" id="det-pay-method2">—</span></div>
-          <div class="det-row"><span class="det-key">Submitted:</span><span class="det-val" id="det-pay-when">—</span></div>
-          <p class="feature-note">I-verify muna sa bank/e-wallet app mo na pumasok ang bayad bago i-confirm.</p>
-        </div>
-
-        <div class="form-field-full" style="margin-bottom:12px;max-width:320px;" id="box-final-amount">
-          <label for="final-amount">Final amount to pay (₱)</label>
-          <input type="number" id="final-amount" min="0" placeholder="e.g. 68998">
-          <p class="feature-note">Para sa solo o special rate, ilagay dito ang final quote. Ito ang ipapakita sa traveler sa payment screen.</p>
-        </div>
-
-        <div class="form-field-full" style="margin-bottom:12px;">
-          <label style="font-weight:700;display:block;margin-bottom:6px;">Admin Remarks / Reply Note</label>
-          <textarea class="reply-textarea" id="reply-text" placeholder="Maglagay ng mensahe o tagubilin para sa booking na ito..."></textarea>
-        </div>
-
-        <div class="reply-row" style="gap:8px;flex-wrap:wrap;">
-          <button class="btn-orange" id="btn-req-pay" onclick="requestPayment()"><i class="ti ti-cash"></i> Request payment</button>
-          <button class="btn-confirm" onclick="confirmInquiry()"><i class="ti ti-check"></i> Mark as Paid &amp; Confirmed</button>
-          <button class="btn-send" onclick="sendInquiryReply()"><i class="ti ti-message-share"></i> Send Note</button>
-          <button class="btn-danger" style="padding:10px 14px;border-radius:10px;" onclick="cancelInquiry()"><i class="ti ti-x"></i> Reject / Cancel</button>
-        </div>
-      </div>
+        </section>
+      </section>
     </div>
-
     <!-- Payments & Revenue Ledger Section -->
     <div class="section" id="sec-revenue">
       <div class="ph">

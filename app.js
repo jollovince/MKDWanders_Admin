@@ -208,7 +208,8 @@ onAuthStateChanged(auth, user => {
   startAgentPresence(user).catch(error => {
     console.error("Agent presence initialization failed:", error);
   });
-  const name = user.displayName || user.email?.split("@")[0] || "Admin";
+  const accountName = user.displayName || user.email?.split("@")[0] || "Admin";
+  const name = accountName.trim().toLowerCase() === "mkdwander" ? "MKDWander" : accountName;
   $("user-name").textContent = name;
   $("user-avatar").textContent = name.slice(0, 2).toUpperCase();
   $("greeting").textContent = `Welcome back, ${name}`;
@@ -238,8 +239,14 @@ export function go(sec, btn) {
     chatbot: "Chatbot Logs", 
     analytics: "Analytics" 
   };
-  document.querySelectorAll(".nav-btn").forEach(b => b.classList.toggle("active", btn ? b === btn : b.dataset.label === labels[sec]));
+  document.querySelectorAll(".nav-btn").forEach(b => {
+    const active = btn ? b === btn : b.dataset.label === labels[sec];
+    b.classList.toggle("active", active);
+    if (active) b.setAttribute("aria-current", "page");
+    else b.removeAttribute("aria-current");
+  });
   $("page-title").textContent = labels[sec] || "Dashboard";
+  $("main").scrollTop = 0;
 }
 
 export const toggleSidebar = () => $("sidebar").classList.toggle("collapsed");
@@ -815,6 +822,10 @@ export function renderPkgs() {
         <button class="btn-danger" onclick="removePkg('${p.id}')">Delete</button>
       </td>
     </tr>`).join("");
+  const labels = ["Photo", "Code", "Package name", "Destination", "Region", "Duration", "Price / pax", "Rating", "Featured", "Actions"];
+  tbody.querySelectorAll("tr").forEach(row => {
+    [...row.cells].forEach((cell, index) => { cell.dataset.label = labels[index]; });
+  });
 }
 
 /* ---------- Booking Inquiries Management ---------- */
@@ -878,6 +889,10 @@ export function renderInquiries() {
         <td><button class="btn-outline" onclick="openDetail('${i.id}')">View</button></td>
       </tr>`;
   }).join("");
+  const labels = ["Ref / Code", "Primary Traveler", "Package", "Travel Schedule", "Travelers", "Total Amount", "Payment Gateway", "Status", "Actions"];
+  tbody.querySelectorAll("tr").forEach(row => {
+    [...row.cells].forEach((cell, index) => { cell.dataset.label = labels[index]; });
+  });
 }
 
 export function exportInquiries() {
@@ -920,6 +935,7 @@ export function openDetail(id) {
   
   $("det-name").textContent = i.client || i.name || "Traveler User";
   $("det-ref").textContent = "Ref: " + (i.code || i.reference || i.id);
+  $("det-status").innerHTML = pillStatus(i.status || "pending");
   $("det-pkg").textContent = pkgName(i);
   $("det-phone").textContent = i.phone || "Not provided";
   $("det-email").textContent = i.email || "Not provided";
@@ -957,7 +973,8 @@ export function openDetail(id) {
   }
   
   $("inq-detail").style.display = "block";
-  $("inq-detail").scrollIntoView({ behavior: "smooth", block: "nearest" });
+  $("inq-detail").focus({ preventScroll: true });
+  $("inq-detail").scrollIntoView({ behavior: window.matchMedia("(prefers-reduced-motion: reduce)").matches ? "auto" : "smooth", block: "start" });
 }
 
 export function closeDetail() { 
@@ -1269,17 +1286,42 @@ export async function resolveChat() {
 }
 
 /* ---------- Dashboard & Analytics ---------- */
+// Calendar boundaries use Philippine time, independent of the viewer's device.
+function overviewRange(period, now = new Date()) {
+  if (period === "all") return null;
+  const local = new Date(now.getTime() + 8 * 60 * 60 * 1000);
+  const y = local.getUTCFullYear(), m = local.getUTCMonth();
+  const midnight = (month, day) => Date.UTC(y, month, day) - 8 * 60 * 60 * 1000;
+  if (period === "last-month") return [midnight(m - 1, 1), midnight(m, 1)];
+  if (period === "this-month") return [midnight(m, 1), now.getTime() + 1];
+  return null;
+}
+$("overview-period").addEventListener("change", renderDashboardData);
+
 function renderDashboardData() {
+  const range = overviewRange($("overview-period").value);
+  const inPeriod = value => {
+    if (!range) return true;
+    const date = toDate(value);
+    return date && Number.isFinite(date.getTime()) && date.getTime() >= range[0] && date.getTime() < range[1];
+  };
+  const periodInquiries = inquiries.filter(i => inPeriod(i.createdAt));
+  const periodPending = periodInquiries.filter(i => ["pending", "payment_submitted"].includes(i.status || "pending"));
+  const periodPaid = inquiries.filter(i => ["confirmed", "paid"].includes(i.status) && inPeriod(i.confirmedAt || i.createdAt));
+  const formatDay = ms => new Date(ms).toLocaleDateString("en-PH", { timeZone: "Asia/Manila", month: "short", day: "numeric", year: "numeric" });
+  $("overview-period-note").textContent = range
+    ? `${formatDay(range[0])} – ${formatDay(range[1] - 1)} · Philippine time. Inquiries by date received; revenue by confirmation date (received date if unavailable). Pending shows current status. Undated records excluded.`
+    : "All recorded inquiries and confirmed payments. Pending shows current status.";
   const total = inquiries.length;
   const pending = inquiries.filter(i => ["pending", "payment_submitted"].includes(i.status || "pending"));
   const confirmed = inquiries.filter(i => ["confirmed", "paid"].includes(i.status));
   const pipeline = inquiries.reduce((s, i) => s + amount(i), 0);
   const revenue = confirmed.reduce((s, i) => s + amount(i), 0);
 
-  $("kpi-total-bookings").textContent = total;
-  $("kpi-total-revenue").textContent = peso(revenue);
-  $("kpi-pipeline").textContent = "Pipeline: " + peso(pipeline);
-  $("kpi-pending-inquiries").textContent = pending.length;
+  $("kpi-total-bookings").textContent = periodInquiries.length;
+  $("kpi-total-revenue").textContent = peso(periodPaid.reduce((s, i) => s + amount(i), 0));
+  $("kpi-pipeline").textContent = "Pipeline: " + peso(periodInquiries.reduce((s, i) => s + amount(i), 0));
+  $("kpi-pending-inquiries").textContent = periodPending.length;
   $("topbar-inq-count").textContent = `${pending.length} pending inquiries`;
   $("nav-inq-badge").textContent = pending.length || "";
   $("kpi-active-pkg").textContent = packages.length;
@@ -1313,15 +1355,18 @@ function renderDashboardData() {
   });
 
   const top = Object.entries(byPkg).sort((a, b) => b[1] - a[1]);
-  $("dest-rows").innerHTML = top.slice(0, 5).map(([n, c]) => {
-    const pct = Math.round((c / total) * 100);
+  const periodByPkg = {};
+  periodInquiries.forEach(i => { const key = pkgName(i); periodByPkg[key] = (periodByPkg[key] || 0) + 1; });
+  const periodTop = Object.entries(periodByPkg).sort((a, b) => b[1] - a[1]);
+  $("dest-rows").innerHTML = periodTop.slice(0, 5).map(([n, c]) => {
+    const pct = Math.round((c / periodInquiries.length) * 100);
     return `<div class="dest-row">
       <div class="dest-hd"><span>${esc(n)}</span><span class="dest-pct">${c} · ${pct}%</span></div>
       <div class="prog-bg"><div class="prog-fill" style="width:${pct}%"></div></div>
     </div>`;
-  }).join("") || `<div class="empty-row">No inquiries yet.</div>`;
+  }).join("") || `<div class="empty-row">No inquiries in this period.</div>`;
 
-  $("recent-inq").innerHTML = inquiries.slice(0, 5).map(i => `
+  $("recent-inq").innerHTML = periodInquiries.slice(0, 5).map(i => `
     <div class="inq-row" onclick="go('inquiries',null);openDetail('${i.id}')">
       <div>
         <div class="inq-name">${esc(i.client || i.name || "Traveler")}</div>
@@ -1329,7 +1374,7 @@ function renderDashboardData() {
       </div>
       ${pillStatus(i.status || "pending")}
     </div>`
-  ).join("") || `<div class="empty-row">No inquiries yet.</div>`;
+  ).join("") || `<div class="empty-row">No inquiries in this period.</div>`;
 
   const pax = inquiries.reduce((s, i) => s + (Number(i.pax) || 1), 0);
   $("analytics-avg-group").textContent = (total ? (pax / total).toFixed(1) : 0) + " pax";
@@ -1356,35 +1401,6 @@ function renderDashboardData() {
 }
 
 /* ---------- Realtime Firestore Listeners ---------- */
-$("recommend-form").addEventListener("submit", async event => {
-  event.preventDefault();
-  const button = $("recommend-submit"), results = $("recommend-results");
-  button.disabled = true;
-  results.textContent = "Finding matching packages...";
-  const catalog = packages.map(p => ({
-    id: p.id, name: p.name || p.title || "", destination: p.dest || p.destination || p.location || "",
-    category: p.category || "", description: p.description || "", durationLabel: p.dur || p.durationLabel || "",
-    price: Number(p.price) || 0, status: p.status || "Active", isActive: p.isActive !== false
-  }));
-  try {
-    const budget = $("recommend-budget").value;
-    const response = await fetch("/api/recommendations", {
-      method: "POST", headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ packages: catalog, preferences: {
-        interests: $("recommend-interests").value.trim(), ...(budget !== "" ? { budget: Number(budget) } : {})
-      }, limit: 5 })
-    });
-    const data = await response.json();
-    if (!response.ok) throw new Error(data.error || "Could not load recommendations");
-    results.innerHTML = data.recommendations.length ? data.recommendations.map(r => {
-      const p = catalog.find(p => p.id === r.id);
-      return `<p><strong>${esc(p.name)}</strong> — ${esc(p.destination)} · ${peso(p.price)} · Similarity: ${Math.round(r.score * 100)}%</p>`;
-    }).join("") : "No matching packages. Try different interests or increase the budget.";
-  } catch (err) {
-    results.textContent = err.message;
-  } finally { button.disabled = false; }
-});
-
 const snap = (q, fn) => onSnapshot(q, fn, err => { console.error(err); toast("Firestore: " + err.message, "err"); });
 
 function initFirestoreRealtime() {
