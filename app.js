@@ -1380,6 +1380,7 @@ function renderDashboardData() {
   $("analytics-avg-group").textContent = (total ? (pax / total).toFixed(1) : 0) + " pax";
   $("analytics-total-inq").textContent = total;
   $("analytics-conf-rate").textContent = (total ? Math.round((confirmed.length / total) * 100) : 0) + "%";
+  window.MKDForecasting?.render(inquiries);
 
   const maxViews = Math.max(1, ...packages.map(p => p.views || 0));
   $("perf-rows").innerHTML = [...packages].sort((a, b) => (byPkg[pkgName({ pkg: b.name })] || 0) - (byPkg[pkgName({ pkg: a.name })] || 0)).slice(0, 6).map(p => {

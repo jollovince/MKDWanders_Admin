@@ -7,6 +7,7 @@
 <link rel="icon" type="image/png" href="images/logo.png">
 <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@latest/tabler-icons.min.css">
+<link rel="stylesheet" href="forecasting.css">
 <style>
 /* ============ MKDWander Admin — design tokens ============
    Spacing: 4/8/12/16/24/32 · Radius: 8/12/16 · Type: 12/13/14/16/20/28
@@ -733,6 +734,10 @@ tbody tr{transition:background .12s}tbody tr:hover{background:var(--soft)}tbody 
         <div class="kpi-card"><div class="kpi-label">Total inquiries received</div><div class="kpi-val" id="analytics-total-inq">0</div><div class="kpi-note">All transactions</div></div>
         <div class="kpi-card"><div class="kpi-label">Confirmed rate</div><div class="kpi-val" id="analytics-conf-rate">0%</div><div class="kpi-note">Inquiry-to-booking conversion</div></div>
       </div>
+        <div class="card" style="margin-bottom:24px">
+          <div class="card-title">Booking Demand Forecast · Next 3 Months</div>
+          <div id="booking-demand-forecast" aria-live="polite">Calculating forecast from Firestore...</div>
+      </div>
       <div class="two-col">
         <div class="card"><div class="card-title">Package performance (inquiries &amp; views)</div><div id="perf-rows"></div></div>
         <div class="card"><div class="card-title">Real-time insights</div><div class="insights" id="realtime-insights-box">Calculating data from Firestore...</div></div>
@@ -742,6 +747,7 @@ tbody tr{transition:background .12s}tbody tr:hover{background:var(--soft)}tbody 
   </div>
 </div>
 <div id="toasts" aria-live="polite"></div>
+<script src="forecasting.js"></script>
 <script type="module" src="app.js"></script>
 <script src="animations.js" defer></script>
 <script src="pkg-form-v2.js" defer></script>

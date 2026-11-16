@@ -1,0 +1,23 @@
+/* Booking demand forecasting addition — scoped to analytics */
+#booking-demand-forecast{min-width:0}
+#booking-demand-forecast .forecast-method{font-size:13px;color:var(--muted);margin-bottom:20px;line-height:1.6}
+#booking-demand-forecast .forecast-bars{display:grid;grid-template-columns:repeat(9,minmax(0,1fr));gap:10px;align-items:end;height:250px;padding:22px 0 0;border-bottom:1px solid var(--border)}
+#booking-demand-forecast .forecast-column{height:100%;min-width:0;display:flex;align-items:center;justify-content:flex-end;flex-direction:column;gap:5px}
+#booking-demand-forecast .forecast-number{font-size:12px;font-weight:700;color:var(--head);font-variant-numeric:tabular-nums}
+#booking-demand-forecast .forecast-bar{width:min(100%,38px);border-radius:5px 5px 0 0;background:var(--head);min-height:0;max-height:155px}
+#booking-demand-forecast .forecast-bar.projected{background:transparent;border:2px dashed var(--muted);border-bottom:0}
+#booking-demand-forecast .forecast-month{font-size:10px;color:var(--head);text-align:center;white-space:nowrap}
+#booking-demand-forecast .forecast-type{font-size:9px;color:var(--muted);padding-bottom:7px}
+#booking-demand-forecast .forecast-summary{display:flex;flex-wrap:wrap;gap:8px 22px;margin-top:20px;color:var(--head);font-size:12px;line-height:1.6}
+#booking-demand-forecast .forecast-disclaimer,#booking-demand-forecast .forecast-empty p,#booking-demand-forecast .forecast-empty small{font-size:12px;color:var(--muted);line-height:1.7;margin-top:12px}
+#booking-demand-forecast .forecast-empty{padding:16px 4px}
+@media(max-width:640px){#booking-demand-forecast .forecast-bars{gap:4px;height:210px;overflow-x:auto}#booking-demand-forecast .forecast-bar{width:100%}#booking-demand-forecast .forecast-month{font-size:9px;white-space:normal}#booking-demand-forecast .forecast-type{font-size:8px}}
+
+/* Safe, in-memory simulation switch */
+#booking-demand-forecast .forecast-controls{display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:12px;margin-bottom:16px}
+#booking-demand-forecast .forecast-mode{font-size:11px;font-weight:800;letter-spacing:.06em;color:var(--muted)}
+#booking-demand-forecast .forecast-mode-demo{color:#A35211}
+#booking-demand-forecast .forecast-toggle{border:1px solid var(--border-s);border-radius:9px;padding:9px 14px;background:var(--card);color:var(--head);font-size:12px;font-weight:700;cursor:pointer}
+#booking-demand-forecast .forecast-toggle:hover{border-color:var(--orange)}
+#booking-demand-forecast .forecast-toggle:focus-visible{outline:2px solid var(--sky);outline-offset:2px}
+#booking-demand-forecast .forecast-demo-note{border-left:3px solid #B66B1F;padding:10px 12px;margin:0 0 18px;background:var(--soft);color:var(--head);font-size:12px;line-height:1.6}
