@@ -14,12 +14,12 @@
    Brand: navy (structure) + orange (one primary action per view)        */
 *{box-sizing:border-box;margin:0;padding:0}
 :root{
-  --nav:#04264B;--nav2:#0A3563;--orange:#FD7830;--cta:#D9480F;--cta-h:#C2410C;--sky:#49C9F0;--gold:#FFBF49;--green:#16A34A;--red:#DC2626;
+  --nav:#04264B;--nav2:#0A3563;--orange:#FD7830;--cta:#C2410C;--cta-h:#9A3412;--sky:#49C9F0;--gold:#FFBF49;--green:#16A34A;--red:#DC2626;
   --bg:#F1F4F9;--card:#fff;--soft:#F6F8FC;--border:#E2E8F0;--border-s:#CBD5E1;--muted:#5B6779;--text:#27334A;--head:#04264B;
   --r-s:8px;--r-m:12px;--r-l:16px;
   --shadow:0 1px 2px rgba(4,38,75,.06),0 4px 12px rgba(4,38,75,.05);--shadow-l:0 12px 32px rgba(4,38,75,.14);
   --ring:0 0 0 3px rgba(73,201,240,.35)}
-[data-theme=dark]{--bg:#0A1424;--card:#111E33;--soft:#16253D;--border:#22344F;--border-s:#2F4565;--muted:#9AA9C2;--text:#DCE4F2;--head:#fff;--cta:#F26A21;--cta-h:#FF7F3D;--shadow:0 1px 2px rgba(0,0,0,.3),0 4px 12px rgba(0,0,0,.25)}
+[data-theme=dark]{--bg:#0A1424;--card:#111E33;--soft:#16253D;--border:#22344F;--border-s:#2F4565;--muted:#9AA9C2;--text:#DCE4F2;--head:#fff;--cta:#C2410C;--cta-h:#9A3412;--shadow:0 1px 2px rgba(0,0,0,.3),0 4px 12px rgba(0,0,0,.25)}
 html{scroll-behavior:smooth}
 body{font-family:'Plus Jakarta Sans',system-ui,-apple-system,'Segoe UI',sans-serif;background:var(--bg);color:var(--text);display:flex;height:100vh;overflow:hidden;font-size:14px;line-height:1.55;-webkit-font-smoothing:antialiased}
 button,input,select,textarea{font-family:inherit;font-size:inherit;color:inherit}
@@ -260,44 +260,44 @@ tbody tr{transition:background .12s}@media(hover:hover){tbody tr:hover{backgroun
 </head>
 <body>
 <a class="skip" href="#main">Skip to content</a>
-<div class="sidebar" id="sidebar">
-  <a class="logo" href="" onclick="window.location.reload(); return false;" aria-label="MKDWander — Reload page" title="Reload page">
-    <div class="logo-icon"><img src="images/logo.png" alt="MKDWander logo" onerror="this.outerHTML='<i class=&quot;ti ti-plane&quot;></i>'"></div>
+<aside class="sidebar" id="sidebar" aria-label="Sidebar">
+  <a class="logo" href="" onclick="window.location.reload(); return false;" title="Reload page">
+    <div class="logo-icon"><img src="images/logo.png" alt="" onerror="this.outerHTML='<i class=&quot;ti ti-plane&quot; aria-hidden=&quot;true&quot;></i>'"></div>
     <div class="logo-texts"><div class="logo-name">MKDWander</div><div class="logo-sub">Travel &amp; Tours</div></div>
   </a>
   <nav aria-label="Main">
     <div class="nav-group">Overview</div>
-    <button class="nav-btn active" aria-current="page" onclick="go('dashboard',this)" data-label="Dashboard" aria-label="Dashboard" title="Dashboard"><i class="ti ti-layout-dashboard"></i><span class="nav-label">Dashboard</span></button>
+    <button class="nav-btn active" aria-current="page" onclick="go('dashboard',this)" data-label="Dashboard" title="Dashboard"><i class="ti ti-layout-dashboard" aria-hidden="true"></i><span class="nav-label">Dashboard</span></button>
     <div class="nav-group">Catalog</div>
-    <button class="nav-btn" onclick="go('packages',this)" data-label="Tour Packages" aria-label="Tour Packages" title="Tour Packages"><i class="ti ti-photo-plus"></i><span class="nav-label">Tour Packages</span></button>
+    <button class="nav-btn" onclick="go('packages',this)" data-label="Tour Packages" title="Tour Packages"><i class="ti ti-photo-plus" aria-hidden="true"></i><span class="nav-label">Tour Packages</span></button>
     <div class="nav-group">Sales</div>
-    <button class="nav-btn" onclick="go('inquiries',this)" data-label="Booking Inquiries" aria-label="Booking Inquiries" title="Booking Inquiries"><i class="ti ti-clipboard-list"></i><span class="nav-label">Booking Inquiries</span><span class="nav-badge" id="nav-inq-badge"></span></button>
-    <button class="nav-btn" onclick="go('revenue',this)" data-label="Payments &amp; Revenue" aria-label="Payments &amp; Revenue" title="Payments &amp; Revenue"><i class="ti ti-cash"></i><span class="nav-label">Payments &amp; Revenue</span></button>
+    <button class="nav-btn" onclick="go('inquiries',this)" data-label="Booking Inquiries" title="Booking Inquiries"><i class="ti ti-clipboard-list" aria-hidden="true"></i><span class="nav-label">Booking Inquiries</span><span class="nav-badge" id="nav-inq-badge"></span></button>
+    <button class="nav-btn" onclick="go('revenue',this)" data-label="Payments &amp; Revenue" title="Payments &amp; Revenue"><i class="ti ti-cash" aria-hidden="true"></i><span class="nav-label">Payments &amp; Revenue</span></button>
     <div class="nav-group">Audience</div>
-    <button class="nav-btn" onclick="go('users',this)" data-label="Users &amp; Accounts" aria-label="Users &amp; Accounts" title="Users &amp; Accounts"><i class="ti ti-users"></i><span class="nav-label">Users &amp; Accounts</span></button>
-    <button class="nav-btn" onclick="go('chatbot',this)" data-label="Chatbot Logs" aria-label="Chatbot Logs" title="Chatbot Logs"><i class="ti ti-message-dots"></i><span class="nav-label">Chatbot Logs</span><span class="nav-badge" id="nav-chat-badge"></span></button>
+    <button class="nav-btn" onclick="go('users',this)" data-label="Users &amp; Accounts" title="Users &amp; Accounts"><i class="ti ti-users" aria-hidden="true"></i><span class="nav-label">Users &amp; Accounts</span></button>
+    <button class="nav-btn" onclick="go('chatbot',this)" data-label="Chatbot Logs" title="Chatbot Logs"><i class="ti ti-message-dots" aria-hidden="true"></i><span class="nav-label">Chatbot Logs</span><span class="nav-badge" id="nav-chat-badge"></span></button>
     <div class="nav-group">Insights</div>
-    <button class="nav-btn" onclick="go('analytics',this)" data-label="Analytics" aria-label="Analytics" title="Analytics"><i class="ti ti-chart-bar"></i><span class="nav-label">Analytics</span></button>
+    <button class="nav-btn" onclick="go('analytics',this)" data-label="Analytics" title="Analytics"><i class="ti ti-chart-bar" aria-hidden="true"></i><span class="nav-label">Analytics</span></button>
   </nav>
   <div class="sidebar-foot">
     <div class="user-row"><div class="avatar" id="user-avatar">MK</div><div class="user-info"><div class="user-name" id="user-name">MKDWander Admin</div><div class="user-role">Workspace administrator</div></div></div>
     <div class="foot-btns">
-      <button onclick="toggleTheme()" title="Dark / light mode" aria-label="Toggle theme"><i class="ti ti-moon"></i></button>
-      <button onclick="toggleSidebar()" title="Collapse sidebar" aria-label="Collapse sidebar"><i class="ti ti-layout-sidebar-left-collapse"></i></button>
-      <button onclick="logout()" title="Log out" aria-label="Log out"><i class="ti ti-logout"></i></button>
+      <button onclick="toggleTheme()" id="theme-btn" title="Dark mode" aria-label="Dark mode" aria-pressed="false"><i class="ti ti-moon" aria-hidden="true"></i></button>
+      <button onclick="toggleSidebar()" id="sidebar-btn" title="Collapse sidebar" aria-label="Collapse sidebar" aria-controls="sidebar" aria-expanded="true"><i class="ti ti-layout-sidebar-left-collapse" aria-hidden="true"></i></button>
+      <button onclick="logout()" title="Log out" aria-label="Log out"><i class="ti ti-logout" aria-hidden="true"></i></button>
     </div>
   </div>
-</div>
+</aside>
 
 <div class="main">
-  <div class="topbar">
+  <header class="topbar">
     <div><h1 id="page-title">Dashboard</h1><p>Your daily travel operations, in one place.</p></div>
     <div class="topbar-right">
       <button type="button" class="badge-warn" id="topbar-inq-count" onclick="go('inquiries',null)">0 pending inquiries</button>
-      <div class="online"><div class="online-dot"></div>Live</div>
+      <div class="online"><div class="online-dot" aria-hidden="true"></div>Live</div>
     </div>
-  </div>
-  <div class="content" id="main" tabindex="-1">
+  </header>
+  <main class="content" id="main" tabindex="-1">
 
     <div class="section active" id="sec-dashboard">
       <div class="hero">
@@ -305,46 +305,46 @@ tbody tr{transition:background .12s}@media(hover:hover){tbody tr:hover{backgroun
         <h2 id="greeting">Welcome back, MKDWander Admin</h2>
         <p>Review new inquiries, track confirmed revenue and manage your travel packages.</p>
         <div class="hero-actions">
-          <button class="btn-orange" onclick="go('inquiries',null)"><i class="ti ti-clipboard-list"></i> Review inquiries</button>
-          <button class="btn-ghost btn-outline-light" onclick="go('revenue',null)"><i class="ti ti-cash"></i> View paid bookings</button>
+          <button class="btn-orange" onclick="go('inquiries',null)"><i class="ti ti-clipboard-list" aria-hidden="true"></i> Review inquiries</button>
+          <button class="btn-ghost btn-outline-light" onclick="go('revenue',null)"><i class="ti ti-cash" aria-hidden="true"></i> View paid bookings</button>
         </div>
         <a class="hero-credit" href="https://www.thepoortraveler.net/2020/03/things-to-do-philippines/" target="_blank" rel="noopener">Photo: Twin Lagoon, Coron · The Poor Traveler</a>
       </div>
       <div class="overview-heading"><div><h2>Business overview</h2><p id="overview-period-note" aria-live="polite">All recorded inquiries and confirmed payments.</p></div><label class="overview-period">Period<select id="overview-period"><option value="all">All time</option><option value="this-month">This month</option><option value="last-month">Last month</option></select></label></div>
       <div class="kpi-grid">
-        <div class="kpi-card"><i class="ti ti-clipboard-list kpi-ico"></i><div class="kpi-label">Total inquiries &amp; bookings</div><div class="kpi-val" id="kpi-total-bookings">0</div></div>
-        <div class="kpi-card"><i class="ti ti-coin kpi-ico"></i><div class="kpi-label">Confirmed revenue</div><div class="kpi-val" id="kpi-total-revenue">₱0</div><div class="kpi-note" id="kpi-pipeline">Pipeline: ₱0</div></div>
-        <div class="kpi-card"><i class="ti ti-clock-hour-4 kpi-ico"></i><div class="kpi-label">Pending inquiries</div><div class="kpi-val" id="kpi-pending-inquiries">0</div></div>
-        <div class="kpi-card"><i class="ti ti-map-2 kpi-ico"></i><div class="kpi-label">Active tour packages</div><div class="kpi-val" id="kpi-active-pkg">0</div><div class="kpi-note">Current total</div></div>
+        <div class="kpi-card"><i class="ti ti-clipboard-list kpi-ico" aria-hidden="true"></i><div class="kpi-label">Total inquiries &amp; bookings</div><div class="kpi-val" id="kpi-total-bookings">0</div></div>
+        <div class="kpi-card"><i class="ti ti-coin kpi-ico" aria-hidden="true"></i><div class="kpi-label">Confirmed revenue</div><div class="kpi-val" id="kpi-total-revenue">₱0</div><div class="kpi-note" id="kpi-pipeline">Pipeline: ₱0</div></div>
+        <div class="kpi-card"><i class="ti ti-clock-hour-4 kpi-ico" aria-hidden="true"></i><div class="kpi-label">Pending inquiries</div><div class="kpi-val" id="kpi-pending-inquiries">0</div></div>
+        <div class="kpi-card"><i class="ti ti-map-2 kpi-ico" aria-hidden="true"></i><div class="kpi-label">Active tour packages</div><div class="kpi-val" id="kpi-active-pkg">0</div><div class="kpi-note">Current total</div></div>
       </div>
       <div class="two-col">
-        <div class="card"><div class="card-title">Monthly booking inquiries (last 6 months)</div><div class="bar-chart" id="monthly-chart"></div></div>
-        <div class="card"><div class="card-title">Top destinations by inquiries</div><div id="dest-rows"></div></div>
-        <div class="card"><div class="card-title">Recent inquiries</div><div id="recent-inq"></div><button class="btn-full" onclick="go('inquiries',null)">View all inquiries</button></div>
-        <div class="card registered-users-card"><div class="card-title">Registered users</div>
+        <div class="card"><h3 class="card-title">Monthly booking inquiries (last 6 months)</h3><div class="bar-chart" id="monthly-chart"></div></div>
+        <div class="card"><h3 class="card-title">Top destinations by inquiries</h3><div id="dest-rows"></div></div>
+        <div class="card"><h3 class="card-title">Recent inquiries</h3><div id="recent-inq"></div><button class="btn-full" onclick="go('inquiries',null)">View all inquiries</button></div>
+        <div class="card registered-users-card"><h3 class="card-title">Registered users</h3>
           <div class="users-big"><b id="kpi-total-users">0</b><span>Registered app accounts · Current total</span></div>
-          <div class="privacy-note"><i class="ti ti-shield-check"></i> Emails and Auth UIDs are masked or hashed before they appear here.</div>
+          <div class="privacy-note"><i class="ti ti-shield-check" aria-hidden="true"></i> Emails and Auth UIDs are masked or hashed before they appear here.</div>
         </div>
       </div>
     </div>
 
     <div class="section" id="sec-packages">
-      <div class="ph"><div class="ph-ico"><i class="ti ti-photo-plus"></i></div><div><h2>Tour Packages</h2><p>Manage destinations, itinerary, inclusions, and prices shown in the app.</p></div></div>
+      <div class="ph"><div class="ph-ico"><i class="ti ti-photo-plus" aria-hidden="true"></i></div><div><h2>Tour Packages</h2><p>Manage destinations, itinerary, inclusions, and prices shown in the app.</p></div></div>
       <div class="filter-row">
         <div class="filter-btns" id="pkg-filters">
           <button class="filt-btn on" onclick="filterPkg('All',this)">All regions</button>
           <button class="filt-btn" onclick="filterPkg('Luzon',this)">Luzon</button>
           <button class="filt-btn" onclick="filterPkg('Visayas',this)">Visayas</button>
           <button class="filt-btn" onclick="filterPkg('Mindanao',this)">Mindanao</button>
-          <button class="filt-btn" onclick="filterPkg('Featured',this)"><i class="ti ti-star"></i> Featured</button>
+          <button class="filt-btn" onclick="filterPkg('Featured',this)"><i class="ti ti-star" aria-hidden="true"></i> Featured</button>
         </div>
         <div class="tools">
-          <input class="search" id="pkg-search" placeholder="Search package, code, destination" oninput="renderPkgs()">
-          <button class="btn-orange" onclick="openPkgForm()"><i class="ti ti-plus"></i> Add new package</button>
+          <input class="search" id="pkg-search" type="search" aria-label="Search packages" placeholder="Search package, code, destination" oninput="renderPkgs()">
+          <button class="btn-orange" onclick="openPkgForm()"><i class="ti ti-plus" aria-hidden="true"></i> Add new package</button>
         </div>
       </div>
       <div class="add-form" id="pkg-form">
-        <div class="add-form-title" id="pkg-form-title">Add a new destination package</div>
+        <h3 class="add-form-title" id="pkg-form-title" tabindex="-1">Add a new destination package</h3>
         <input type="hidden" id="pkg-id"><input type="hidden" id="pkg-old-poster">
         <div class="form-body">
           <section class="form-sec">
@@ -455,7 +455,7 @@ tbody tr{transition:background .12s}@media(hover:hover){tbody tr:hover{backgroun
               <div class="form-field-full"><label for="pkg-route">Stops and highlights (comma-separated)</label><input id="pkg-route" placeholder="e.g. Big Lagoon, Secret Lagoon, Shimizu Island"></div>
               <div class="form-field-full"><label for="pkg-inc">Inclusions (one per line)</label><textarea id="pkg-inc" class="reply-textarea" placeholder="3 Nights Hotel Stay&#10;Daily Breakfast" oninput="renderIncPreview()"></textarea></div>
               <div class="form-field-full cp-box">
-                <div class="feature-hd"><i class="ti ti-layout-cards"></i> Card preview (shown on the app card) <span class="cp-auto" id="cp-mode">AUTO</span></div>
+                <div class="feature-hd"><i class="ti ti-layout-cards" aria-hidden="true"></i> Card preview (shown on the app card) <span class="cp-auto" id="cp-mode">AUTO</span></div>
                 <div class="cp-chips" id="cp-chips"><span class="feature-note">Add inclusions above to display the preview.</span></div>
                 <div class="cp-label">Prefer a different inclusion? Click to pin it (up to 3)</div>
                 <div class="cp-pick" id="cp-pick"></div>
@@ -473,28 +473,28 @@ tbody tr{transition:background .12s}@media(hover:hover){tbody tr:hover{backgroun
           <section class="form-sec">
             <div class="form-sec-hd"><span class="n">6</span><div><h3>Photos &amp; poster</h3><p>The first photo is the cover on the Home screen.</p></div></div>
             <div class="form-grid">
-              <div class="form-field-full"><label>Package photos<span class="req">*</span> (swipe in the app to view multiple photos)</label>
-                <div class="upload-box"><input type="file" id="gal-file" accept="image/*" multiple onchange="addGalleryFiles(event)" aria-label="Upload package photos"><i class="ti ti-photos"></i><span>Click or drag one or more tour photos (PNG, JPG). You can select multiple photos at once.</span></div>
+              <div class="form-field-full"><label for="gal-file">Package photos<span class="req" aria-hidden="true">*</span><span class="visually-hidden"> (required)</span> (swipe in the app to view multiple photos)</label>
+                <div class="upload-box"><input type="file" id="gal-file" accept="image/*" multiple onchange="addGalleryFiles(event)" aria-describedby="gal-help"><i class="ti ti-photos" aria-hidden="true"></i><span>Click or drag one or more tour photos (PNG, JPG). You can select multiple photos at once.</span></div>
                 <div class="gal-grid" id="gal-grid"></div>
-                <p class="feature-note"><b>The first photo</b> becomes the <b>Home screen cover</b>. Use the arrows to reorder photos. Upload clear photos without text or posters.</p>
+                <p class="feature-note" id="gal-help"><b>The first photo</b> becomes the <b>Home screen cover</b>. Use the arrows to reorder photos. Upload clear photos without text or posters.</p>
               </div>
-              <div class="form-field-full"><label>Agency poster (optional)</label>
-                <div class="upload-box"><input type="file" id="pkg-file" accept="image/*" onchange="previewImg(event,'pkg-prev','pkg-hint','pkg')" aria-label="Upload agency poster"><i class="ti ti-cloud-upload"></i><span id="pkg-hint">Click or drag the agency poster (PNG, JPG)</span><img id="pkg-prev" class="upload-preview" alt="Poster preview"></div>
-                <div class="scan-row"><button type="button" class="btn-outline" id="btn-scan" onclick="scanPoster()"><i class="ti ti-scan"></i> Scan poster &amp; auto-fill</button><label class="scan-ow"><input type="checkbox" id="scan-overwrite"> Overwrite existing values</label><span class="scan-status" id="scan-status" aria-live="polite"></span></div>
+              <div class="form-field-full"><label for="pkg-file">Agency poster (optional)</label>
+                <div class="upload-box"><input type="file" id="pkg-file" accept="image/*" onchange="previewImg(event,'pkg-prev','pkg-hint','pkg')"><i class="ti ti-cloud-upload" aria-hidden="true"></i><span id="pkg-hint">Click or drag the agency poster (PNG, JPG)</span><img id="pkg-prev" class="upload-preview" alt="Poster preview"></div>
+                <div class="scan-row"><button type="button" class="btn-outline" id="btn-scan" onclick="scanPoster()"><i class="ti ti-scan" aria-hidden="true"></i> Scan poster &amp; auto-fill</button><label class="scan-ow"><input type="checkbox" id="scan-overwrite"> Overwrite existing values</label><span class="scan-status" id="scan-status" aria-live="polite"></span></div>
                 <p class="feature-note">Your browser reads the poster using OCR and fills in only the <b>Package name</b> and <b>Inclusions</b>. <b>Always review</b> the orange fields before saving. The poster is used only for scanning, not as the cover.</p>
               </div>
             </div>
           </section>
         </div>
-        <div class="form-actions"><button type="button" class="btn-outline" onclick="closePkgForm()">Cancel</button><button class="btn-orange" id="btn-save-pkg" onclick="savePackage()"><i class="ti ti-check"></i> Save package</button></div>
+        <div class="form-actions"><button type="button" class="btn-outline" onclick="closePkgForm()">Cancel</button><button class="btn-orange" id="btn-save-pkg" onclick="savePackage()"><i class="ti ti-check" aria-hidden="true"></i> Save package</button></div>
       </div>
-      <div class="tbl-wrap"><table><thead><tr><th>Photo</th><th>Code</th><th>Package name</th><th>Destination</th><th>Region</th><th>Duration</th><th>Price / pax</th><th>Rating</th><th>Featured</th><th>Actions</th></tr></thead>
+      <div class="tbl-wrap" role="region" aria-label="Tour packages table" tabindex="0"><table aria-label="Tour packages"><thead><tr><th>Photo</th><th>Code</th><th>Package name</th><th>Destination</th><th>Region</th><th>Duration</th><th>Price / pax</th><th>Rating</th><th>Featured</th><th>Actions</th></tr></thead>
       <tbody id="pkg-body"><tr><td colspan="10" class="empty-row">Loading packages from Firestore...</td></tr></tbody></table></div>
     </div>
 
     <div class="section" id="sec-inquiries">
       <div class="ph">
-        <div class="ph-ico"><i class="ti ti-clipboard-list"></i></div>
+        <div class="ph-ico"><i class="ti ti-clipboard-list" aria-hidden="true"></i></div>
         <div>
           <h2>Booking Inquiries &amp; Transactions</h2>
           <p>Review customer booking forms, schedules, passenger counts, and payment methods.</p>
@@ -512,13 +512,13 @@ tbody tr{transition:background .12s}@media(hover:hover){tbody tr:hover{backgroun
           <button class="filt-btn" onclick="filterInq('cancelled',this)">Cancelled</button>
         </div>
         <div class="tools">
-          <input class="search" id="inq-search" placeholder="Search client, ref, or package" oninput="renderInquiries()">
-          <button class="btn-outline" onclick="exportInquiries()"><i class="ti ti-download"></i> Export CSV</button>
+          <input class="search" id="inq-search" type="search" aria-label="Search booking inquiries" placeholder="Search client, ref, or package" oninput="renderInquiries()">
+          <button class="btn-outline" onclick="exportInquiries()"><i class="ti ti-download" aria-hidden="true"></i> Export CSV</button>
         </div>
       </div>
 
-      <div class="tbl-wrap">
-        <table>
+      <div class="tbl-wrap" role="region" aria-label="Booking inquiries table" tabindex="0">
+        <table aria-label="Booking inquiries">
           <thead>
             <tr>
               <th>Ref / Code</th>
@@ -573,10 +573,10 @@ tbody tr{transition:background .12s}@media(hover:hover){tbody tr:hover{backgroun
           <div class="form-field-full" id="box-final-amount"><label for="final-amount">Final amount to pay (PHP)</label><input type="number" id="final-amount" min="0" step="0.01" placeholder="e.g. 68998" aria-describedby="final-amount-help"><p class="feature-note" id="final-amount-help">Set the final quote for a solo or special rate. This amount appears on the traveler's payment screen.</p></div>
           <div class="form-field-full"><label for="reply-text">Message to traveler</label><textarea class="reply-textarea" id="reply-text" placeholder="Write a reply or payment instructions..."></textarea></div>
           <div class="reply-row booking-actions">
-            <button class="btn-orange" id="btn-req-pay" onclick="requestPayment()"><i class="ti ti-cash"></i> Request payment</button>
-            <button class="btn-confirm" onclick="confirmInquiry()"><i class="ti ti-check"></i> Confirm payment</button>
-            <button class="btn-outline" onclick="sendInquiryReply()"><i class="ti ti-message-share"></i> Send message</button>
-            <button class="btn-danger" onclick="cancelInquiry()"><i class="ti ti-x"></i> Cancel booking</button>
+            <button class="btn-orange" id="btn-req-pay" onclick="requestPayment()"><i class="ti ti-cash" aria-hidden="true"></i> Request payment</button>
+            <button class="btn-confirm" onclick="confirmInquiry()"><i class="ti ti-check" aria-hidden="true"></i> Confirm payment</button>
+            <button class="btn-outline" onclick="sendInquiryReply()"><i class="ti ti-message-share" aria-hidden="true"></i> Send message</button>
+            <button class="btn-danger" onclick="cancelInquiry()"><i class="ti ti-x" aria-hidden="true"></i> Cancel booking</button>
           </div>
         </section>
       </section>
@@ -584,7 +584,7 @@ tbody tr{transition:background .12s}@media(hover:hover){tbody tr:hover{backgroun
     <!-- Payments & Revenue Ledger Section -->
     <div class="section" id="sec-revenue">
       <div class="ph">
-        <div class="ph-ico"><i class="ti ti-cash"></i></div>
+        <div class="ph-ico"><i class="ti ti-cash" aria-hidden="true"></i></div>
         <div>
           <h2>Payments &amp; Revenue Ledger</h2>
           <p>List of paid transactions.</p>
@@ -593,25 +593,25 @@ tbody tr{transition:background .12s}@media(hover:hover){tbody tr:hover{backgroun
 
       <div class="kpi-grid">
         <div class="kpi-card">
-          <i class="ti ti-cash-banknote kpi-ico"></i>
+          <i class="ti ti-cash-banknote kpi-ico" aria-hidden="true"></i>
           <div class="kpi-label">Total Collected Revenue</div>
           <div class="kpi-val" id="rev-total-collected">₱0</div>
           <div class="kpi-note" id="rev-paid-count">0 confirmed bookings</div>
         </div>
         <div class="kpi-card">
-          <i class="ti ti-qrcode kpi-ico"></i>
+          <i class="ti ti-qrcode kpi-ico" aria-hidden="true"></i>
           <div class="kpi-label">UnionBank QR Ph Volume</div>
           <div class="kpi-val" id="rev-ub-volume">₱0</div>
           <div class="kpi-note" id="rev-ub-count">0 transactions</div>
         </div>
         <div class="kpi-card">
-          <i class="ti ti-building-bank kpi-ico"></i>
+          <i class="ti ti-building-bank kpi-ico" aria-hidden="true"></i>
           <div class="kpi-label">BPI Direct Payments</div>
           <div class="kpi-val" id="rev-bpi-volume">₱0</div>
           <div class="kpi-note" id="rev-bpi-count">0 transactions</div>
         </div>
         <div class="kpi-card">
-          <i class="ti ti-chart-arrows kpi-ico"></i>
+          <i class="ti ti-chart-arrows kpi-ico" aria-hidden="true"></i>
           <div class="kpi-label">Average Booking Value</div>
           <div class="kpi-val" id="rev-avg-value">₱0</div>
           <div class="kpi-note">Per confirmed passenger ticket</div>
@@ -619,48 +619,48 @@ tbody tr{transition:background .12s}@media(hover:hover){tbody tr:hover{backgroun
       </div>
 
       <div class="card" id="paydet-card" style="margin-bottom:24px">
-        <div class="card-title">Payment instructions (shown to travelers)</div>
+        <h3 class="card-title">Payment instructions (shown to travelers)</h3>
         <p class="feature-note" style="margin:-8px 0 16px">These details appear in the app when you request payment for a booking. For testing, use "TEST" details and a placeholder QR code. Do not enter passwords, PINs, or OTPs.</p>
-        <div class="feature-box" data-method="QR Ph" style="margin-bottom:12px">
-          <div class="feature-hd"><i class="ti ti-qrcode"></i> QR Ph</div>
+        <div class="feature-box" role="group" aria-labelledby="pay-qrph-hd" data-method="QR Ph" style="margin-bottom:12px">
+          <div class="feature-hd" id="pay-qrph-hd"><i class="ti ti-qrcode" aria-hidden="true"></i> QR Ph</div>
           <div class="form-grid">
-            <div class="form-field"><label>Account name</label><input data-f="accountName" placeholder="TEST ACCOUNT"></div>
-            <div class="form-field"><label>Account / mobile number</label><input data-f="accountNumber" placeholder="0000-0000-0000"></div>
-            <div class="form-field"><label>Bank / wallet</label><input data-f="bank" placeholder="UnionBank"></div>
-            <div class="form-field-full"><label>Instructions (optional)</label><input data-f="note" placeholder="e.g. Include the booking reference in the transfer notes"></div>
-            <div class="form-field-full"><label>QR code image (optional)</label>
-              <input type="file" data-f="qrFile" accept="image/*">
+            <div class="form-field"><label for="pay-qrph-accountName">Account name</label><input id="pay-qrph-accountName" data-f="accountName" placeholder="TEST ACCOUNT"></div>
+            <div class="form-field"><label for="pay-qrph-accountNumber">Account / mobile number</label><input id="pay-qrph-accountNumber" data-f="accountNumber" placeholder="0000-0000-0000"></div>
+            <div class="form-field"><label for="pay-qrph-bank">Bank / wallet</label><input id="pay-qrph-bank" data-f="bank" placeholder="UnionBank"></div>
+            <div class="form-field-full"><label for="pay-qrph-note">Instructions (optional)</label><input id="pay-qrph-note" data-f="note" placeholder="e.g. Include the booking reference in the transfer notes"></div>
+            <div class="form-field-full"><label for="pay-qrph-qrFile">QR code image (optional)</label>
+              <input id="pay-qrph-qrFile" type="file" data-f="qrFile" accept="image/*">
               <img data-f="qrPrev" class="upload-preview" alt="QR preview" style="max-width:200px;object-fit:contain">
             </div>
           </div>
         </div>
-        <div class="feature-box" data-method="UnionBank" style="margin-bottom:12px">
-          <div class="feature-hd"><i class="ti ti-building-bank"></i> UnionBank</div>
+        <div class="feature-box" role="group" aria-labelledby="pay-ub-hd" data-method="UnionBank" style="margin-bottom:12px">
+          <div class="feature-hd" id="pay-ub-hd"><i class="ti ti-building-bank" aria-hidden="true"></i> UnionBank</div>
           <div class="form-grid">
-            <div class="form-field"><label>Account name</label><input data-f="accountName" placeholder="TEST ACCOUNT"></div>
-            <div class="form-field"><label>Account / mobile number</label><input data-f="accountNumber" placeholder="0000-0000-0000"></div>
-            <div class="form-field"><label>Bank / wallet</label><input data-f="bank" placeholder="UnionBank of the Philippines"></div>
-            <div class="form-field-full"><label>Instructions (optional)</label><input data-f="note" placeholder="e.g. Include the booking reference in the transfer notes"></div>
-            <div class="form-field-full"><label>QR code image (optional)</label>
-              <input type="file" data-f="qrFile" accept="image/*">
+            <div class="form-field"><label for="pay-ub-accountName">Account name</label><input id="pay-ub-accountName" data-f="accountName" placeholder="TEST ACCOUNT"></div>
+            <div class="form-field"><label for="pay-ub-accountNumber">Account / mobile number</label><input id="pay-ub-accountNumber" data-f="accountNumber" placeholder="0000-0000-0000"></div>
+            <div class="form-field"><label for="pay-ub-bank">Bank / wallet</label><input id="pay-ub-bank" data-f="bank" placeholder="UnionBank of the Philippines"></div>
+            <div class="form-field-full"><label for="pay-ub-note">Instructions (optional)</label><input id="pay-ub-note" data-f="note" placeholder="e.g. Include the booking reference in the transfer notes"></div>
+            <div class="form-field-full"><label for="pay-ub-qrFile">QR code image (optional)</label>
+              <input id="pay-ub-qrFile" type="file" data-f="qrFile" accept="image/*">
               <img data-f="qrPrev" class="upload-preview" alt="QR preview" style="max-width:200px;object-fit:contain">
             </div>
           </div>
         </div>
-        <div class="feature-box" data-method="BPI" style="margin-bottom:12px">
-          <div class="feature-hd"><i class="ti ti-building-bank"></i> BPI</div>
+        <div class="feature-box" role="group" aria-labelledby="pay-bpi-hd" data-method="BPI" style="margin-bottom:12px">
+          <div class="feature-hd" id="pay-bpi-hd"><i class="ti ti-building-bank" aria-hidden="true"></i> BPI</div>
           <div class="form-grid">
-            <div class="form-field"><label>Account name</label><input data-f="accountName" placeholder="TEST ACCOUNT"></div>
-            <div class="form-field"><label>Account / mobile number</label><input data-f="accountNumber" placeholder="0000-0000-0000"></div>
-            <div class="form-field"><label>Bank / wallet</label><input data-f="bank" placeholder="BPI"></div>
-            <div class="form-field-full"><label>Instructions (optional)</label><input data-f="note" placeholder="e.g. Include the booking reference in the transfer notes"></div>
-            <div class="form-field-full"><label>QR code image (optional)</label>
-              <input type="file" data-f="qrFile" accept="image/*">
+            <div class="form-field"><label for="pay-bpi-accountName">Account name</label><input id="pay-bpi-accountName" data-f="accountName" placeholder="TEST ACCOUNT"></div>
+            <div class="form-field"><label for="pay-bpi-accountNumber">Account / mobile number</label><input id="pay-bpi-accountNumber" data-f="accountNumber" placeholder="0000-0000-0000"></div>
+            <div class="form-field"><label for="pay-bpi-bank">Bank / wallet</label><input id="pay-bpi-bank" data-f="bank" placeholder="BPI"></div>
+            <div class="form-field-full"><label for="pay-bpi-note">Instructions (optional)</label><input id="pay-bpi-note" data-f="note" placeholder="e.g. Include the booking reference in the transfer notes"></div>
+            <div class="form-field-full"><label for="pay-bpi-qrFile">QR code image (optional)</label>
+              <input id="pay-bpi-qrFile" type="file" data-f="qrFile" accept="image/*">
               <img data-f="qrPrev" class="upload-preview" alt="QR preview" style="max-width:200px;object-fit:contain">
             </div>
           </div>
         </div>
-        <button class="btn-orange" id="btn-save-paydet" onclick="savePaymentDetails()"><i class="ti ti-check"></i> Save payment details</button>
+        <button class="btn-orange" id="btn-save-paydet" onclick="savePaymentDetails()"><i class="ti ti-check" aria-hidden="true"></i> Save payment details</button>
       </div>
 
       <div class="filter-row">
@@ -670,13 +670,13 @@ tbody tr{transition:background .12s}@media(hover:hover){tbody tr:hover{backgroun
           <button class="filt-btn" onclick="filterRev('bpi',this)">BPI Payment</button>
         </div>
         <div class="tools">
-          <input class="search" id="revenue-search" placeholder="Search client, ref or package" oninput="renderRevenue()">
-          <button class="btn-outline" onclick="exportRevenue()"><i class="ti ti-download"></i> Export Revenue CSV</button>
+          <input class="search" id="revenue-search" type="search" aria-label="Search paid bookings" placeholder="Search client, ref or package" oninput="renderRevenue()">
+          <button class="btn-outline" onclick="exportRevenue()"><i class="ti ti-download" aria-hidden="true"></i> Export Revenue CSV</button>
         </div>
       </div>
 
-      <div class="tbl-wrap">
-        <table>
+      <div class="tbl-wrap" role="region" aria-label="Paid bookings table" tabindex="0">
+        <table aria-label="Paid bookings">
           <thead>
             <tr>
               <th>Ref / Receipt</th>
@@ -698,14 +698,14 @@ tbody tr{transition:background .12s}@media(hover:hover){tbody tr:hover{backgroun
     </div>
 
     <div class="section" id="sec-users">
-      <div class="ph"><div class="ph-ico"><i class="ti ti-users"></i></div><div><h2>Users &amp; Accounts</h2><p>Registered mobile travelers with verified profiles.</p></div></div>
-      <div class="tbl-wrap"><div class="tbl-header"><span class="tbl-header-title">Registered travelers</span><input class="search" id="user-search" placeholder="Search traveler" oninput="renderUsers()"></div>
-      <table><thead><tr><th>Traveler</th><th>Masked email</th><th>Hashed user ID</th><th>Status</th></tr></thead>
+      <div class="ph"><div class="ph-ico"><i class="ti ti-users" aria-hidden="true"></i></div><div><h2>Users &amp; Accounts</h2><p>Registered mobile travelers with verified profiles.</p></div></div>
+      <div class="tbl-wrap" role="region" aria-label="Registered travelers table" tabindex="0"><div class="tbl-header"><h3 class="tbl-header-title">Registered travelers</h3><input class="search" id="user-search" type="search" aria-label="Search travelers" placeholder="Search traveler" oninput="renderUsers()"></div>
+      <table aria-label="Registered travelers"><thead><tr><th>Traveler</th><th>Masked email</th><th>Hashed user ID</th><th>Status</th></tr></thead>
       <tbody id="users-body"><tr><td colspan="4" class="empty-row">Loading accounts...</td></tr></tbody></table></div>
     </div>
 
     <div class="section" id="sec-chatbot">
-      <div class="ph"><div class="ph-ico"><i class="ti ti-message-dots"></i></div><div><h2>Chatbot Logs</h2><p>Review chats, and reply directly when a traveler asks for our team.</p><span id="human-agent-status" class="pill pill-off" aria-live="polite"> Offline </span></div></div>
+      <div class="ph"><div class="ph-ico"><i class="ti ti-message-dots" aria-hidden="true"></i></div><div><h2>Chatbot Logs</h2><p>Review chats, and reply directly when a traveler asks for our team.</p><span id="human-agent-status" class="pill pill-off" aria-live="polite"> Offline </span></div></div>
       <div class="chat-layout">
         <div class="chat-list"><div class="chat-list-hd">Conversations</div>
           <div class="chat-filters" id="chat-filters">
@@ -719,33 +719,33 @@ tbody tr{transition:background .12s}@media(hover:hover){tbody tr:hover{backgroun
           <div class="chat-reply" id="chat-reply-bar" style="display:none">
             <textarea id="chat-reply-text" class="reply-textarea" rows="2" placeholder="Type your reply to the traveler..." aria-label="Reply to traveler"></textarea>
             <div class="chat-reply-actions">
-              <button class="btn-outline" id="btn-chat-resolve" onclick="resolveChat()"><i class="ti ti-circle-check"></i> Mark resolved</button>
-              <button class="btn-orange" id="btn-chat-send" onclick="sendChatReply()"><i class="ti ti-send"></i> Send reply</button>
+              <button class="btn-outline" id="btn-chat-resolve" onclick="resolveChat()"><i class="ti ti-circle-check" aria-hidden="true"></i> Mark resolved</button>
+              <button class="btn-orange" id="btn-chat-send" onclick="sendChatReply()"><i class="ti ti-send" aria-hidden="true"></i> Send reply</button>
             </div>
           </div></div>
       </div>
     </div>
 
     <div class="section" id="sec-analytics">
-      <div class="ph"><div class="ph-ico"><i class="ti ti-chart-bar"></i></div><div><h2>Analytics</h2><p>Track performance across destinations, bookings and revenue.</p></div></div>
+      <div class="ph"><div class="ph-ico"><i class="ti ti-chart-bar" aria-hidden="true"></i></div><div><h2>Analytics</h2><p>Track performance across destinations, bookings and revenue.</p></div></div>
       <div class="analytics-kpi">
         <div class="kpi-card"><div class="kpi-label">Average group size</div><div class="kpi-val" id="analytics-avg-group">0 pax</div><div class="kpi-note">Per inquiry</div></div>
         <div class="kpi-card"><div class="kpi-label">Total inquiries received</div><div class="kpi-val" id="analytics-total-inq">0</div><div class="kpi-note">All transactions</div></div>
         <div class="kpi-card"><div class="kpi-label">Confirmed rate</div><div class="kpi-val" id="analytics-conf-rate">0%</div><div class="kpi-note">Inquiry-to-booking conversion</div></div>
       </div>
         <div class="card" style="margin-bottom:24px">
-          <div class="card-title">Booking Demand Forecast · Next 3 Months</div>
+          <h3 class="card-title">Booking Demand Forecast · Next 3 Months</h3>
           <div id="booking-demand-forecast" aria-live="polite">Calculating forecast from Firestore...</div>
       </div>
       <div class="two-col">
-        <div class="card"><div class="card-title">Package performance (inquiries &amp; views)</div><div id="perf-rows"></div></div>
-        <div class="card"><div class="card-title">Real-time insights</div><div class="insights" id="realtime-insights-box">Calculating data from Firestore...</div></div>
+        <div class="card"><h3 class="card-title">Package performance (inquiries &amp; views)</h3><div id="perf-rows"></div></div>
+        <div class="card"><h3 class="card-title">Real-time insights</h3><div class="insights" id="realtime-insights-box">Calculating data from Firestore...</div></div>
       </div>
     </div>
 
-  </div>
+  </main>
 </div>
-<div id="toasts" aria-live="polite"></div>
+<div id="toasts" role="status" aria-live="polite"></div>
 <script src="forecasting.js"></script>
 <script type="module" src="app.js"></script>
 <script src="animations.js" defer></script>

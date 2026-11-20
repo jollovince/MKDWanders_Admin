@@ -135,3 +135,23 @@ nav{padding:0 14px 20px}.nav-group{padding:22px 14px 8px;color:var(--muted);font
 /* Optical alignment: 2px less padding on the icon side of icon+label buttons */
 :is(.btn-orange,.btn-ghost,.btn-outline,.btn-send,.btn-confirm):has(> .ti:first-child){padding-inline-start:14px}
 .booking-actions .btn-danger:has(> .ti:first-child){padding-inline-start:12px}
+
+/* ---------- Accessibility (WCAG 2.2 AA) ---------- */
+.visually-hidden{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0}
+/* Placeholder text: 4.5:1 in both themes */
+.form-field input::placeholder,.form-field-full textarea::placeholder,.form-field-full input::placeholder,.search::placeholder,.reply-textarea::placeholder{color:var(--muted)}
+/* Featured star is a state graphic: 3:1 against the card in both states */
+.star-btn{color:#8593A8}.star-btn.on{color:#9A6B00}
+[data-theme=dark] .star-btn.on{color:#E8A400}
+/* Clickable rows are real buttons now: strip UA button chrome, keep each row's own look */
+button.inq-row,button.chat-item{appearance:none;font:inherit;color:inherit;text-align:left;background:transparent;border-top:0;border-left:0;border-right:0;width:100%}
+button.inq-row{width:calc(100% + 16px)}
+button.chat-item{display:flex}
+button.chat-item>.chat-preview{display:block}
+button.inq-row .inq-name,button.inq-row .inq-sub{display:block}
+/* Focus is never hidden behind the sticky table header or form action bar */
+.content :focus{scroll-margin-top:72px;scroll-margin-bottom:88px}
+.tbl-wrap:focus-visible{outline-offset:-3px}
+/* Forced colors: keep the active nav item and pills distinguishable */
+@media(forced-colors:active){.nav-btn.active{outline:2px solid CanvasText}.pill{border:1px solid CanvasText}.online-dot{forced-color-adjust:none}}
+[tabindex="-1"]:focus-visible{outline:none}

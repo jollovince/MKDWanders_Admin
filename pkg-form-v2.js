@@ -56,32 +56,46 @@ const dayRow=(d,rm,chg)=>{
   const t=h('input',{placeholder:'Title, e.g. Arrival & hotel check-in',value:d.title||''});
   const a=h('textarea',{rows:'4',placeholder:'One activity per line\nArrival at Caticlan Airport\nMeet by tour coordinator'});a.value=(d.activities||[]).join('\n');
   const lab=h('b',{},'Day 1');
-  const el=h('div',{class:'v2-row'},h('div',{class:'v2-top'},lab,t,h('button',{type:'button',class:'btn-danger',onclick:rm},'Remove')),a);
+  const rmBtn=h('button',{type:'button',class:'btn-danger',onclick:rm},'Remove');
+  const el=h('div',{class:'v2-row',role:'group'},h('div',{class:'v2-top'},lab,t,rmBtn),a);
   [t,a].forEach(x=>x.addEventListener('input',chg));
-  return{el,setIdx:i=>lab.textContent='Day '+i,get:()=>({title:t.value.trim(),activities:a.value.split('\n').map(x=>x.trim()).filter(Boolean)})};
+  const setIdx=i=>{lab.textContent='Day '+i;el.setAttribute('aria-label','Day '+i);t.setAttribute('aria-label','Day '+i+' title');a.setAttribute('aria-label','Day '+i+' activities, one per line');rmBtn.setAttribute('aria-label','Remove day '+i)};
+  setIdx(1);
+  return{el,setIdx,get:()=>({title:t.value.trim(),activities:a.value.split('\n').map(x=>x.trim()).filter(Boolean)})};
 };
 const hlRow=(d,rm,chg)=>{
   const l=h('input',{placeholder:'Label, e.g. Southwest Monsoon Off Season (optional)',value:d.label||''});
   const p=h('input',{placeholder:'Places, comma-separated: Puka Beach, Crocodile Island, Crystal Cove',value:(d.places||[]).join(', ')});
-  const el=h('div',{class:'v2-row'},h('div',{class:'v2-top'},l,h('button',{type:'button',class:'btn-danger',onclick:rm},'Remove')),p);
+  const rmBtn=h('button',{type:'button',class:'btn-danger',onclick:rm},'Remove');
+  const el=h('div',{class:'v2-row',role:'group'},h('div',{class:'v2-top'},l,rmBtn),p);
   [l,p].forEach(x=>x.addEventListener('input',chg));
-  return{el,get:()=>({label:l.value.trim(),places:p.value.split(',').map(x=>x.trim()).filter(Boolean)})};
+  const setIdx=i=>{el.setAttribute('aria-label','Highlight '+i);l.setAttribute('aria-label','Highlight '+i+' label (optional)');p.setAttribute('aria-label','Highlight '+i+' places, comma-separated');rmBtn.setAttribute('aria-label','Remove highlight '+i)};
+  setIdx(1);
+  return{el,setIdx,get:()=>({label:l.value.trim(),places:p.value.split(',').map(x=>x.trim()).filter(Boolean)})};
 };
 
 /* ---------- Travel date row: start -> end (+ optional surcharge per person) ---------- */
 const dateRow=(d={})=>{
   const r=h('div',{class:'v2-date'},
-    h('input',{type:'date','aria-label':'Departure',value:d.start||''}),'→',
-    h('input',{type:'date','aria-label':'Return',value:d.end||''}),
+    h('input',{type:'date','aria-label':'Departure date',value:d.start||''}),h('span',{'aria-hidden':'true'},'→'),
+    h('input',{type:'date','aria-label':'Return date',value:d.end||''}),
     h('input',{type:'number',min:'0',placeholder:'+₱/pax',title:'Additional price per person for this date (optional)','aria-label':'Extra per pax (optional)',style:'width:120px',value:d.extra>0?String(d.extra):''}),
-    h('button',{type:'button',class:'btn-danger',onclick:()=>r.remove()},'Remove'));
+    h('button',{type:'button',class:'btn-danger','aria-label':'Remove this travel date',onclick:()=>r.remove()},'Remove'));
+  r.setAttribute('role','group');r.setAttribute('aria-label','Travel date');
   return r;
 };
 
 /* ---------- Build UI ---------- */
 let inc,exc,days,hls,dates,datesBox,flightBox;
 function secEl(title,sub,...body){return h('section',{class:'form-sec'},h('div',{class:'form-sec-hd'},h('span',{class:'n'},'0'),h('div',{},h('h3',{},title),h('p',{},sub))),...body)}
-const field=(lab,el,cls='form-field')=>h('div',{class:cls},h('label',{},lab),el);
+let fieldSeq=0;
+// Every visible label is programmatically tied to its control (WCAG 1.3.1 / 3.3.2)
+const groupField=(lab,el,cls='form-field-full')=>{const id='v2-g'+(++fieldSeq);return h('div',{class:cls,role:'group','aria-labelledby':id},h('label',{id},lab),el)};
+const field=(lab,el,cls='form-field')=>{
+  const ctl=el.matches?.('input,select,textarea')?el:el.querySelector?.('input,select,textarea');
+  if(ctl&&!ctl.id)ctl.id='v2-f'+(++fieldSeq);
+  return h('div',{class:cls},ctl?h('label',{for:ctl.id},lab):h('label',{},lab),el);
+};
 
 function init(){
   const form=$('pkg-form');if(!form||form.dataset.v2)return;form.dataset.v2='1';
@@ -103,7 +117,8 @@ function init(){
     field('Baggage',h('input',{id:'pkg-baggage',placeholder:'7kg hand carry & 20kg check-in'})));
   datesBox=h('div');dates=h('div');
   const addDate=(d={})=>{dates.append(dateRow(d))};
-  datesBox.append(h('label',{style:'display:block;font-size:13px;font-weight:600;margin:12px 0 6px'},'Travel dates (departure → return)'),dates,
+  datesBox.setAttribute('role','group');datesBox.setAttribute('aria-labelledby','v2-dates-lab');
+  datesBox.append(h('label',{id:'v2-dates-lab',style:'display:block;font-size:13px;font-weight:600;margin:12px 0 6px'},'Travel dates (departure → return)'),dates,
     h('button',{type:'button',class:'btn-outline',onclick:()=>addDate()},'+ Add date'),
     h('p',{class:'feature-note'},'One row per schedule (e.g. Nov 6 to Nov 9). Dates appear in the app grouped by year. The additional price per person is optional: enter it only for dates with a surcharge (e.g. peak season, 1000). It will be added to the traveler total.'));
   const noFlight=h('p',{class:'feature-note',id:'v2-noflight'},'Flights are not included. Travelers must book their own flights. Airfare Tickets will be added to Exclusions.');
@@ -117,8 +132,8 @@ function init(){
     ['4D3N Hotel Accommodation','Daily Hotel Buffet Breakfast',"Free use of the Hotel's facilities",'Hotel Taxes and Surcharges','Round Trip Land and Sea Transfers (Airport-Hotel-Airport)','Environmental Fee & Terminal Fee']);
   exc=tagEditor('pkg-exc','Type an exclusion and press Enter to add it',['Airfare Tickets','Hotel Security Deposit','Snorkeling Gear','Travel Insurance','Fuel Surcharge: 400 per pax (subject to change)']);
   const incBox=$('pkg-inc').closest('.form-field-full'),routeBox=$('pkg-route').closest('.form-field-full');
-  hide(routeBox);hide(incBox);incBox.before(h('div',{class:'form-field-full'},h('label',{},'Inclusions'),inc.root));
-  const excBox=$('pkg-exc').closest('.form-field-full');hide(excBox);excBox.before(h('div',{class:'form-field-full'},h('label',{},'Exclusions'),exc.root));
+  hide(routeBox);hide(incBox);incBox.before(groupField('Inclusions',inc.root));
+  const excBox=$('pkg-exc').closest('.form-field-full');hide(excBox);excBox.before(groupField('Exclusions',exc.root));
 
   /* Highlights (own section, inserted before itinerary) */
   hls=repeater(hlRow,'Add highlight group',syncHL);
@@ -128,7 +143,7 @@ function init(){
 
   /* Itinerary: structured days */
   days=repeater(dayRow,'Add day',syncItin);
-  const itinBox=$('pkg-itin').closest('.form-field-full');hide(itinBox);itinBox.before(h('div',{class:'form-field-full'},h('label',{},'Day-by-day itinerary'),days.root));
+  const itinBox=$('pkg-itin').closest('.form-field-full');hide(itinBox);itinBox.before(groupField('Day-by-day itinerary',days.root));
 
   $('pkg-schedule-type').addEventListener('change',applyFlightVis);
   sel.addEventListener('change',()=>{applyFlightVis();refreshFlightLine(true)});

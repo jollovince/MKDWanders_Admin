@@ -126,16 +126,16 @@ input:focus{border-color:var(--gold);background:rgba(255,255,255,.09);box-shadow
       <div class="field rise" style="--i:3">
         <label for="email">Email</label>
         <div class="inp">
-          <svg viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="14" rx="3"/><path d="m4 8 8 6 8-6"/></svg>
+          <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><rect x="3" y="5" width="18" height="14" rx="3"/><path d="m4 8 8 6 8-6"/></svg>
           <input type="email" id="email" placeholder="admin@mkdwander.com" required autocomplete="username">
         </div>
       </div>
       <div class="field rise" style="--i:3">
         <label for="password">Password</label>
         <div class="inp">
-          <svg viewBox="0 0 24 24"><rect x="4" y="11" width="16" height="9" rx="3"/><path d="M8 11V8a4 4 0 0 1 8 0v3"/></svg>
+          <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><rect x="4" y="11" width="16" height="9" rx="3"/><path d="M8 11V8a4 4 0 0 1 8 0v3"/></svg>
           <input type="password" id="password" placeholder="••••••••" required autocomplete="current-password">
-          <button type="button" class="eye" id="eye">Show</button>
+          <button type="button" class="eye" id="eye" aria-label="Show password" aria-pressed="false" aria-controls="password">Show</button>
         </div>
       </div>
       <div class="err" id="error-msg" role="alert"></div>
@@ -177,7 +177,15 @@ $("eye").onclick = () => {
   const p = $("password"), show = p.type === "password";
   p.type = show ? "text" : "password";
   $("eye").textContent = show ? "Hide" : "Show";
+  $("eye").setAttribute("aria-label", show ? "Hide password" : "Show password");
+  $("eye").setAttribute("aria-pressed", String(show));
 };
+const fields = [$("email"), $("password")];
+const markInvalid = on => fields.forEach(f => {
+  if (on) { f.setAttribute("aria-invalid", "true"); f.setAttribute("aria-describedby", "error-msg"); }
+  else { f.removeAttribute("aria-invalid"); f.removeAttribute("aria-describedby"); }
+});
+fields.forEach(f => f.addEventListener("input", () => markInvalid(false)));
 
 /* ---------- Inline sign-in feedback ---------- */
 $("login-form").onsubmit = async e => {
@@ -203,10 +211,13 @@ $("login-form").onsubmit = async e => {
     status.textContent = "";
     error.textContent = messages[err.code] || "Could not sign in. Please try again.";
     error.classList.add("show");
+    markInvalid(true);
     signingIn = false;
     btn.disabled = false;
     btn.textContent = "Sign in";
     $("login-form").setAttribute("aria-busy", "false");
+    // Put the user back where they can fix it; the alert above is announced on its own
+    (err.code === "auth/wrong-password" || err.code === "auth/invalid-credential" ? $("password") : $("email")).focus();
   }
 };
 </script>
