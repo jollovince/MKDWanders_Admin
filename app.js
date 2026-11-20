@@ -48,6 +48,15 @@ const fmtDate = t => {
 const amount = i => Number(i.total || i.price) || 0;
 const pkgName = i => i.pkg || i.packageTitle || i.title || "Tour Package";
 
+const reduceMotion = () => window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+let detailOpener = null, pkgFormOpener = null;
+
+// Nav badge: the count is read as part of the button name ("Booking Inquiries, 3 pending")
+function setNavBadge(el, n, noun) {
+  if (!el) return;
+  el.innerHTML = n ? `<span class="visually-hidden">, </span>${n}<span class="visually-hidden"> ${noun}</span>` : "";
+}
+
 function toast(msg, type = "ok") {
   const t = document.createElement("div");
   t.className = "toast" + (type === "err" ? " err" : "");
@@ -229,8 +238,13 @@ export function toggleTheme() {
   void getComputedStyle(root).opacity; // force a style flush before restoring transitions
   requestAnimationFrame(() => requestAnimationFrame(() => root.classList.remove("theme-switching")));
   try { localStorage.setItem("mkd-theme", dark ? "dark" : "light"); } catch {}
+  syncThemeButton();
+}
+function syncThemeButton() {
+  $("theme-btn")?.setAttribute("aria-pressed", String(document.documentElement.dataset.theme === "dark"));
 }
 try { document.documentElement.dataset.theme = localStorage.getItem("mkd-theme") || "light"; } catch {}
+syncThemeButton();
 
 export function go(sec, btn) {
   document.querySelectorAll(".section").forEach(s => s.classList.remove("active"));
@@ -251,10 +265,17 @@ export function go(sec, btn) {
     else b.removeAttribute("aria-current");
   });
   $("page-title").textContent = labels[sec] || "Dashboard";
+  document.title = `${labels[sec] || "Dashboard"} · MKDWander Admin`;
   $("main").scrollTop = 0;
+  // Keyboard and screen-reader users land at the start of the new section, not back in the sidebar
+  $("main").focus({ preventScroll: true });
 }
 
-export const toggleSidebar = () => $("sidebar").classList.toggle("collapsed");
+export function toggleSidebar() {
+  const collapsed = $("sidebar").classList.toggle("collapsed");
+  const b = $("sidebar-btn");
+  if (b) { b.setAttribute("aria-expanded", String(!collapsed)); b.setAttribute("aria-label", collapsed ? "Expand sidebar" : "Collapse sidebar"); b.title = b.getAttribute("aria-label"); }
+}
 
 /* ---------- Card highlights: generated automatically from inclusions ----------
    Matches the mobile app logic (home_screen.dart: _inclusionRank /
@@ -310,12 +331,12 @@ export function renderIncPreview() {
   // Pinned items first, then automatic ranking. The app shows only chips that fit the card width.
   const ordered = [...pinnedInc, ...sorted.filter(x => !pinnedInc.includes(x))];
   const head = ordered.slice(0, 3);
-  const chip = (l, i) => `<span class="cp-chip ${i === 2 ? "maybe" : ""}" ${i === 2 ? 'title="Shown only if it fits the phone width"' : ""}><i class="ti ${incKind(l).icon}"></i>${esc(shortInc(l))}</span>`;
+  const chip = (l, i) => `<span class="cp-chip ${i === 2 ? "maybe" : ""}" ${i === 2 ? 'title="Shown only if it fits the phone width"' : ""}><i class="ti ${incKind(l).icon}" aria-hidden="true"></i>${esc(shortInc(l))}</span>`;
   $("cp-chips").innerHTML = items.length
     ? head.map(chip).join("") + (items.length > head.length ? `<span class="cp-chip more">+${items.length - head.length} more</span>` : "")
     : `<span class="feature-note">Add inclusions above to display the preview.</span>`;
   $("cp-pick").innerHTML = items.map((l, i) =>
-    `<button type="button" class="cp-pick-btn ${pinnedInc.includes(l) ? "on" : ""}" onclick="toggleIncPin(${i})"><i class="ti ${incKind(l).icon}"></i>${esc(l)}</button>`
+    `<button type="button" class="cp-pick-btn ${pinnedInc.includes(l) ? "on" : ""}" onclick="toggleIncPin(${i})"><i class="ti ${incKind(l).icon}" aria-hidden="true"></i>${esc(l)}</button>`
   ).join("");
   const mode = $("cp-mode");
   mode.textContent = pinnedInc.length ? "PINNED" : "AUTO";
@@ -528,12 +549,12 @@ document.addEventListener("change", e => e.target?.classList?.remove("autofilled
 function renderGal() {
   $("gal-grid").innerHTML = gal.map((g, i) => `
     <div class="gal-item ${i === 0 ? "first" : ""}">
-      <img src="${esc(g.src)}" alt="Photo ${i + 1}">
+      <img src="${esc(g.src)}" alt="Package photo ${i + 1}${i === 0 ? " (cover)" : ""}">
       <span class="gal-tag">${i === 0 ? "Cover · Home" : i + 1}</span>
       <div class="gal-act">
-        <button type="button" title="Move left" onclick="galMove(${i},-1)"><i class="ti ti-arrow-left"></i></button>
-        <button type="button" title="Move right" onclick="galMove(${i},1)"><i class="ti ti-arrow-right"></i></button>
-        <button type="button" title="Remove" onclick="galDel(${i})"><i class="ti ti-x"></i></button>
+        <button type="button" title="Move left" aria-label="Move photo ${i + 1} left"${i === 0 ? " disabled" : ""} onclick="galMove(${i},-1)"><i class="ti ti-arrow-left" aria-hidden="true"></i></button>
+        <button type="button" title="Move right" aria-label="Move photo ${i + 1} right"${i === gal.length - 1 ? " disabled" : ""} onclick="galMove(${i},1)"><i class="ti ti-arrow-right" aria-hidden="true"></i></button>
+        <button type="button" title="Remove" aria-label="Remove photo ${i + 1}" onclick="galDel(${i})"><i class="ti ti-x" aria-hidden="true"></i></button>
       </div>
     </div>`).join("");
 }
@@ -619,13 +640,17 @@ $("pkg-schedule-type").value =
   $("pkg-hint").textContent = pkg?.poster ? "Choose a new image to replace current poster" : "Click or drag the agency poster (PNG, JPG)";
   $("pkg-file").value = "";
   files.pkg = null;
+  pkgFormOpener = document.activeElement;
   $("pkg-form").style.display = "block";
-  $("pkg-form").scrollIntoView({ behavior: "smooth", block: "start" });
+  $("pkg-form-title").focus({ preventScroll: true });
+  $("pkg-form").scrollIntoView({ behavior: reduceMotion() ? "auto" : "smooth", block: "start" });
 }
 
 export function closePkgForm() { 
   $("pkg-form").style.display = "none"; 
   files.pkg = null;
+  if (pkgFormOpener?.isConnected) pkgFormOpener.focus();
+  pkgFormOpener = null;
 }
 
 export function previewImg(event, imgId, hintId, kind) {
@@ -674,14 +699,14 @@ if (!["fixed", "flexible"].includes(scheduleType)) {
 
   const btn = $("btn-save-pkg");
   btn.disabled = true;
-  btn.innerHTML = `<i class="ti ti-loader"></i> Saving...`;
+  btn.innerHTML = `<i class="ti ti-loader" aria-hidden="true"></i> Saving...`;
 
   try {
     // Upload new package photos and preserve their order. [0] is the Home cover.
     const galleryUrls = [];
     for (let i = 0; i < gal.length; i++) {
       if (gal[i].url) { galleryUrls.push(gal[i].url); continue; }
-      btn.innerHTML = `<i class="ti ti-loader"></i> Uploading photo ${i + 1}/${gal.length}...`;
+      btn.innerHTML = `<i class="ti ti-loader" aria-hidden="true"></i> Uploading photo ${i + 1}/${gal.length}...`;
       galleryUrls.push(await uploadImage(gal[i].file, "gallery"));
     }
     // The optional poster is used only for scanning, not as the cover.
@@ -755,7 +780,7 @@ scheduleType: scheduleType
     toast("Could not save package: " + err.message, "err");
   } finally {
     btn.disabled = false;
-    btn.innerHTML = `<i class="ti ti-check"></i> Save package`;
+    btn.innerHTML = `<i class="ti ti-check" aria-hidden="true"></i> Save package`;
   }
 }
 
@@ -815,16 +840,16 @@ export function renderPkgs() {
       <td>${pillRegion(p.region)}</td>
       <td class="td-muted">${esc(p.dur || p.durationLabel)}</td>
       <td class="td-navy">${peso(p.price)}</td>
-      <td>${(() => { const st = reviewStats[p.id]; return st && st.count ? `<span class="pill pill-view"><i class="ti ti-star-filled"></i> ${(st.sum / st.count).toFixed(1)} (${st.count})</span>` : `<span class="td-muted">No reviews yet</span>`; })()}</td>
+      <td>${(() => { const st = reviewStats[p.id]; return st && st.count ? `<span class="pill pill-view"><i class="ti ti-star-filled" aria-hidden="true"></i> ${(st.sum / st.count).toFixed(1)} (${st.count})</span>` : `<span class="td-muted">No reviews yet</span>`; })()}</td>
       <td>
-        <button class="star-btn ${isFeaturedNow(p) ? "on" : ""}" onclick="toggleFeatured('${p.id}')" title="${isFeaturedNow(p) ? "Remove from Featured" : "Feature on app Home"}" aria-label="Toggle featured"><i class="ti ti-star${isFeaturedNow(p) ? "-filled" : ""}"></i></button>
+        <button class="star-btn ${isFeaturedNow(p) ? "on" : ""}" onclick="toggleFeatured('${p.id}')" title="${isFeaturedNow(p) ? "Remove from Featured" : "Feature on app Home"}" aria-label="Featured on app Home: ${esc(p.name || p.title)}" aria-pressed="${isFeaturedNow(p)}"><i class="ti ti-star${isFeaturedNow(p) ? "-filled" : ""}" aria-hidden="true"></i></button>
         ${p.featured === true ? (isFeaturedNow(p)
           ? `<span class="pill pill-feat">#${p.featuredOrder || "–"}${p.featuredUntil ? " · until " + esc(p.featuredUntil) : ""}</span>`
           : `<span class="pill pill-off">Expired</span>`) : ""}
       </td>
       <td>
-        <button class="btn-edit" onclick="openPkgForm('${p.id}')">Edit</button>
-        <button class="btn-danger" onclick="removePkg('${p.id}')">Delete</button>
+        <button class="btn-edit" onclick="openPkgForm('${p.id}')" aria-label="Edit ${esc(p.name || p.title)}">Edit</button>
+        <button class="btn-danger" onclick="removePkg('${p.id}')" aria-label="Delete ${esc(p.name || p.title)}">Delete</button>
       </td>
     </tr>`).join("");
   const labels = ["Photo", "Code", "Package name", "Destination", "Region", "Duration", "Price / pax", "Rating", "Featured", "Actions"];
@@ -886,12 +911,12 @@ export function renderInquiries() {
           <div class="td-muted" style="font-size:11px;font-weight:400;">${esc(i.phone || maskEmail(i.email))}</div>
         </td>
         <td class="td-muted">${esc(pkgName(i))}</td>
-        <td class="td-bold" style="font-size:12px;color:var(--nav);">${dateRange}</td>
+        <td class="td-bold" style="font-size:12px;color:var(--head);">${dateRange}</td>
         <td>${i.pax || 1} pax${i.roomNeedsCheck ? `<div class="td-muted" style="font-size:11px">${i.soloRateRequest ? "⚠ Solo: send rate" : "⚠ Check room"}</div>` : ""}</td>
         <td class="td-navy">${peso(amount(i))}</td>
         <td class="td-mono">${esc(i.paymentMethod || "UnionBank QR Ph")}</td>
         <td>${pillStatus(i.status || "pending")}</td>
-        <td><button class="btn-outline" onclick="openDetail('${i.id}')">View</button></td>
+        <td><button class="btn-outline" onclick="openDetail('${i.id}')" aria-label="View booking for ${esc(i.client || i.name || "Traveler")}">View</button></td>
       </tr>`;
   }).join("");
   const labels = ["Ref / Code", "Primary Traveler", "Package", "Travel Schedule", "Travelers", "Total Amount", "Payment Gateway", "Status", "Actions"];
@@ -977,6 +1002,7 @@ export function openDetail(id) {
     $("det-pay-when").textContent = fmtDate(i.paymentSubmittedAt);
   }
   
+  if (!$("inq-detail").contains(document.activeElement)) detailOpener = document.activeElement;
   $("inq-detail").style.display = "block";
   $("inq-detail").focus({ preventScroll: true });
   $("inq-detail").scrollIntoView({ behavior: window.matchMedia("(prefers-reduced-motion: reduce)").matches ? "auto" : "smooth", block: "start" });
@@ -985,6 +1011,8 @@ export function openDetail(id) {
 export function closeDetail() { 
   $("inq-detail").style.display = "none"; 
   currentInq = null; 
+  if (detailOpener?.isConnected) detailOpener.focus(); else $("inq-search")?.focus();
+  detailOpener = null;
 }
 
 async function setStatus(status, stamp, msg, extra = {}) {
@@ -1136,10 +1164,10 @@ export function renderRevenue() {
           <div class="td-muted" style="font-size:11px;font-weight:400;">${esc(i.phone || maskEmail(i.email))}</div>
         </td>
         <td class="td-muted">${esc(pkgName(i))}</td>
-        <td class="td-bold" style="font-size:12px;color:var(--nav);">${dateRange}</td>
+        <td class="td-bold" style="font-size:12px;color:var(--head);">${dateRange}</td>
         <td>${i.pax || 1} pax</td>
         <td class="td-navy" style="color:var(--green);font-size:14px;">${peso(amount(i))}</td>
-        <td class="td-mono"><span class="pill pill-view"><i class="ti ti-credit-card"></i> ${esc(i.paymentMethod || "UnionBank QR Ph")}</span></td>
+        <td class="td-mono"><span class="pill pill-view"><i class="ti ti-credit-card" aria-hidden="true"></i> ${esc(i.paymentMethod || "UnionBank QR Ph")}</span></td>
         <td class="td-muted">${fmtDate(i.confirmedAt || i.createdAt)}</td>
         <td><span class="pill pill-conf">Paid &amp; Confirmed</span></td>
       </tr>`;
@@ -1184,7 +1212,7 @@ export function renderUsers() {
   
   tbody.innerHTML = list.map(u => `
     <tr>
-      <td class="td-bold"><i class="ti ti-user" style="margin-right:6px;color:var(--orange)"></i>${esc(u.fullName || u.displayName || u.firstName || "App Traveler")}</td>
+      <td class="td-bold"><i class="ti ti-user" aria-hidden="true" style="margin-right:6px;color:var(--orange)"></i>${esc(u.fullName || u.displayName || u.firstName || "App Traveler")}</td>
       <td class="td-muted">${esc(maskEmail(u.email))}</td>
       <td><span class="pill pill-hash">${esc(hashUid(u.id))}</span></td>
       <td><span class="pill pill-conf">Active</span></td>
@@ -1206,7 +1234,7 @@ function renderChats() {
   const box = $("chat-session-list");
   const need = chats.filter(c => chatState(c) === "escalated").length;
   const badge = $("nav-chat-badge");
-  if (badge) badge.textContent = need || "";
+  setNavBadge(badge, need, "need a reply");
   const nf = $("chat-need-count");
   if (nf) nf.textContent = need ? ` (${need})` : "";
 
@@ -1227,14 +1255,14 @@ function renderChats() {
     const pill = st === "escalated" ? `<span class="pill pill-pend">Needs reply</span>`
       : st === "resolved" ? `<span class="pill pill-conf">Resolved</span>`
       : `<span class="pill pill-hash">${c.handledBy === "agent" ? "Agent" : "Bot"}</span>`;
-    return `<div class="chat-item ${c.id === activeChat ? "on" : ""}" onclick="openChat('${c.id}')">
-      <div class="chat-item-top">
+    return `<button type="button" class="chat-item ${c.id === activeChat ? "on" : ""}"${c.id === activeChat ? ' aria-current="true"' : ""} onclick="openChat('${c.id}')">
+      <span class="chat-item-top">
         <span class="chat-item-name">${esc(c.userName || c.user || "Traveler")}</span>
         <span class="chat-time">${fmtDate(c.updatedAt || c.createdAt)}</span>
-      </div>
-      <div class="chat-preview">${esc(last?.text || last?.content || "No messages")}</div>
-      <div class="chat-meta">${pill}<span class="td-muted">${msgs.length} msgs</span></div>
-    </div>`;
+      </span>
+      <span class="chat-preview">${esc(last?.text || last?.content || "No messages")}</span>
+      <span class="chat-meta">${pill}<span class="td-muted">${msgs.length} msgs</span></span>
+    </button>`;
   }).join("");
 }
 
@@ -1328,7 +1356,7 @@ function renderDashboardData() {
   $("kpi-pipeline").textContent = "Pipeline: " + peso(periodInquiries.reduce((s, i) => s + amount(i), 0));
   $("kpi-pending-inquiries").textContent = periodPending.length;
   $("topbar-inq-count").textContent = `${pending.length} pending inquiries`;
-  $("nav-inq-badge").textContent = pending.length || "";
+  setNavBadge($("nav-inq-badge"), pending.length, "pending");
   $("kpi-active-pkg").textContent = packages.length;
   $("kpi-total-users").textContent = usersList.length;
 
@@ -1372,13 +1400,13 @@ function renderDashboardData() {
   }).join("") || `<div class="empty-row">No inquiries in this period.</div>`;
 
   $("recent-inq").innerHTML = periodInquiries.slice(0, 5).map(i => `
-    <div class="inq-row" onclick="go('inquiries',null);openDetail('${i.id}')">
-      <div>
-        <div class="inq-name">${esc(i.client || i.name || "Traveler")}</div>
-        <div class="inq-sub">${esc(pkgName(i))} · ${i.pax || 1} pax</div>
-      </div>
+    <button type="button" class="inq-row" onclick="go('inquiries',null);openDetail('${i.id}')">
+      <span>
+        <span class="inq-name">${esc(i.client || i.name || "Traveler")}</span>
+        <span class="inq-sub">${esc(pkgName(i))} · ${i.pax || 1} pax</span>
+      </span>
       ${pillStatus(i.status || "pending")}
-    </div>`
+    </button>`
   ).join("") || `<div class="empty-row">No inquiries in this period.</div>`;
 
   const pax = inquiries.reduce((s, i) => s + (Number(i.pax) || 1), 0);
@@ -1403,7 +1431,7 @@ function renderDashboardData() {
   if (best?.n) tips.push(`Busiest recent month: <b>${best.label}</b> with ${best.n} inquiries.`);
   const noViews = packages.filter(p => !(p.views > 0)).length;
   if (noViews) tips.push(`${noViews} package${noViews > 1 ? "s have" : " has"} no views yet.`);
-  $("realtime-insights-box").innerHTML = tips.map(t => `<p><i class="ti ti-bulb"></i><span>${t}</span></p>`).join("") || "No data yet. Insights will appear once inquiries come in.";
+  $("realtime-insights-box").innerHTML = tips.map(t => `<p><i class="ti ti-bulb" aria-hidden="true"></i><span>${t}</span></p>`).join("") || "No data yet. Insights will appear once inquiries come in.";
 }
 
 /* ---------- Realtime Firestore Listeners ---------- */
