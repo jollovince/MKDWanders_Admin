@@ -17,13 +17,13 @@ body{min-height:100vh;font-family:'Plus Jakarta Sans',sans-serif;color:#fff;disp
 .scene{position:absolute;inset:0;width:100%;height:100%}
 .art::after{content:"";position:absolute;inset:0;background:linear-gradient(180deg,rgba(3,28,56,.55) 0%,rgba(3,28,56,0) 35%,rgba(3,28,56,0) 62%,rgba(3,28,56,.7) 100%);pointer-events:none}
 .brand,.copy{position:relative;z-index:2}
-.brand{display:flex;align-items:center;gap:12px;font-weight:800;font-size:18px;letter-spacing:-.02em;animation:rise .8s var(--ease) both}
+.brand{display:flex;align-items:center;gap:12px;font-weight:800;font-size:18px;letter-spacing:-.02em;animation:rise 300ms ease-out both}
 .brand i{width:40px;height:40px;border-radius:12px;background:#fff;display:flex;align-items:center;justify-content:center;padding:5px}
 .brand i img{width:100%;height:100%;object-fit:contain}
 .brand small{display:block;font-weight:500;font-size:11px;color:rgba(255,255,255,.7);letter-spacing:0}
-.copy h2{font-size:40px;font-weight:800;letter-spacing:-.035em;line-height:1.08;max-width:430px;text-shadow:0 2px 18px rgba(0,0,0,.45);animation:rise .9s var(--ease) .15s both}
+.copy h2{font-size:40px;font-weight:800;letter-spacing:-.035em;line-height:1.08;max-width:430px;text-shadow:0 2px 18px rgba(0,0,0,.45);animation:rise 300ms ease-out both}
 .copy h2 span{color:var(--gold)}
-.copy p{margin-top:12px;max-width:390px;line-height:1.6;color:rgba(255,255,255,.88);text-shadow:0 1px 8px rgba(0,0,0,.5);animation:rise .9s var(--ease) .25s both}
+.copy p{margin-top:12px;max-width:390px;line-height:1.6;color:rgba(255,255,255,.88);text-shadow:0 1px 8px rgba(0,0,0,.5);animation:rise 300ms ease-out 100ms both}
 .chips{display:flex;gap:8px;flex-wrap:wrap;margin-top:20px;animation:rise .9s var(--ease) .35s both}
 .chips span{font-size:12px;font-weight:600;padding:7px 14px;border-radius:99px;background:rgba(255,255,255,.14);border:1px solid rgba(255,255,255,.25);backdrop-filter:blur(8px);display:inline-flex;align-items:center;gap:7px}
 .chips span::before{content:"";width:6px;height:6px;border-radius:50%;background:var(--gold)}
@@ -57,8 +57,9 @@ body{min-height:100vh;font-family:'Plus Jakarta Sans',sans-serif;color:#fff;disp
 /* ---------- Right: form ---------- */
 .panel{position:relative;display:flex;align-items:center;justify-content:center;padding:32px;background:radial-gradient(600px 400px at 85% 10%,rgba(73,201,240,.12),transparent 60%),radial-gradient(500px 380px at 10% 95%,rgba(253,120,48,.12),transparent 60%),#031C38}
 .box{width:100%;max-width:410px;padding:36px 32px 30px;border-radius:26px;background:rgba(255,255,255,.045);border:1px solid rgba(255,255,255,.1);backdrop-filter:blur(14px);box-shadow:0 30px 70px rgba(0,0,0,.4)}
-.rise{animation:rise .8s var(--ease) both;animation-delay:calc(var(--i,0)*.08s + .1s)}
-@keyframes rise{from{opacity:0;transform:translateY(18px)}to{opacity:1;transform:none}}
+.rise{animation:rise 300ms ease-out backwards;animation-delay:calc(var(--i,0) * 100ms + 100ms)}
+@keyframes rise{from{opacity:0}to{opacity:1}}
+@media(prefers-reduced-motion:no-preference){@keyframes rise{from{opacity:0;filter:blur(4px);transform:translateY(12px)}to{opacity:1;filter:blur(0);transform:none}}}
 .logo{width:84px;height:84px;border-radius:22px;background:#fff;padding:10px;display:flex;align-items:center;justify-content:center;margin-bottom:22px;box-shadow:0 14px 34px rgba(0,0,0,.35);animation:rise .8s var(--ease) both,floaty 5s ease-in-out 1s infinite}
 .logo img{width:100%;height:100%;object-fit:contain}
 @keyframes floaty{0%,100%{transform:translateY(0)}50%{transform:translateY(-6px)}}
@@ -67,26 +68,28 @@ h1{font-size:27px;font-weight:800;letter-spacing:-.025em}
 label{display:block;font-size:12px;font-weight:600;margin-bottom:8px;color:rgba(255,255,255,.8);letter-spacing:.02em}
 .field{margin-bottom:18px}
 .inp{position:relative}
-.inp svg{position:absolute;left:14px;top:50%;width:18px;height:18px;transform:translateY(-50%);stroke:rgba(255,255,255,.4);fill:none;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round;transition:stroke .25s;pointer-events:none}
-input{width:100%;padding:14px 16px 14px 42px;background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.16);border-radius:13px;font:inherit;font-size:15px;color:#fff;outline:none;transition:border-color .25s,background .25s,box-shadow .25s,transform .25s var(--ease)}
+.inp svg{position:absolute;left:14px;top:50%;width:18px;height:18px;transform:translateY(-50%);stroke:rgba(255,255,255,.4);fill:none;stroke-width:1.5;stroke-linecap:round;stroke-linejoin:round;transition:stroke 150ms ease-out;pointer-events:none}
+input{width:100%;padding:14px 16px 14px 42px;background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.16);border-radius:13px;font:inherit;font-size:15px;color:#fff;outline:none;transition:border-color 150ms ease-out,background-color 150ms ease-out,box-shadow 150ms ease-out}
 input::placeholder{color:rgba(255,255,255,.28)}
 input:focus{border-color:var(--gold);background:rgba(255,255,255,.09);box-shadow:0 0 0 4px rgba(255,191,73,.14);transform:translateY(-1px)}
 .inp:focus-within svg{stroke:var(--gold)}
 #password{padding-right:62px}
-.eye{position:absolute;right:8px;top:50%;transform:translateY(-50%);background:none;border:none;color:rgba(255,255,255,.55);cursor:pointer;padding:7px 9px;border-radius:8px;font:inherit;font-size:12px;font-weight:600;transition:.2s}
-.eye:hover{color:#fff;background:rgba(255,255,255,.08)}
+.eye{position:absolute;right:8px;top:50%;transform:translateY(-50%);background:none;border:none;color:rgba(255,255,255,.55);cursor:pointer;padding:7px 9px;border-radius:8px;font:inherit;font-size:12px;font-weight:600;transition:color 150ms ease-out,background-color 150ms ease-out;-webkit-tap-highlight-color:transparent}
+@media(hover:hover){.eye:hover{color:#fff;background:rgba(255,255,255,.08)}}
 .err{display:none;font-size:13px;font-weight:500;color:#FF8A82;background:rgba(255,59,48,.1);border:1px solid rgba(255,59,48,.25);padding:11px 14px;border-radius:11px;margin-bottom:16px}
 .err.show{display:block;animation:rise .35s var(--ease) both}
-.btn{position:relative;overflow:hidden;width:100%;padding:15px;margin-top:6px;background:linear-gradient(135deg,var(--orange),#FF9448);color:#fff;border:none;border-radius:13px;font:inherit;font-size:15px;font-weight:700;cursor:pointer;box-shadow:0 12px 26px rgba(253,120,48,.38);transition:transform .2s var(--ease),box-shadow .25s,filter .2s;display:flex;align-items:center;justify-content:center;gap:10px}
+.btn{position:relative;overflow:hidden;width:100%;padding:15px;margin-top:6px;background:linear-gradient(135deg,var(--orange),#FF9448);color:#fff;border:none;border-radius:13px;font:inherit;font-size:15px;font-weight:700;cursor:pointer;box-shadow:0 12px 26px rgba(253,120,48,.38);transition:transform 150ms ease-out,background-color 150ms ease-out,box-shadow 150ms ease-out;-webkit-tap-highlight-color:transparent;display:flex;align-items:center;justify-content:center;gap:10px}
 .btn::after{content:"";position:absolute;top:0;left:-60%;width:40%;height:100%;background:linear-gradient(100deg,transparent,rgba(255,255,255,.35),transparent);transform:skewX(-20deg);transition:left .7s var(--ease)}
-.btn:hover{transform:translateY(-2px);box-shadow:0 16px 32px rgba(253,120,48,.5)}
-.btn:hover::after{left:130%}
-.btn:active{transform:scale(.97)}
+@media(hover:hover){.btn:hover{transform:translateY(-2px);box-shadow:0 16px 32px rgba(253,120,48,.5)}}
+@media(hover:hover){.btn:hover::after{left:130%}}
+.btn:not(:disabled):active{transform:scale(.96)}
 .btn:disabled{opacity:.7;cursor:wait;transform:none}
-.spin{width:16px;height:16px;border-radius:50%;border:2px solid rgba(255,255,255,.4);border-top-color:#fff;animation:spin .7s linear infinite}
+.spin{width:16px;height:16px;border-radius:50%;border:2px solid rgba(255,255,255,.4);border-top-color:#fff;animation:pulse 1.2s ease-in-out infinite}
 @keyframes spin{to{transform:rotate(360deg)}}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.4}}
+@media(prefers-reduced-motion:no-preference){.spin{animation:spin .7s linear infinite}}
 .foot{margin-top:22px;text-align:center;font-size:12px;color:rgba(255,255,255,.4)}
-.shake{animation:shake .45s cubic-bezier(.36,.07,.19,.97)}
+@media(prefers-reduced-motion:no-preference){.shake{animation:shake .45s cubic-bezier(.36,.07,.19,.97)}}
 @keyframes shake{10%,90%{transform:translateX(-2px)}20%,80%{transform:translateX(4px)}30%,50%,70%{transform:translateX(-7px)}40%,60%{transform:translateX(7px)}}
 :focus-visible{outline:2px solid var(--sky);outline-offset:2px}
 
@@ -127,7 +130,7 @@ input:focus{border-color:var(--gold);background:rgba(255,255,255,.09);box-shadow
           <input type="email" id="email" placeholder="admin@mkdwander.com" required autocomplete="username">
         </div>
       </div>
-      <div class="field rise" style="--i:4">
+      <div class="field rise" style="--i:3">
         <label for="password">Password</label>
         <div class="inp">
           <svg viewBox="0 0 24 24"><rect x="4" y="11" width="16" height="9" rx="3"/><path d="M8 11V8a4 4 0 0 1 8 0v3"/></svg>
@@ -136,10 +139,10 @@ input:focus{border-color:var(--gold);background:rgba(255,255,255,.09);box-shadow
         </div>
       </div>
       <div class="err" id="error-msg" role="alert"></div>
-      <button type="submit" class="btn rise" style="--i:5" id="submit-btn">Sign in</button>
+      <button type="submit" class="btn rise" style="--i:4" id="submit-btn">Sign in</button>
       <p class="login-status" id="login-status" role="status" aria-live="polite"></p>
     </form>
-    <p class="foot rise" style="--i:6">Authorized MKDWander staff only</p>
+    <p class="foot rise" style="--i:4">Authorized MKDWander staff only</p>
   </div>
 </main>
 

@@ -34,7 +34,7 @@ app.get('/login', (req, res) => res.redirect('/login.html'));
 app.get('/dashboard', (req, res) => res.redirect('/index.html'));
 
 // Serve only public website files, never the project directory itself.
-for (const file of ['login.html', 'index.html', 'app.js', 'animations.css', 'animations.js', 'pkg-form-v2.js']) {
+for (const file of ['login.html', 'index.html', 'app.js', 'animations.css', 'animations.js', 'pkg-form-v2.js', 'dashboard.css', 'login-design.css', 'forecasting.css', 'forecasting.js']) {
   app.get(`/${file}`, (req, res) => res.sendFile(path.join(__dirname, file)));
 }
 app.use('/images', express.static(path.join(__dirname, 'images'), { dotfiles: 'deny', index: false }));

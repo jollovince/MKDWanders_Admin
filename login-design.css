@@ -15,12 +15,12 @@ body{display:flex;flex-direction:column;min-height:100vh;min-height:100dvh;backg
 label{font-size:12px;color:#F1F5F9;letter-spacing:0}.field{margin-bottom:20px}
 input{min-height:50px;border-radius:10px;background:rgba(3,28,56,.45);border-color:#71879D;font-size:14px;color:#fff}
 input::placeholder{color:#B9C9D8}.inp svg{stroke:#B9C9D8}input:focus{transform:none;background:rgba(3,28,56,.7);border-color:#FFD0A8;box-shadow:0 0 0 3px rgba(255,208,168,.18)}
-.eye{color:#DFE9F2;min-height:40px}.eye:hover{color:#fff;background:rgba(255,255,255,.12)}
-.btn{min-height:50px;border-radius:10px;font-size:14px;background:#C74713;box-shadow:none;margin-top:4px}.btn:hover{background:#AD3B0D;transform:none;box-shadow:none}.btn::after{display:none}
+.eye{color:#DFE9F2;min-height:40px}@media(hover:hover){.eye:hover{color:#fff;background:rgba(255,255,255,.12)}}
+.btn{min-height:50px;border-radius:10px;font-size:14px;background:#C74713;box-shadow:none;margin-top:4px}@media(hover:hover){.btn:hover{background:#AD3B0D;transform:none;box-shadow:none}}.btn::after{display:none}
 .foot{font-size:11px;color:#CEDCE8;margin-top:24px;padding-top:18px;border-top:1px solid rgba(255,255,255,.18)}
 .login-status{min-height:18px;margin-top:12px;text-align:center;font-size:12px;line-height:1.5;color:#D1DFEA}
 .box .err.show{animation:none;color:#FFE1DD;background:#542C32;border-color:#A16A70;line-height:1.6}
 .btn:disabled{opacity:1;background:#8B431F;cursor:wait}
 :focus-visible{outline:3px solid #FFD0A8;outline-offset:3px}
 @media(max-width:600px){.brand{padding:20px 24px;font-size:14px}.brand i{width:34px;height:34px}.panel{padding:12px 20px 28px;gap:22px}.copy h2{font-size:30px}.copy p{display:block;font-size:12px}.box{padding:26px 24px;margin:0}.box h1{font-size:25px}.travel-photo{object-position:48% center}}
-@media(prefers-reduced-motion:reduce){*,*::before,*::after{animation:none!important;transition:none!important}}
+/* Reduced motion: login.html swaps movement for opacity fades; nothing is removed instantly. */

@@ -66,6 +66,11 @@
     span.addEventListener("animationend", () => span.remove());
   });
 
+  /* ---------- First-load hero runs once per page load ---------- */
+  // The staggered hero entrance ends at ~600ms; after that, returning to the
+  // dashboard tab shows it instantly instead of replaying the sequence.
+  setTimeout(() => document.documentElement.classList.add("intro-done"), 700);
+
   if (document.readyState === "loading") document.addEventListener("DOMContentLoaded", initCounters);
   else initCounters();
 })();

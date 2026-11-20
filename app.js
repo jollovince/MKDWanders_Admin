@@ -221,8 +221,13 @@ export function logout() {
 }
 
 export function toggleTheme() {
-  const dark = document.documentElement.dataset.theme !== "dark";
-  document.documentElement.dataset.theme = dark ? "dark" : "light";
+  const root = document.documentElement;
+  const dark = root.dataset.theme !== "dark";
+  // Suppress every colour transition for the swap so the theme changes in one frame.
+  root.classList.add("theme-switching");
+  root.dataset.theme = dark ? "dark" : "light";
+  void getComputedStyle(root).opacity; // force a style flush before restoring transitions
+  requestAnimationFrame(() => requestAnimationFrame(() => root.classList.remove("theme-switching")));
   try { localStorage.setItem("mkd-theme", dark ? "dark" : "light"); } catch {}
 }
 try { document.documentElement.dataset.theme = localStorage.getItem("mkd-theme") || "light"; } catch {}
